@@ -31,6 +31,7 @@ export async function GET() {
 export async function POST({ request }) {
 	const formData = await request.formData();
 	const filePart = formData.get('file');
+	const folder = formData.get('folder');
 
 	if (!filePart || !(filePart instanceof Blob)) {
 		return new Response(JSON.stringify({ error: 'No file provided' }), {
@@ -42,7 +43,7 @@ export async function POST({ request }) {
 	const file = filePart as Blob & { name: string; type: string };
 	const buffer = Buffer.from(await file.arrayBuffer());
 
-	await minioClient.putObject('first', `/new/${file.name}`, buffer, buffer.length, {
+	await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, buffer.length, {
 		'Content-Type': file.type
 	});
 
