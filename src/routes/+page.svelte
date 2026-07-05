@@ -119,10 +119,16 @@
 			{#each photos as { name, url }}
 				<div class="col">
 					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded p-1">
-						<div
-							class="h-100 rounded"
-							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
-						></div>
+						{#if !url.includes('mp4')}
+							<div
+								class="h-100 rounded"
+								style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
+							></div>
+						{:else}
+							<div class=" ratio-4x3">
+								<video class="w-100 rounded" src={url} controls={true}></video>
+							</div>
+						{/if}
 						<div class="small px-1 text-center">
 							{name.replace(folders1[selectedFolder] + '/', '')}
 						</div>

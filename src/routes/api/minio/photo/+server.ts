@@ -13,7 +13,7 @@ export async function GET({ url }) {
 		for await (const objInfo of objects) {
 			// берём только файлы с расширениями картинок
 			const ext = objInfo.name.split('.').pop()?.toLowerCase();
-			if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext ?? '')) {
+			if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'mp4'].includes(ext ?? '')) {
 				continue;
 			}
 
