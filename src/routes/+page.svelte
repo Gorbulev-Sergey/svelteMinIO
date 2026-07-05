@@ -7,7 +7,7 @@
 		name: string;
 		url: string;
 	}
-	let file = $state<Blob>();
+	let file = $state<null | Blob>();
 	let inputFile = $state<HTMLInputElement>();
 	let folders1 = $state<string[]>([]);
 	let photos = $state<IPhoto[]>([]);
@@ -34,10 +34,10 @@
 
 <Block title="Welcome to SvelteKit">
 	<form
-		use:enhance={({ formData }) => {
-			return async ({ result }) => {
+		use:enhance={() => {
+			return async () => {
 				await getPhotos(folders1[selectedFolder] || 'f');
-				file = new Blob();
+				file = null;
 			};
 		}}
 		class="d-flex mt-1 gap-2"
@@ -54,8 +54,12 @@
 			bind:value={file}
 			bind:this={inputFile}
 		/>
-		<button class="btn btn-dark text-light" onclick={() => inputFile?.click()}>Открыть</button>
-		<button class="btn btn-dark text-light" type="submit">Загрузить</button>
+		<button type="button" class="btn btn-dark text-light" onclick={() => inputFile?.click()}
+			>Добавить</button
+		>
+		{#if file}
+			<button class="btn btn-dark text-light" type="submit">Загрузить</button>
+		{/if}
 	</form>
 </Block>
 
