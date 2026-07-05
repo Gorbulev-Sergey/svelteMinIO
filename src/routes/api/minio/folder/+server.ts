@@ -27,3 +27,19 @@ export async function GET() {
 		});
 	}
 }
+
+export async function POST({ request }) {
+	let { folder } = await request.json();
+
+	// folder должен быть без начального слэша, например 'images/2024'
+	const objectName = folder.endsWith('/') ? folder : folder + '/';
+
+	await minioClient.putObject(
+		'first',
+		objectName,
+		Buffer.alloc(0), // пустой буфер
+		0 // длина
+	);
+
+	return new Response(JSON.stringify({ status: 'ok' }));
+}

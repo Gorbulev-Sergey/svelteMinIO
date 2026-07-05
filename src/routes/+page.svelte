@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Block from '$lib/components/Block.svelte';
+	import Modal from '$lib/components/Modal.svelte';
 	import { onMount } from 'svelte';
 
 	interface IPhoto {
@@ -13,6 +14,8 @@
 	let folders1 = $state<string[]>([]);
 	let photos = $state<IPhoto[]>([]);
 	let selectedFolder = $state(0);
+	let isFolderCreateShow = $state(false);
+	let newFolder = $state('');
 
 	async function getFolders() {
 		const res = await fetch('/api/minio/folder');
@@ -57,8 +60,15 @@
 			bind:value={files}
 			bind:this={inputFiles}
 		/>
+		<button
+			type="button"
+			class="btn btn-dark text-light"
+			onclick={async () => {
+				isFolderCreateShow = true;
+			}}>Добавить папку</button
+		>
 		<button type="button" class="btn btn-dark text-light" onclick={() => inputFiles?.click()}
-			>Добавить</button
+			>Добавить фотографии</button
 		>
 		{#if files}
 			<button class="btn btn-dark text-light" type="submit">Загрузить</button>
@@ -105,3 +115,25 @@
 		</div>
 	</Block>
 {/if}
+
+<Modal
+	title="Добавить папку"
+	bind:isShow={isFolderCreateShow}
+	onSave={() => {
+		fetch('api/minio/folder', {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify({
+				folder: newFolder
+			})
+		}).then((r) => {
+			getFolders();
+			newFolder = '';
+		});
+	}}
+	onClose={() => (newFolder = '')}
+>
+	<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
+</Modal>
