@@ -35,3 +35,25 @@ export async function GET({ url }) {
 		});
 	}
 }
+
+export async function POST({ request }) {
+	const formData = await request.formData();
+	const filePart = formData.get('file');
+	const folder = formData.get('folder');
+
+	if (!filePart || !(filePart instanceof Blob)) {
+		return new Response(JSON.stringify({ error: 'No file provided' }), {
+			status: 400,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
+
+	const file = filePart as Blob & { name: string; type: string };
+	const buffer = Buffer.from(await file.arrayBuffer());
+
+	await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, buffer.length, {
+		'Content-Type': file.type
+	});
+
+	return new Response(JSON.stringify({ ok: true, name: file.name }));
+}

@@ -7,51 +7,44 @@
 		name: string;
 		url: string;
 	}
+	let file = $state(null);
 	let folders1 = $state<string[]>([]);
 	let photos = $state<IPhoto[]>([]);
 	let selectedFolder = $state(0);
 
 	async function getFolders() {
-		const res = await fetch('/api/minio');
+		const res = await fetch('/api/minio/folder');
 		const { folders } = await res.json();
 		folders1 = folders;
-		console.log(folders);
 	}
 
 	async function getPhotos(prefix: string) {
 		const res = await fetch(`/api/minio/photo?prefix=${encodeURIComponent(prefix)}`);
 		const { images } = await res.json();
 		photos = images;
-		console.log(images);
 	}
 
 	onMount(async () => {
-		getFolders();
-		getPhotos(folders1[selectedFolder] || 'f');
+		await getFolders();
+		await getPhotos(folders1[selectedFolder] || '');
 	});
 </script>
 
 <Block title="Welcome to SvelteKit">
-	<div class="d-flex gap-2">
-		<button class="btn btn-dark text-light" onclick={getFolders}>Получить папки</button>
-		<button
-			class="btn btn-dark text-light"
-			onclick={async () => await getPhotos(folders1[selectedFolder] || 'f')}>Получить фото</button
-		>
-	</div>
 	<form
-		use:enhance={() => {
-			return async ({ result }) => {
+		use:enhance={({ formData, cancel }) => {
+			return async ({ result, update }) => {
 				await getPhotos(folders1[selectedFolder] || 'f');
+				file = null;
 			};
 		}}
 		class="d-flex mt-2 gap-2"
 		method="POST"
-		action="/api/minio"
+		action="/api/minio/photo"
 		enctype="multipart/form-data"
 	>
 		<input hidden name="folder" bind:value={folders1[selectedFolder]} />
-		<input class="form-control" type="file" name="file" />
+		<input class="form-control" type="file" name="file" bind:value={file} />
 		<button class="btn btn-dark text-light" type="submit">Загрузить</button>
 	</form>
 </Block>
