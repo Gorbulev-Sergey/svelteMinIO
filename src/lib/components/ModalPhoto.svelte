@@ -20,12 +20,15 @@
 </script>
 
 <div
-	class="modal modal-xl {isShow ? 'show' : 'fade'} bg-dark bg-opacity-10"
+	class="modal modal-xl {isShow ? 'show' : 'fade'} bg-dark bg-opacity-75"
 	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.04em);"
 >
-	<div class="modal-dialog modal-dialog-centered m-auto" style="width: 98vw; height:98vh;">
+	<div
+		class="modal-dialog modal-dialog-centered m-auto p-0"
+		style="max-width: auto; max-height: auto;"
+	>
 		<div
-			class="modal-content rounded shadow-sm bg-white p-1 {_class} position-relative"
+			class="modal-content rounded shadow-sm bg-white p-0 {_class} position-relative"
 			style="border-width: 0;"
 		>
 			<button

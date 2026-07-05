@@ -3,11 +3,23 @@
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
+	import exifr from 'exifr';
 	import { onMount } from 'svelte';
 
 	interface IPhoto {
 		name: string;
 		url: string;
+	}
+	interface IEXIF {
+		CreateDate?: Date;
+		Model?: string;
+		LensModel?: string;
+		ImageWidth?: number;
+		ImageHeight?: number;
+		FocalLength?: number;
+		ISO?: number;
+		ExposureTime?: number;
+		WhiteBalance?: string;
 	}
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -18,6 +30,7 @@
 	let newFolder = $state('');
 	let isPhotoFullScreenShow = $state(false);
 	let selectedPhoto = $state<IPhoto>();
+	let selectedPhotoMeta = $state<IEXIF>();
 
 	async function getFolders() {
 		const res = await fetch('/api/minio/folder');
@@ -125,9 +138,15 @@
 						<div
 							class="h-100 rounded"
 							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
-							onclick={() => {
+							onclick={async () => {
 								selectedPhoto = photos.find((pf) => pf.url == url);
 								isPhotoFullScreenShow = true;
+
+								const res = await fetch(url);
+								if (!res.ok) throw new Error('Не удалось скачать файл');
+								const blob = await res.blob();
+								selectedPhotoMeta = await exifr.parse(blob);
+								console.log($state.snapshot(selectedPhotoMeta));
 							}}
 						></div>
 						<div class="small px-1 text-center">
@@ -163,11 +182,43 @@
 	<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
 </Modal>
 
-<ModalPhoto bind:isShow={isPhotoFullScreenShow} _class="w-100">
+<ModalPhoto bind:isShow={isPhotoFullScreenShow} _class="">
 	<div
-		hidden
 		class="rounded"
-		style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:90dvh;"
+		style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: contain; height:98vh;"
 	></div>
-	<img src={selectedPhoto?.url} class=" rounded" style="widyh: 95dvw; height:95dvh;" alt="" />
+	<div
+		class="bg-light text-dark bg-opacity-50 p-2 rounded position-absolute"
+		style="bottom: .7em; right:.7em; max-width: 40%;"
+	>
+		<div class="d-flex flex-column justify-content-end overflow-hidden">
+			<small><b>Hазвание:</b> {selectedPhoto?.name}</small>
+			<small
+				><b>Url:</b>
+				<a href={selectedPhoto?.url} target="_blank">{selectedPhoto?.url.slice(0, 45)}...</a></small
+			>
+			<small
+				><b>Дата:</b>
+				{new Date(selectedPhotoMeta?.CreateDate).toLocaleDateString('ru-Ru', {
+					day: 'numeric',
+					month: 'long',
+					year: 'numeric'
+				})}
+			</small>
+			<hr class="my-1" />
+			<small><b>Камера:</b> {selectedPhotoMeta?.Model}</small>
+			<small><b>Объектив:</b> {selectedPhotoMeta?.LensModel}</small>
+			{#if selectedPhotoMeta?.ImageWidth && selectedPhotoMeta?.ImageHeight}
+				<small
+					><b>Размер фото:</b>
+					{String(selectedPhotoMeta.ImageWidth)}px*{String(selectedPhotoMeta?.ImageHeight)}
+					px
+				</small>
+			{/if}
+			<small><b>Фокусное расстояние:</b> {selectedPhotoMeta?.FocalLength}мм</small>
+			<small><b>ISO:</b> {selectedPhotoMeta?.ISO}</small>
+			<small><b>Выдержка:</b> {selectedPhotoMeta?.ExposureTime}сек</small>
+			<small><b>Баланс белого:</b> {selectedPhotoMeta?.WhiteBalance}</small>
+		</div>
+	</div>
 </ModalPhoto>

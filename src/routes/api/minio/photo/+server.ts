@@ -1,5 +1,6 @@
 import { minioClient } from '$lib/minio';
 import { json } from '@sveltejs/kit';
+import sharp from 'sharp';
 
 export async function GET({ url }) {
 	// читаем префикс из query-параметра, например ?prefix=images
@@ -13,7 +14,7 @@ export async function GET({ url }) {
 		for await (const objInfo of objects) {
 			// берём только файлы с расширениями картинок
 			const ext = objInfo.name.split('.').pop()?.toLowerCase();
-			if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext ?? '')) {
+			if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'].includes(ext ?? '')) {
 				continue;
 			}
 
@@ -72,8 +73,10 @@ export async function POST({ request }) {
 
 	for (const filePart of fileParts) {
 		const file = filePart as Blob & { name: string; type: string };
-		const buffer = Buffer.from(await file.arrayBuffer());
-		await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, buffer.length, {
+		console.log(file.name);
+
+		let buffer = Buffer.from(await file.arrayBuffer());
+		await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, file.size, {
 			'Content-Type': file.type
 		});
 	}
