@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Block from '$lib/components/Block.svelte';
+	import { onMount } from 'svelte';
 
 	interface IPhoto {
 		name: string;
@@ -22,6 +24,11 @@
 		photos = images;
 		console.log(images);
 	}
+
+	onMount(async () => {
+		getFolders();
+		getPhotos(folders1[selectedFolder] || 'f');
+	});
 </script>
 
 <Block title="Welcome to SvelteKit">
@@ -32,7 +39,17 @@
 			onclick={async () => await getPhotos(folders1[selectedFolder] || 'f')}>Получить фото</button
 		>
 	</div>
-	<form class="d-flex mt-2 gap-2" method="POST" action="/api/minio" enctype="multipart/form-data">
+	<form
+		use:enhance={() => {
+			return async ({ result }) => {
+				await getPhotos(folders1[selectedFolder] || 'f');
+			};
+		}}
+		class="d-flex mt-2 gap-2"
+		method="POST"
+		action="/api/minio"
+		enctype="multipart/form-data"
+	>
 		<input hidden name="folder" bind:value={folders1[selectedFolder]} />
 		<input class="form-control" type="file" name="file" />
 		<button class="btn btn-dark text-light" type="submit">Загрузить</button>

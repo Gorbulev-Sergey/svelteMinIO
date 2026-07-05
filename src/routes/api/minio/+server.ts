@@ -47,5 +47,5 @@ export async function POST({ request }) {
 		'Content-Type': file.type
 	});
 
-	return json({ ok: true, name: file.name });
+	return new Response(JSON.stringify({ ok: true, name: file.name }));
 }
