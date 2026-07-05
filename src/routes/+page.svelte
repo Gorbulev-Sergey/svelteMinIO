@@ -91,7 +91,7 @@
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100">
 			{#each photos as { name, url }}
 				<div class="col">
-					<div class="d-flex flex-column">
+					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded p-1">
 						<div
 							class="h-100 rounded"
 							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
