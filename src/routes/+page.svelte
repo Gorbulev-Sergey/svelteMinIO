@@ -73,6 +73,23 @@
 		{#if files}
 			<button class="btn btn-dark text-light" type="submit">Загрузить</button>
 		{/if}
+		<button
+			type="button"
+			class="btn btn-danger text-light"
+			onclick={() => {
+				fetch('/api/minio/folder', {
+					method: 'DELETE',
+					headers: {
+						'content-type': 'application/json'
+					},
+					body: JSON.stringify({ folder: folders1[selectedFolder] })
+				}).then(async (r) => {
+					selectedFolder = 0;
+					await getFolders();
+					await getPhotos(folders1[selectedFolder] || '');
+				});
+			}}>Удалить папку</button
+		>
 	</form>
 </Block>
 

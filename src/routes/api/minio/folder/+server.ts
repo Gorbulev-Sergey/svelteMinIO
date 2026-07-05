@@ -43,3 +43,18 @@ export async function POST({ request }) {
 
 	return new Response(JSON.stringify({ status: 'ok' }));
 }
+
+export async function DELETE({ request }) {
+	let { folder } = await request.json();
+
+	const objects = minioClient.listObjects('first', folder, true);
+	const removeObjects = [];
+
+	for await (const obj of objects) {
+		removeObjects.push({ name: obj.name });
+	}
+
+	if (removeObjects.length != 0) await minioClient.removeObjects('first', removeObjects);
+
+	return new Response(JSON.stringify({ status: 'Папка удалена' }));
+}
