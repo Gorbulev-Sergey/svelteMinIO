@@ -7,7 +7,8 @@
 		name: string;
 		url: string;
 	}
-	let file = $state(null);
+	let file = $state<Blob>();
+	let inputFile = $state<HTMLInputElement>();
 	let folders1 = $state<string[]>([]);
 	let photos = $state<IPhoto[]>([]);
 	let selectedFolder = $state(0);
@@ -19,6 +20,7 @@
 	}
 
 	async function getPhotos(prefix: string) {
+		photos = [];
 		const res = await fetch(`/api/minio/photo?prefix=${encodeURIComponent(prefix)}`);
 		const { images } = await res.json();
 		photos = images;
@@ -32,19 +34,27 @@
 
 <Block title="Welcome to SvelteKit">
 	<form
-		use:enhance={({ formData, cancel }) => {
-			return async ({ result, update }) => {
+		use:enhance={({ formData }) => {
+			return async ({ result }) => {
 				await getPhotos(folders1[selectedFolder] || 'f');
-				file = null;
+				file = new Blob();
 			};
 		}}
-		class="d-flex mt-2 gap-2"
+		class="d-flex mt-1 gap-2"
 		method="POST"
 		action="/api/minio/photo"
 		enctype="multipart/form-data"
 	>
 		<input hidden name="folder" bind:value={folders1[selectedFolder]} />
-		<input class="form-control" type="file" name="file" bind:value={file} />
+		<input
+			hidden
+			class="form-control"
+			type="file"
+			name="file"
+			bind:value={file}
+			bind:this={inputFile}
+		/>
+		<button class="btn btn-dark text-light" onclick={() => inputFile?.click()}>Открыть</button>
 		<button class="btn btn-dark text-light" type="submit">Загрузить</button>
 	</form>
 </Block>
