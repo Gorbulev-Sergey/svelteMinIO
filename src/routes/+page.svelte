@@ -2,13 +2,13 @@
 	import { enhance } from '$app/forms';
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import { onMount } from 'svelte';
 
 	interface IPhoto {
 		name: string;
 		url: string;
 	}
-	let form = $state();
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
 	let folders1 = $state<string[]>([]);
@@ -16,6 +16,8 @@
 	let selectedFolder = $state(0);
 	let isFolderCreateShow = $state(false);
 	let newFolder = $state('');
+	let isPhotoFullScreenShow = $state(false);
+	let selectedPhoto = $state<IPhoto>();
 
 	async function getFolders() {
 		const res = await fetch('/api/minio/folder');
@@ -38,7 +40,6 @@
 
 <Block title="Welcome to SvelteKit">
 	<form
-		bind:this={form}
 		use:enhance={() => {
 			return async () => {
 				await getPhotos(folders1[selectedFolder] || 'f');
@@ -119,9 +120,15 @@
 			{#each photos as { name, url }}
 				<div class="col">
 					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded" style="padding:3.5px">
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
+						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							class="h-100 rounded"
-							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
+							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
+							onclick={() => {
+								selectedPhoto = photos.find((pf) => pf.url == url);
+								isPhotoFullScreenShow = true;
+							}}
 						></div>
 						<div class="small px-1 text-center">
 							{name.replace(folders1[selectedFolder] + '/', '')}
@@ -155,3 +162,12 @@
 >
 	<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
 </Modal>
+
+<ModalPhoto bind:isShow={isPhotoFullScreenShow} _class="w-100">
+	<div
+		hidden
+		class="rounded"
+		style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:90dvh;"
+	></div>
+	<img src={selectedPhoto?.url} class=" rounded" style="widyh: 95dvw; height:95dvh;" alt="" />
+</ModalPhoto>
