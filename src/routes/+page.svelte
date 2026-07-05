@@ -7,8 +7,9 @@
 		name: string;
 		url: string;
 	}
-	let file = $state<null | Blob>();
-	let inputFile = $state<HTMLInputElement>();
+	let form = $state();
+	let files = $state<null | FileList>();
+	let inputFiles = $state<HTMLInputElement>();
 	let folders1 = $state<string[]>([]);
 	let photos = $state<IPhoto[]>([]);
 	let selectedFolder = $state(0);
@@ -34,10 +35,11 @@
 
 <Block title="Welcome to SvelteKit">
 	<form
+		bind:this={form}
 		use:enhance={() => {
 			return async () => {
 				await getPhotos(folders1[selectedFolder] || 'f');
-				file = null;
+				files = null;
 			};
 		}}
 		class="d-flex mt-1 gap-2"
@@ -50,14 +52,15 @@
 			hidden
 			class="form-control"
 			type="file"
-			name="file"
-			bind:value={file}
-			bind:this={inputFile}
+			name="files"
+			multiple
+			bind:value={files}
+			bind:this={inputFiles}
 		/>
-		<button type="button" class="btn btn-dark text-light" onclick={() => inputFile?.click()}
+		<button type="button" class="btn btn-dark text-light" onclick={() => inputFiles?.click()}
 			>Добавить</button
 		>
-		{#if file}
+		{#if files}
 			<button class="btn btn-dark text-light" type="submit">Загрузить</button>
 		{/if}
 	</form>
@@ -85,9 +88,19 @@
 
 {#if photos?.length > 0}
 	<Block title="Фотографии" _class="mt-3">
-		<div class="d-flex flex-wrap align-items-start gap-2">
+		<div class="row row-cols-1 row-cols-md-4 g-2 w-100">
 			{#each photos as { name, url }}
-				<img class="rounded" style="width: 24%;" src={url} alt="" />
+				<div class="col">
+					<div class="d-flex flex-column">
+						<div
+							class="h-100 rounded"
+							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
+						></div>
+						<div class="small px-1 text-center">
+							{name.replace(folders1[selectedFolder] + '/', '')}
+						</div>
+					</div>
+				</div>
 			{/each}
 		</div>
 	</Block>
