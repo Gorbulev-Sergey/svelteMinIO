@@ -118,17 +118,11 @@
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100">
 			{#each photos as { name, url }}
 				<div class="col">
-					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded p-1">
-						{#if !url.includes('mp4')}
-							<div
-								class="h-100 rounded"
-								style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
-							></div>
-						{:else}
-							<div class=" ratio-4x3">
-								<video class="w-100 rounded" src={url} controls={true}></video>
-							</div>
-						{/if}
+					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded" style="padding:3.5px">
+						<div
+							class="h-100 rounded"
+							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; "
+						></div>
 						<div class="small px-1 text-center">
 							{name.replace(folders1[selectedFolder] + '/', '')}
 						</div>
@@ -152,11 +146,12 @@
 				folder: newFolder
 			})
 		}).then((r) => {
-			getFolders();
-			newFolder = '';
+			getFolders().then(() => {
+				selectedFolder = folders1.findIndex((v) => v == newFolder);
+				getPhotos(folders1[selectedFolder]).then(() => (newFolder = ''));
+			});
 		});
 	}}
-	onClose={() => (newFolder = '')}
 >
 	<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
 </Modal>
