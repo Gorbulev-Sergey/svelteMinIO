@@ -26,11 +26,13 @@
 	let folders1 = $state<string[]>([]);
 	let photos = $state<IPhoto[]>([]);
 	let selectedFolder = $state(0);
-	let isFolderCreateShow = $state(false);
 	let newFolder = $state('');
-	let isPhotoFullScreenShow = $state(false);
 	let selectedPhoto = $state<IPhoto>();
 	let selectedPhotoMeta = $state<IEXIF>();
+	let isFolderCreateShow = $state(false);
+	let isPhotoFullScreenShow = $state(false);
+	let isDeleteFolderShow = $state(false);
+	let isDeletePhotoShow = $state(false);
 
 	async function getFolders() {
 		const res = await fetch('/api/minio/folder');
@@ -91,17 +93,7 @@
 			type="button"
 			class="btn btn-danger text-light"
 			onclick={() => {
-				fetch('/api/minio/folder', {
-					method: 'DELETE',
-					headers: {
-						'content-type': 'application/json'
-					},
-					body: JSON.stringify({ folder: folders1[selectedFolder] })
-				}).then(async (r) => {
-					selectedFolder = 0;
-					await getFolders();
-					await getPhotos(folders1[selectedFolder] || '');
-				});
+				isDeleteFolderShow = true;
 			}}>Удалить папку</button
 		>
 	</form>
@@ -136,7 +128,7 @@
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
-							class="h-100 rounded"
+							class="h-100 rounded position-relative"
 							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
 							onclick={async () => {
 								selectedPhoto = photos.find((pf) => pf.url == url);
@@ -148,7 +140,20 @@
 								selectedPhotoMeta = await exifr.parse(blob);
 								console.log($state.snapshot(selectedPhotoMeta));
 							}}
-						></div>
+						>
+							<button
+								title=""
+								class="badge bg-danger bg-opacity-75 text-light position-absolute border-0 p-1"
+								style="right: .3em; top: .3em"
+								onclick={(e) => {
+									e.stopPropagation();
+									selectedPhoto = photos.find((pf) => pf.url == url);
+									isDeletePhotoShow = true;
+								}}
+							>
+								<i class="fa-solid fa-trash"></i>
+							</button>
+						</div>
 						<div class="small px-1 text-center">
 							{name.replace(folders1[selectedFolder] + '/', '')}
 						</div>
@@ -160,9 +165,10 @@
 {/if}
 
 <Modal
-	title="Добавить папку"
+	title="Добавить папку?"
 	bind:isShow={isFolderCreateShow}
-	onSave={() => {
+	onOkTitle="Добавить"
+	onOk={() => {
 		fetch('api/minio/folder', {
 			method: 'POST',
 			headers: {
@@ -183,10 +189,7 @@
 </Modal>
 
 <ModalPhoto bind:isShow={isPhotoFullScreenShow} _class="">
-	<div
-		class="rounded"
-		style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: contain; height:98vh;"
-	></div>
+	<img class="rounded" style="max-height: 98vh;" src={selectedPhoto?.url} alt="" />
 	<div
 		class="bg-light text-dark bg-opacity-50 p-2 rounded position-absolute"
 		style="bottom: .7em; right:.7em; max-width: 40%;"
@@ -222,3 +225,33 @@
 		</div>
 	</div>
 </ModalPhoto>
+
+<Modal
+	title="Удалить папку?"
+	bind:isShow={isDeleteFolderShow}
+	onOkTitle="Удалить"
+	onOk={() => {
+		fetch('/api/minio/folder', {
+			method: 'DELETE',
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify({ folder: folders1[selectedFolder] })
+		}).then(async (r) => {
+			selectedFolder = 0;
+			await getFolders();
+			await getPhotos(folders1[selectedFolder] || '');
+		});
+	}}
+>
+	<div class="text-center">
+		Вы действительно хотите удалить папку <b>"{folders1[selectedFolder]}"</b>?
+	</div>
+</Modal>
+
+<Modal title="Удалить этот файл?" bind:isShow={isDeletePhotoShow} onOkTitle="Удалить">
+	<div
+		class="rounded text-center"
+		style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:16em;"
+	></div>
+</Modal>

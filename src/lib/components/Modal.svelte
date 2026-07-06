@@ -3,18 +3,20 @@
 
 	interface IProps {
 		title?: string;
+		onOkTitle?: string;
 		isShow?: boolean;
 		_class?: string;
 		children?: Snippet<[]>;
-		onSave?: () => void;
+		onOk?: () => void;
 		onClose?: () => void;
 	}
 	let {
 		title,
+		onOkTitle = 'Ок',
 		isShow = $bindable(false),
 		_class,
 		children,
-		onSave = () => {},
+		onOk = () => {},
 		onClose = () => {}
 	}: IProps = $props();
 </script>
@@ -29,7 +31,7 @@
 			style="border-width: 0;"
 		>
 			<div class="d-flex align-self-center justify-content-between p-2 w-100">
-				<h5 class="ps-1 mb-0">{title}</h5>
+				<b class="ps-1 mb-0">{title}</b>
 				<button
 					aria-label="Закрыть"
 					class="btn-close"
@@ -39,24 +41,24 @@
 					}}
 				></button>
 			</div>
-			<div class="p-2">
+			<div class="px-2 py-1">
 				{@render children?.()}
 			</div>
 			<div class="d-flex align-items-center justify-content-between p-2">
 				<button
-					class="btn btn-light text-dark"
+					class="btn btn-sm btn-light text-dark"
 					onclick={() => {
 						isShow = false;
 						onClose();
 					}}>Отмена</button
 				>
 				<button
-					class="btn btn-dark text-light"
+					class="btn btn-sm btn-dark text-light"
 					onclick={() => {
 						isShow = false;
-						onSave();
+						onOk();
 						onClose();
-					}}>Сохранить</button
+					}}>{onOkTitle}</button
 				>
 			</div>
 		</div>
