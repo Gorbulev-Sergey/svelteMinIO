@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
@@ -99,10 +98,10 @@
 			name="files"
 			multiple
 			bind:this={inputFiles}
-			onchange={(e) => {
-				if (e.target.files !== 0) {
-					files = e.target.files;
-
+			onchange={(e: Event) => {
+				const t = e.target as HTMLInputElement;
+				if (t.files && t.files.length > 0) {
+					files = t.files;
 					const formData = new FormData();
 					for (let item of files) {
 						formData.append('files', item);
@@ -207,7 +206,7 @@
 			>
 			<small
 				><b>Дата:</b>
-				{new Date(selectedPhotoMeta?.CreateDate).toLocaleDateString('ru-Ru', {
+				{new Date(selectedPhotoMeta?.CreateDate || '').toLocaleDateString('ru-Ru', {
 					day: 'numeric',
 					month: 'long',
 					year: 'numeric'
