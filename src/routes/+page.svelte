@@ -51,9 +51,49 @@
 		await getFolders();
 		await getPhotos(folders1[selectedFolder] || '');
 	});
+	let path = $derived(folders1[selectedFolder] || '');
+	let paths = ['Остров', 'Город', 'Деревня', 'Страна'];
+	let subPath1 = 'Остров/Сад/Деревья/Зелёные';
 </script>
 
-<Block title="Welcome to SvelteKit" _class="bg-opacity-10"></Block>
+<Block title="Welcome to SvelteKit" _class="bg-opacity-10">
+	<div class="d-flex align-items-center">
+		{#each path.split('/') as item, i}
+			<button
+				class="btn btn-sm btn-light text-dark px-1 py-0"
+				onclick={() => {
+					selectedFolder = folders1.findIndex((f) => f == item);
+					getPhotos(folders1[selectedFolder]);
+				}}>{item}</button
+			>
+			{#if i < path.split('/').length - 1}
+				<div class="d-flex align-items-end">
+					<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
+				</div>
+			{/if}
+		{/each}
+	</div>
+</Block>
+<Block title="Пути">
+	<div class="d-flex flex-column gap-1">
+		<div class="d-flex align-items-center gap-1">
+			{#each paths as item, i}
+				<button class="btn btn-sm btn-light text-dark">{item}</button>
+			{/each}
+			<div class="btn-group btn-group-sm dropdown-center">
+				<button class="btn btn-sm btn-light">Поля</button>
+				<button class="btn btn-light px-1 rounded-end" data-bs-toggle="dropdown" aria-label="">
+					<i class="fa-solid fa-angles-down"></i>
+				</button>
+				<ul class="dropdown-menu border-0 shadow-sm py-1">
+					{#each subPath1.split('/') as sub}
+						<li><a class="dropdown-item small" href="/">{sub}</a></li>
+					{/each}
+				</ul>
+			</div>
+		</div>
+	</div>
+</Block>
 
 <Block _class="mt-3">
 	<Title title="Папки">
@@ -72,7 +112,7 @@
 			}}>Добавить</button
 		>
 	</Title>
-	<div class="d-flex flex-wrap align-items-start gap-2">
+	<div class="d-flex flex-wrap align-items-start gap-1">
 		{#each folders1 as item}
 			{#if item == folders1[selectedFolder]}
 				<button class="btn btn-sm btn-dark text-light">{item}</button>

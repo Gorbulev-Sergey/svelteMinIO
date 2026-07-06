@@ -12,7 +12,7 @@
 
 <div class={`bg-white p-3 rounded d-flex flex-column align-items-start gap-2 ${_class}`}>
 	{#if title}
-		<h4 class="my-0">{title}</h4>
+		<h5 class="my-0">{title}</h5>
 	{/if}
 	{@render children?.()}
 </div>
