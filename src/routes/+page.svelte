@@ -3,6 +3,7 @@
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
+	import Title from '$lib/components/Title.svelte';
 	import exifr from 'exifr';
 	import { onMount } from 'svelte';
 
@@ -53,116 +54,119 @@
 	});
 </script>
 
-<Block title="Welcome to SvelteKit">
-	<form
-		use:enhance={() => {
-			return async () => {
-				await getPhotos(folders1[selectedFolder] || 'f');
-				files = null;
-			};
-		}}
-		class="d-flex mt-1 gap-2"
-		method="POST"
-		action="/api/minio/photo"
-		enctype="multipart/form-data"
-	>
-		<input hidden name="folder" bind:value={folders1[selectedFolder]} />
-		<input
-			hidden
-			class="form-control"
-			type="file"
-			name="files"
-			multiple
-			bind:value={files}
-			bind:this={inputFiles}
-		/>
+<Block title="Welcome to SvelteKit" _class="bg-opacity-10"></Block>
+
+<Block _class="mt-3">
+	<Title title="Папки">
 		<button
 			type="button"
-			class="btn btn-dark text-light"
-			onclick={async () => {
-				isFolderCreateShow = true;
-			}}>Добавить папку</button
-		>
-		<button type="button" class="btn btn-dark text-light" onclick={() => inputFiles?.click()}
-			>Добавить фотографии</button
-		>
-		{#if files}
-			<button class="btn btn-dark text-light" type="submit">Загрузить</button>
-		{/if}
-		<button
-			type="button"
-			class="btn btn-danger text-light"
+			class="btn btn-sm btn-danger text-light"
 			onclick={() => {
 				isDeleteFolderShow = true;
-			}}>Удалить папку</button
+			}}>Удалить</button
 		>
-	</form>
+		<button
+			type="button"
+			class="btn btn-sm btn-dark text-light"
+			onclick={async () => {
+				isFolderCreateShow = true;
+			}}>Добавить</button
+		>
+	</Title>
+	<div class="d-flex flex-wrap align-items-start gap-2">
+		{#each folders1 as item}
+			{#if item == folders1[selectedFolder]}
+				<button class="btn btn-sm btn-dark text-light">{item}</button>
+			{:else}
+				<button
+					class="btn btn-sm btn-light text-dark"
+					onclick={async () => {
+						selectedFolder = folders1.findIndex((v) => v == item);
+						await getPhotos(folders1[selectedFolder]);
+					}}>{item}</button
+				>
+			{/if}
+		{/each}
+	</div>
 </Block>
 
-{#if folders1?.length > 0}
-	<Block title="Папки" _class="mt-3">
-		<div class="d-flex flex-wrap align-items-start gap-2">
-			{#each folders1 as item}
-				{#if item == folders1[selectedFolder]}
-					<button class="btn btn-sm btn-dark text-light">{item}</button>
-				{:else}
-					<button
-						class="btn btn-sm btn-light text-dark"
+<Block _class="mt-3">
+	<Title title="Фотографии">
+		<form
+			use:enhance={() => {
+				return async () => {
+					await getPhotos(folders1[selectedFolder] || 'f');
+					files = null;
+				};
+			}}
+			class="d-flex mt-1 gap-2"
+			method="POST"
+			action="/api/minio/photo"
+			enctype="multipart/form-data"
+		>
+			<input hidden name="folder" bind:value={folders1[selectedFolder]} />
+			<input
+				hidden
+				class="form-control"
+				type="file"
+				name="files"
+				multiple
+				bind:value={files}
+				bind:this={inputFiles}
+			/>
+			<button
+				type="button"
+				class="btn btn-sm btn-dark text-light"
+				onclick={() => inputFiles?.click()}>Добавить</button
+			>
+			{#if files}
+				<button class="btn btn-sm btn-dark text-light" type="submit">Загрузить</button>
+			{/if}
+		</form>
+	</Title>
+	<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
+		{#each photos as { name, url }}
+			<div class="col">
+				<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded" style="padding:3.5px">
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div
+						class="h-100 rounded position-relative"
+						style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
 						onclick={async () => {
-							selectedFolder = folders1.findIndex((v) => v == item);
-							await getPhotos(folders1[selectedFolder]);
-						}}>{item}</button
+							selectedPhoto = photos.find((pf) => pf.url == url);
+							isPhotoFullScreenShow = true;
+
+							const res = await fetch(url);
+							if (!res.ok) throw new Error('Не удалось скачать файл');
+							const blob = await res.blob();
+							selectedPhotoMeta = await exifr.parse(blob);
+							console.log($state.snapshot(selectedPhotoMeta));
+						}}
 					>
-				{/if}
-			{/each}
-		</div>
-	</Block>
-{/if}
-
-{#if photos?.length > 0}
-	<Block title="Фотографии" _class="mt-3">
-		<div class="row row-cols-1 row-cols-md-4 g-2 w-100">
-			{#each photos as { name, url }}
-				<div class="col">
-					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded" style="padding:3.5px">
-						<!-- svelte-ignore a11y_click_events_have_key_events -->
-						<!-- svelte-ignore a11y_no_static_element_interactions -->
-						<div
-							class="h-100 rounded position-relative"
-							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
-							onclick={async () => {
+						<button
+							title=""
+							class="badge bg-light bg-opacity-25 text-light position-absolute border-0 p-1"
+							style="right: .3em; top: .3em"
+							onclick={(e) => {
+								e.stopPropagation();
 								selectedPhoto = photos.find((pf) => pf.url == url);
-								isPhotoFullScreenShow = true;
-
-								const res = await fetch(url);
-								if (!res.ok) throw new Error('Не удалось скачать файл');
-								const blob = await res.blob();
-								selectedPhotoMeta = await exifr.parse(blob);
-								console.log($state.snapshot(selectedPhotoMeta));
+								isDeletePhotoShow = true;
 							}}
 						>
-							<button
-								title=""
-								class="badge bg-light bg-opacity-25 text-light position-absolute border-0 p-1"
-								style="right: .3em; top: .3em"
-								onclick={(e) => {
-									e.stopPropagation();
-									selectedPhoto = photos.find((pf) => pf.url == url);
-									isDeletePhotoShow = true;
-								}}
-							>
-								<i class="fa-solid fa-trash text-danger"></i>
-							</button>
-						</div>
-						<div class="small px-1 text-center">
-							{name.replace(folders1[selectedFolder] + '/', '')}
-						</div>
+							<i class="fa-solid fa-trash text-danger"></i>
+						</button>
+					</div>
+					<div class="small px-1 text-center">
+						{name.length < 30
+							? name.replace(folders1[selectedFolder] + '/', '')
+							: name.replace(folders1[selectedFolder] + '/', '').slice(0, 30) + '...'}
 					</div>
 				</div>
-			{/each}
-		</div>
-	</Block>
-{/if}
+			</div>
+		{/each}
+	</div>
+</Block>
 
 <Modal
 	title="Добавить папку?"
