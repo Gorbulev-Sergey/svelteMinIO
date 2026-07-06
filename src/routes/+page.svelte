@@ -92,37 +92,38 @@
 
 <Block _class="mt-3">
 	<Title title="Фотографии">
-		<form
-			use:enhance={() => {
-				return async () => {
-					await getPhotos(folders1[selectedFolder] || 'f');
-					files = null;
-				};
+		<input
+			hidden
+			class="form-control"
+			type="file"
+			name="files"
+			multiple
+			bind:this={inputFiles}
+			onchange={(e) => {
+				if (e.target.files !== 0) {
+					files = e.target.files;
+
+					const formData = new FormData();
+					for (let item of files) {
+						formData.append('files', item);
+					}
+					formData.append('folder', folders1[selectedFolder]);
+					fetch('api/minio/photo', {
+						method: 'POST',
+						body: formData
+					}).then((r) => {
+						getPhotos(folders1[selectedFolder]);
+					});
+				}
 			}}
-			class="d-flex mt-1 gap-2"
-			method="POST"
-			action="/api/minio/photo"
-			enctype="multipart/form-data"
+		/>
+		<button
+			type="button"
+			class="btn btn-sm btn-dark text-light"
+			onclick={() => {
+				inputFiles?.click();
+			}}>Добавить</button
 		>
-			<input hidden name="folder" bind:value={folders1[selectedFolder]} />
-			<input
-				hidden
-				class="form-control"
-				type="file"
-				name="files"
-				multiple
-				bind:value={files}
-				bind:this={inputFiles}
-			/>
-			<button
-				type="button"
-				class="btn btn-sm btn-dark text-light"
-				onclick={() => inputFiles?.click()}>Добавить</button
-			>
-			{#if files}
-				<button class="btn btn-sm btn-dark text-light" type="submit">Загрузить</button>
-			{/if}
-		</form>
 	</Title>
 	<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
 		{#each photos as { name, url }}

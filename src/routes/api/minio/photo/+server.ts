@@ -59,20 +59,45 @@ export async function GET({ url }) {
 // 	return new Response(JSON.stringify({ ok: true, name: file.name }));
 // }
 
+// export async function POST({ request }) {
+// 	const formData = await request.formData();
+// 	const fileParts = formData.getAll('files');
+// 	const folder = formData.get('folder');
+
+// 	if (!fileParts || !(fileParts[0] instanceof Blob)) {
+// 		return new Response(JSON.stringify({ error: 'No file provided' }), {
+// 			status: 400,
+// 			headers: { 'Content-Type': 'application/json' }
+// 		});
+// 	}
+
+// 	for (const filePart of fileParts) {
+// 		const file = filePart as Blob & { name: string; type: string };
+// 		console.log(file.name);
+
+// 		let buffer = Buffer.from(await file.arrayBuffer());
+// 		await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, file.size, {
+// 			'Content-Type': file.type
+// 		});
+// 	}
+
+// 	return new Response(JSON.stringify({ ok: true }));
+// }
+
 export async function POST({ request }) {
 	const formData = await request.formData();
-	const fileParts = formData.getAll('files');
+	const files = formData.getAll('files');
 	const folder = formData.get('folder');
 
-	if (!fileParts || !(fileParts[0] instanceof Blob)) {
+	if (!files || !(files[0] instanceof Blob)) {
 		return new Response(JSON.stringify({ error: 'No file provided' }), {
 			status: 400,
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
 
-	for (const filePart of fileParts) {
-		const file = filePart as Blob & { name: string; type: string };
+	for (const f of files) {
+		const file = f as Blob & { name: string; type: string };
 		console.log(file.name);
 
 		let buffer = Buffer.from(await file.arrayBuffer());
