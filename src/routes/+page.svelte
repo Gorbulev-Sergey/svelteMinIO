@@ -143,7 +143,7 @@
 						>
 							<button
 								title=""
-								class="badge bg-danger bg-opacity-75 text-light position-absolute border-0 p-1"
+								class="badge bg-light bg-opacity-25 text-light position-absolute border-0 p-1"
 								style="right: .3em; top: .3em"
 								onclick={(e) => {
 									e.stopPropagation();
@@ -151,7 +151,7 @@
 									isDeletePhotoShow = true;
 								}}
 							>
-								<i class="fa-solid fa-trash"></i>
+								<i class="fa-solid fa-trash text-danger"></i>
 							</button>
 						</div>
 						<div class="small px-1 text-center">
@@ -249,7 +249,23 @@
 	</div>
 </Modal>
 
-<Modal title="Удалить этот файл?" bind:isShow={isDeletePhotoShow} onOkTitle="Удалить">
+<Modal
+	title="Удалить этот файл?"
+	bind:isShow={isDeletePhotoShow}
+	onOkTitle="Удалить"
+	onOk={() => {
+		fetch('api/minio/photo/url', {
+			method: 'DELETE',
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify({ name: selectedPhoto?.name })
+		}).then((r) => {
+			photos = photos.filter((ph) => ph != selectedPhoto);
+			selectedPhoto = photos[0];
+		});
+	}}
+>
 	<div
 		class="rounded text-center"
 		style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:16em;"
