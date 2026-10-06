@@ -26,27 +26,27 @@ async function downloadObject(
 	const dirPath = dirname(baseDir + '/' + objectName);
 
 	// 3. Создаём все недостающие папки (recursive: true — создаст всю цепочку)
-	await mkdir(dirPath, { recursive: true }, (r) => {});
+	mkdir(dirPath, { recursive: true }, async () => {
+		// // 4. Создаём поток записи
+		if (objectName.at(-1) != '/') {
+			const writeStream = createWriteStream(baseDir + '/' + objectName);
 
-	// // 4. Создаём поток записи
-	if (objectName.at(-1) != '/') {
-		const writeStream = createWriteStream(baseDir + '/' + objectName);
+			try {
+				// 5. Запускаем скачивание
+				const readStream = await minioClient.getObject(bucketName, objectName);
+				readStream.pipe(writeStream);
 
-		try {
-			// 5. Запускаем скачивание
-			const readStream = await minioClient.getObject(bucketName, objectName);
-			readStream.pipe(writeStream);
-
-			// Ждём окончания записи
-			await once(writeStream, 'finish');
-			console.log(`Файл сохранён: ${localPath}`);
-		} catch (err) {
-			console.error('Ошибка скачивания:', err);
-			throw err;
-		} finally {
-			writeStream.destroy();
+				// Ждём окончания записи
+				await once(writeStream, 'finish');
+				console.log(`Файл сохранён: ${localPath}`);
+			} catch (err) {
+				console.error('Ошибка скачивания:', err);
+				throw err;
+			} finally {
+				writeStream.destroy();
+			}
 		}
-	}
+	});
 }
 
 async function downloadBucket(
@@ -73,12 +73,10 @@ async function downloadBucket(
 	// Скачиваем по очереди (последовательно, чтобы не перегружать систему)
 	for (const name of objects) {
 		try {
-			let f = await downloadObject(minioClient, bucketName, name, baseDir);
+			await downloadObject(minioClient, bucketName, name, baseDir);
 		} catch (err) {
 			console.error(`Пропускаем ${name}: ${err.message}`);
 			// Продолжаем скачивать остальные, даже если один упал
 		}
 	}
-
-	console.log('Готово! Все объекты скачаны.');
 }
