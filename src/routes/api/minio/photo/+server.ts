@@ -1,14 +1,15 @@
 import { minioClient } from '$lib/minio';
 import { json } from '@sveltejs/kit';
-import sharp from 'sharp';
+
+const bucket = 'gorbulevsv-container';
 
 export async function GET({ url }) {
 	// читаем префикс из query-параметра, например ?prefix=images
 	const prefix = url.searchParams.get('prefix') || '';
-	const bucket = 'first';
 
 	try {
 		const objects = await minioClient.listObjects(bucket, prefix, true);
+
 		const images: Array<{ name: string; url: string }> = [];
 
 		for await (const objInfo of objects) {
@@ -21,10 +22,12 @@ export async function GET({ url }) {
 			// генерируем presigned URL — он будет работать даже без публичного бакета
 			const presignedUrl = await minioClient.presignedGetObject(bucket, objInfo.name, 24 * 60 * 60);
 
-			images.push({
-				name: objInfo.name,
-				url: presignedUrl
-			});
+			if (!objInfo.name.replace(prefix + '/', '').includes('/')) {
+				images.push({
+					name: objInfo.name,
+					url: presignedUrl
+				});
+			}
 		}
 
 		return json({ images });
@@ -101,7 +104,7 @@ export async function POST({ request }) {
 		console.log(file.name);
 
 		let buffer = Buffer.from(await file.arrayBuffer());
-		await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, file.size, {
+		await minioClient.putObject(bucket, `${folder}/${file.name}`, buffer, file.size, {
 			'Content-Type': file.type
 		});
 	}
