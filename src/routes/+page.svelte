@@ -34,6 +34,8 @@
 	let isDeleteFolderShow = $state(false);
 	let isDeletePhotoShow = $state(false);
 
+	let bucket = 'gorbulevsv-container';
+
 	async function getFolders() {
 		const res = await fetch('/api/minio/folder');
 		const { folders } = await res.json();
@@ -57,21 +59,34 @@
 </script>
 
 <Block title="Welcome to SvelteKit" _class="bg-opacity-10">
-	<div class="d-flex align-items-center">
-		{#each path.split('/') as item, i}
-			<button
-				class="btn btn-sm btn-light text-dark px-1 py-0"
-				onclick={() => {
-					selectedFolder = folders1.findIndex((f) => f == item);
-					getPhotos(folders1[selectedFolder]);
-				}}>{item}</button
-			>
-			{#if i < path.split('/').length - 1}
-				<div class="d-flex align-items-end">
-					<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
-				</div>
-			{/if}
-		{/each}
+	<div class="d-flex align-items-center justify-content-between w-100 gap-3">
+		<div class="d-flex align-items-center">
+			{#each path.split('/') as item, i}
+				<button
+					class="btn btn-sm btn-light text-dark px-1 py-0"
+					onclick={() => {
+						selectedFolder = folders1.findIndex((f) => f == item);
+						getPhotos(folders1[selectedFolder]);
+					}}>{item}</button
+				>
+				{#if i < path.split('/').length - 1}
+					<div class="d-flex align-items-end">
+						<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
+					</div>
+				{/if}
+			{/each}
+		</div>
+		<button
+			class="btn btn-sm bg-dark text-light"
+			onclick={async () => {
+				fetch('/api/minio/bucket/download', {
+					method: 'POST',
+					body: JSON.stringify({
+						bucket
+					})
+				});
+			}}>Скачать весь bucket к себе на компьютер</button
+		>
 	</div>
 </Block>
 <Block title="Пути">
