@@ -74,9 +74,7 @@ async function downloadBucket(
 
 	console.log(`Найдено файлов: ${files.length}`);
 
-	// Скачиваем по очереди (последовательно, чтобы не перегружать систему)
-
-	files.forEach(async (name, i) => {
+	const downloadPromises = files.map(async (name, i) => {
 		try {
 			await downloadObject(minioClient, bucketName, name, baseDir, i + 1);
 		} catch (err) {
@@ -84,4 +82,8 @@ async function downloadBucket(
 			// Продолжаем скачивать остальные, даже если один упал
 		}
 	});
+
+	// Скачиваем по очереди (последовательно, чтобы не перегружать систему)
+	await Promise.all(downloadPromises);
+	console.error('Все файлы скачаны');
 }
