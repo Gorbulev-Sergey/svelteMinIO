@@ -1,6 +1,7 @@
 import { minioClient } from '$lib/minio.js';
 import { once } from 'events';
 import { createWriteStream, mkdir } from 'fs';
+import { access, constants } from 'fs/promises';
 import type { Client } from 'minio';
 import { dirname } from 'path';
 
@@ -11,6 +12,15 @@ export async function POST({ request }) {
 	await downloadBucket(minioClient, bucket, baseDir);
 
 	return new Response();
+}
+
+async function fileExists(path: string) {
+	try {
+		await access(path, constants.F_OK); // F_OK = проверка существования
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 async function downloadObject(
@@ -25,6 +35,8 @@ async function downloadObject(
 
 	// 2. Получаем путь к папке (без имени файла)
 	const dirPath = dirname(baseDir + '/' + objectName);
+
+	if (await fileExists(localPath)) return;
 
 	// 3. Создаём все недостающие папки (recursive: true — создаст всю цепочку)
 	mkdir(dirPath, { recursive: true }, async () => {
