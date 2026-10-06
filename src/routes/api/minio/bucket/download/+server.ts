@@ -2,7 +2,7 @@ import { minioClient } from '$lib/minio.js';
 import { once } from 'events';
 import { createWriteStream, mkdir } from 'fs';
 import type { Client } from 'minio';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 export async function POST({ request }) {
 	let { bucket } = await request.json();
@@ -17,19 +17,20 @@ async function downloadObject(
 	minioClient: Client,
 	bucketName: string,
 	objectName: string,
-	baseDir: string
+	baseDir: string,
+	index: number
 ) {
 	// 1. Формируем полный локальный путь
-	const localPath = join(baseDir, objectName);
+	const localPath = baseDir + '/' + objectName;
 
 	// 2. Получаем путь к папке (без имени файла)
 	const dirPath = dirname(baseDir + '/' + objectName);
 
 	// 3. Создаём все недостающие папки (recursive: true — создаст всю цепочку)
 	mkdir(dirPath, { recursive: true }, async () => {
-		// // 4. Создаём поток записи
+		// 4. Создаём поток записи
 		if (objectName.at(-1) != '/') {
-			const writeStream = createWriteStream(baseDir + '/' + objectName);
+			const writeStream = createWriteStream(localPath);
 
 			try {
 				// 5. Запускаем скачивание
@@ -37,8 +38,9 @@ async function downloadObject(
 				readStream.pipe(writeStream);
 
 				// Ждём окончания записи
-				await once(writeStream, 'finish');
-				console.log(`Файл сохранён: ${localPath}`);
+				await once(writeStream, 'finish').then((_) => {
+					console.log(`${index ? index + '. ' : ''}Файл сохранён: ${localPath}`);
+				});
 			} catch (err) {
 				console.error('Ошибка скачивания:', err);
 				throw err;
@@ -68,15 +70,18 @@ async function downloadBucket(
 		stream.on('end', () => resolve(names));
 	});
 
-	console.log(`Найдено объектов: ${objects.length}`);
+	let files = (objects as [])?.filter((o) => o?.at(-1) != '/');
+
+	console.log(`Найдено файлов: ${files.length}`);
 
 	// Скачиваем по очереди (последовательно, чтобы не перегружать систему)
-	for (const name of objects) {
+
+	files.forEach(async (name, i) => {
 		try {
-			await downloadObject(minioClient, bucketName, name, baseDir);
+			await downloadObject(minioClient, bucketName, name, baseDir, i + 1);
 		} catch (err) {
 			console.error(`Пропускаем ${name}: ${err.message}`);
 			// Продолжаем скачивать остальные, даже если один упал
 		}
-	}
+	});
 }
