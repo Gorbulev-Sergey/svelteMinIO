@@ -54,7 +54,7 @@ export async function DELETE({ request }) {
 		removeObjects.push({ name: obj.name });
 	}
 
-	if (removeObjects.length != 0) await minioClient.removeObjects('first', removeObjects);
+	if (removeObjects.length != 0) await minioClient.removeObjects(bucket, removeObjects);
 
 	return new Response(JSON.stringify({ status: 'Папка удалена!' }));
 }
