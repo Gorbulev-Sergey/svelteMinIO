@@ -114,6 +114,7 @@
 				if (t.files && t.files.length > 0) {
 					files = t.files;
 					const formData = new FormData();
+					formData.append('bucket', bucket);
 					for (let item of files) {
 						formData.append('files', item);
 					}
@@ -121,6 +122,8 @@
 					fetch('api/minio/photo', {
 						method: 'POST',
 						body: formData
+					}).then(() => {
+						invalidateAll();
 					});
 				}
 			}}

@@ -89,8 +89,8 @@ export async function GET({ url }) {
 export async function POST({ request }) {
 	const formData = await request.formData();
 	const bucket = formData.get('bucket') || '';
-	const files = formData.getAll('files');
 	const folder = formData.get('folder');
+	const files = formData.getAll('files');
 
 	if (!files || !(files[0] instanceof Blob)) {
 		return new Response(JSON.stringify({ error: 'No file provided' }), {
