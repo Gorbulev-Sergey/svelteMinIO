@@ -1,15 +1,13 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Title from '$lib/components/Title.svelte';
+	import type { IPhoto } from '$lib/models/IPhoto.js';
 	import exifr from 'exifr';
 	import { onMount } from 'svelte';
 
-	interface IPhoto {
-		name: string;
-		url: string;
-	}
 	interface IEXIF {
 		CreateDate?: Date;
 		Model?: string;
@@ -21,41 +19,43 @@
 		ExposureTime?: number;
 		WhiteBalance?: string;
 	}
-	let files = $state<null | FileList>();
-	let inputFiles = $state<HTMLInputElement>();
-	let folders1 = $state<string[]>([]);
-	let photos = $state<IPhoto[]>([]);
+	let { data } = $props();
+	let buckets = $derived(data.buckets);
+	let bucket = $derived(buckets[1].name);
+	let folders1 = $derived<string[]>(data.folders);
+	let photos = $derived<IPhoto[]>(data.photos);
+
 	let selectedFolder = $state(0);
-	let newFolder = $state('');
 	let selectedPhoto = $state<IPhoto>();
 	let selectedPhotoMeta = $state<IEXIF>();
+
+	let files = $state<null | FileList>();
+	let inputFiles = $state<HTMLInputElement>();
+	let newFolder = $state('');
 	let isFolderCreateShow = $state(false);
 	let isPhotoFullScreenShow = $state(false);
 	let isDeleteFolderShow = $state(false);
 	let isDeletePhotoShow = $state(false);
 
-	let { data } = $props();
-	let bucket = $derived(data.buckets[1].name);
+	// async function getFolders() {
+	// 	const res = await fetch(`/api/minio/folder?bucket=${bucket}`);
+	// 	const { folders } = await res.json();
+	// 	folders1 = folders;
+	// }
 
-	async function getFolders() {
-		const res = await fetch(`/api/minio/folder?bucket=${bucket}`);
-		const { folders } = await res.json();
-		folders1 = folders;
-	}
-
-	async function getPhotos(prefix: string) {
-		photos = [];
-		const res = await fetch(
-			`/api/minio/photo?bucket=${bucket}&prefix=${encodeURIComponent(prefix)}`
-		);
-		const { images } = await res.json();
-		photos = images;
-	}
+	// async function getPhotos(prefix: string) {
+	// 	photos = [];
+	// 	const res = await fetch(
+	// 		`/api/minio/photo?bucket=${bucket}&prefix=${encodeURIComponent(prefix)}`
+	// 	);
+	// 	const { images } = await res.json();
+	// 	photos = images;
+	// }
 
 	onMount(async () => {
-		await getFolders();
-		await getPhotos(folders1[selectedFolder] || '');
-		console.log(selectedFolder);
+		// await getFolders();
+		// await getPhotos(folders1[selectedFolder] || '');
+		// console.log(selectedFolder);
 	});
 	let path = $derived(folders1[selectedFolder] || '');
 	let paths = ['Остров', 'Город', 'Деревня', 'Страна'];
@@ -70,7 +70,7 @@
 					class="btn btn-sm btn-light text-dark px-1 py-0"
 					onclick={() => {
 						selectedFolder = folders1.findIndex((f) => f == item);
-						getPhotos(folders1[selectedFolder]);
+						//getPhotos(folders1[selectedFolder]);
 					}}>{item}</button
 				>
 				{#if i < path.split('/').length - 1}
@@ -139,8 +139,9 @@
 				<button
 					class="btn btn-sm btn-light text-dark"
 					onclick={async () => {
+						goto(`?folder=${item}`, { replaceState: false, noScroll: true });
 						selectedFolder = folders1.findIndex((v) => v == item);
-						await getPhotos(folders1[selectedFolder]);
+						//await getPhotos(folders1[selectedFolder]);
 					}}>{item}</button
 				>
 			{/if}
@@ -170,7 +171,7 @@
 						method: 'POST',
 						body: formData
 					}).then((r) => {
-						getPhotos(folders1[selectedFolder]);
+						//getPhotos(folders1[selectedFolder]);
 					});
 				}
 			}}
@@ -241,10 +242,10 @@
 				folder: newFolder
 			})
 		}).then((r) => {
-			getFolders().then(() => {
-				selectedFolder = folders1.findIndex((v) => v == newFolder);
-				getPhotos(folders1[selectedFolder]).then(() => (newFolder = ''));
-			});
+			// getFolders().then(() => {
+			// 	selectedFolder = folders1.findIndex((v) => v == newFolder);
+			// 	getPhotos(folders1[selectedFolder]).then(() => (newFolder = ''));
+			// });
 		});
 	}}
 >
@@ -302,8 +303,8 @@
 			body: JSON.stringify({ folder: folders1[selectedFolder] })
 		}).then(async (r) => {
 			selectedFolder = 0;
-			await getFolders();
-			await getPhotos(folders1[selectedFolder] || '');
+			//await getFolders();
+			//await getPhotos(folders1[selectedFolder] || '');
 		});
 	}}
 >
