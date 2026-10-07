@@ -34,7 +34,8 @@
 	let isDeleteFolderShow = $state(false);
 	let isDeletePhotoShow = $state(false);
 
-	let bucket = 'gorbulevsv-container';
+	let { data } = $props();
+	let bucket = $derived(data.buckets[1].name);
 
 	async function getFolders() {
 		const res = await fetch(`/api/minio/folder?bucket=${bucket}`);
@@ -54,6 +55,7 @@
 	onMount(async () => {
 		await getFolders();
 		await getPhotos(folders1[selectedFolder] || '');
+		console.log(selectedFolder);
 	});
 	let path = $derived(folders1[selectedFolder] || '');
 	let paths = ['Остров', 'Город', 'Деревня', 'Страна'];
