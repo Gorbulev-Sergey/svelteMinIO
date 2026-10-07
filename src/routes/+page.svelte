@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
@@ -267,8 +267,7 @@
 			},
 			body: JSON.stringify({ name: selectedPhoto?.name })
 		}).then((r) => {
-			photos = photos.filter((ph) => ph != selectedPhoto);
-			selectedPhoto = photos[0];
+			invalidateAll();
 		});
 	}}
 >
