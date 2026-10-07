@@ -1,28 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import Block from '$lib/components/Block.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Title from '$lib/components/Title.svelte';
-	import type { IPhoto } from '$lib/models/IPhoto.js';
+	import type { IEXIF, IPhoto } from '$lib/models/IPhoto.js';
 	import exifr from 'exifr';
-	import { onMount } from 'svelte';
 
-	interface IEXIF {
-		CreateDate?: Date;
-		Model?: string;
-		LensModel?: string;
-		ImageWidth?: number;
-		ImageHeight?: number;
-		FocalLength?: number;
-		ISO?: number;
-		ExposureTime?: number;
-		WhiteBalance?: string;
-	}
 	let { data } = $props();
 	let buckets = $derived(data.buckets);
 	let bucket = $derived(buckets[1].name);
-	let folders1 = $derived<string[]>(data.folders);
+	let folders = $derived<string[]>(data.folders);
 	let photos = $derived<IPhoto[]>(data.photos);
 
 	let selectedFolder = $state(0);
@@ -37,29 +26,7 @@
 	let isDeleteFolderShow = $state(false);
 	let isDeletePhotoShow = $state(false);
 
-	// async function getFolders() {
-	// 	const res = await fetch(`/api/minio/folder?bucket=${bucket}`);
-	// 	const { folders } = await res.json();
-	// 	folders1 = folders;
-	// }
-
-	// async function getPhotos(prefix: string) {
-	// 	photos = [];
-	// 	const res = await fetch(
-	// 		`/api/minio/photo?bucket=${bucket}&prefix=${encodeURIComponent(prefix)}`
-	// 	);
-	// 	const { images } = await res.json();
-	// 	photos = images;
-	// }
-
-	onMount(async () => {
-		// await getFolders();
-		// await getPhotos(folders1[selectedFolder] || '');
-		// console.log(selectedFolder);
-	});
-	let path = $derived(folders1[selectedFolder] || '');
-	let paths = ['Остров', 'Город', 'Деревня', 'Страна'];
-	let subPath1 = 'Остров/Сад/Деревья/Зелёные';
+	let path = $derived(page.url.searchParams.get('folder') || '');
 </script>
 
 <Block title="Welcome to SvelteKit" _class="bg-opacity-10">
@@ -69,8 +36,7 @@
 				<button
 					class="btn btn-sm btn-light text-dark px-1 py-0"
 					onclick={() => {
-						selectedFolder = folders1.findIndex((f) => f == item);
-						//getPhotos(folders1[selectedFolder]);
+						selectedFolder = folders.findIndex((f) => f == item);
 					}}>{item}</button
 				>
 				{#if i < path.split('/').length - 1}
@@ -93,26 +59,6 @@
 		>
 	</div>
 </Block>
-<Block title="Пути">
-	<div class="d-flex flex-column gap-1">
-		<div class="d-flex align-items-center gap-1">
-			{#each paths as item, i}
-				<button class="btn btn-sm btn-light text-dark">{item}</button>
-			{/each}
-			<div class="btn-group btn-group-sm dropdown-center">
-				<button class="btn btn-sm btn-light">Поля</button>
-				<button class="btn btn-light px-1 rounded-end" data-bs-toggle="dropdown" aria-label="">
-					<i class="fa-solid fa-angles-down"></i>
-				</button>
-				<ul class="dropdown-menu border-0 shadow-sm py-1">
-					{#each subPath1.split('/') as sub}
-						<li><a class="dropdown-item small" href="/">{sub}</a></li>
-					{/each}
-				</ul>
-			</div>
-		</div>
-	</div>
-</Block>
 
 <Block _class="mt-3">
 	<Title title="Папки">
@@ -132,16 +78,15 @@
 		>
 	</Title>
 	<div class="d-flex flex-wrap align-items-start gap-1">
-		{#each folders1 as item}
-			{#if item == folders1[selectedFolder]}
+		{#each folders as item}
+			{#if item == folders[selectedFolder]}
 				<button class="btn btn-sm btn-dark text-light">{item}</button>
 			{:else}
 				<button
 					class="btn btn-sm btn-light text-dark"
 					onclick={async () => {
 						goto(`?folder=${item}`, { replaceState: false, noScroll: true });
-						selectedFolder = folders1.findIndex((v) => v == item);
-						//await getPhotos(folders1[selectedFolder]);
+						selectedFolder = folders.findIndex((v) => v == item);
 					}}>{item}</button
 				>
 			{/if}
@@ -166,12 +111,10 @@
 					for (let item of files) {
 						formData.append('files', item);
 					}
-					formData.append('folder', folders1[selectedFolder]);
+					formData.append('folder', folders[selectedFolder]);
 					fetch('api/minio/photo', {
 						method: 'POST',
 						body: formData
-					}).then((r) => {
-						//getPhotos(folders1[selectedFolder]);
 					});
 				}
 			}}
@@ -219,8 +162,8 @@
 					</div>
 					<div class="small px-1 text-center">
 						{name.length < 30
-							? name.replace(folders1[selectedFolder] + '/', '')
-							: name.replace(folders1[selectedFolder] + '/', '').slice(0, 30) + '...'}
+							? name.replace(folders[selectedFolder] + '/', '')
+							: name.replace(folders[selectedFolder] + '/', '').slice(0, 30) + '...'}
 					</div>
 				</div>
 			</div>
@@ -241,11 +184,6 @@
 			body: JSON.stringify({
 				folder: newFolder
 			})
-		}).then((r) => {
-			// getFolders().then(() => {
-			// 	selectedFolder = folders1.findIndex((v) => v == newFolder);
-			// 	getPhotos(folders1[selectedFolder]).then(() => (newFolder = ''));
-			// });
 		});
 	}}
 >
@@ -300,16 +238,14 @@
 			headers: {
 				'content-type': 'application/json'
 			},
-			body: JSON.stringify({ folder: folders1[selectedFolder] })
+			body: JSON.stringify({ folder: folders[selectedFolder] })
 		}).then(async (r) => {
 			selectedFolder = 0;
-			//await getFolders();
-			//await getPhotos(folders1[selectedFolder] || '');
 		});
 	}}
 >
 	<div class="text-center">
-		Вы действительно хотите удалить папку <b>"{folders1[selectedFolder]}"</b>?
+		Вы действительно хотите удалить папку <b>"{folders[selectedFolder]}"</b>?
 	</div>
 </Modal>
 
