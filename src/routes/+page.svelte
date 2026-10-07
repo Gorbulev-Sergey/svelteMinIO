@@ -15,7 +15,7 @@
 	let folders = $derived<string[]>(data.folders);
 	let photos = $derived<IPhoto[]>(data.photos);
 
-	let selectedFolder = $derived(folders.findIndex((f) => f == path));
+	let selectedFolder = $derived(path != '' ? folders.findIndex((f) => f == path) : 0);
 	let selectedPhoto = $state<IPhoto>();
 	let selectedPhotoMeta = $state<IEXIF>();
 

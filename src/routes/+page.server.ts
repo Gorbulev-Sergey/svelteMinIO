@@ -19,7 +19,6 @@ export async function load({ url, fetch }) {
 		photos = images;
 	}
 
-	//console.log(buckets, folders, folderName, photos);
 	return {
 		buckets,
 		folders,
