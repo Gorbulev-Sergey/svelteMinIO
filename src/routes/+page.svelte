@@ -36,7 +36,12 @@
 				<button
 					class="btn btn-sm btn-light text-dark px-1 py-0"
 					onclick={() => {
-						selectedFolder = folders.findIndex((f) => f == item);
+						let selectedPuth = path
+							.split('/')
+							.slice(0, i + 1)
+							.join('/');
+						selectedFolder = folders.findIndex((f) => f == selectedPuth);
+						goto(`?folder=${selectedPuth}`, { replaceState: false, noScroll: true });
 					}}>{item}</button
 				>
 				{#if i < path.split('/').length - 1}
