@@ -31,8 +31,14 @@
 
 <Block title="Welcome to SvelteKit" _class="bg-opacity-10">
 	<div class="d-flex align-items-center justify-content-between w-100 gap-3">
-		<div class="d-flex align-items-center">
+		<div class="d-flex align-items-center gap-0">
 			{#each path.split('/') as item, i}
+				{#if i == 0}
+					<small class="text-dark px-1 py-0 rounded-1"><b>{bucket}:</b></small>
+				{/if}
+				<div class="d-flex align-items-end">
+					<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
+				</div>
 				<button
 					class="btn btn-sm btn-light text-dark px-1 py-0"
 					onclick={() => {
@@ -44,11 +50,6 @@
 						goto(`?folder=${selectedPuth}`, { replaceState: false, noScroll: true });
 					}}>{item}</button
 				>
-				{#if i < path.split('/').length - 1}
-					<div class="d-flex align-items-end">
-						<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
-					</div>
-				{/if}
 			{/each}
 		</div>
 		<button
