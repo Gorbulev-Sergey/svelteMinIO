@@ -37,14 +37,16 @@
 	let bucket = 'gorbulevsv-container';
 
 	async function getFolders() {
-		const res = await fetch('/api/minio/folder');
+		const res = await fetch(`/api/minio/folder?bucket=${bucket}`);
 		const { folders } = await res.json();
 		folders1 = folders;
 	}
 
 	async function getPhotos(prefix: string) {
 		photos = [];
-		const res = await fetch(`/api/minio/photo?prefix=${encodeURIComponent(prefix)}`);
+		const res = await fetch(
+			`/api/minio/photo?bucket=${bucket}&prefix=${encodeURIComponent(prefix)}`
+		);
 		const { images } = await res.json();
 		photos = images;
 	}

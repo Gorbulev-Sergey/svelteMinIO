@@ -1,10 +1,9 @@
 import { minioClient } from '$lib/minio';
 import { json } from '@sveltejs/kit';
 
-const bucket = 'gorbulevsv-container';
-
 export async function GET({ url }) {
 	// читаем префикс из query-параметра, например ?prefix=images
+	const bucket = url.searchParams.get('bucket') || '';
 	const prefix = url.searchParams.get('prefix') || '';
 
 	try {
@@ -89,6 +88,7 @@ export async function GET({ url }) {
 
 export async function POST({ request }) {
 	const formData = await request.formData();
+	const bucket = formData.get('bucket') || '';
 	const files = formData.getAll('files');
 	const folder = formData.get('folder');
 
@@ -104,7 +104,7 @@ export async function POST({ request }) {
 		console.log(file.name);
 
 		let buffer = Buffer.from(await file.arrayBuffer());
-		await minioClient.putObject(bucket, `${folder}/${file.name}`, buffer, file.size, {
+		await minioClient.putObject(bucket.toString(), `${folder}/${file.name}`, buffer, file.size, {
 			'Content-Type': file.type
 		});
 	}

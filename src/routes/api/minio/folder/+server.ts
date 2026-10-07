@@ -1,9 +1,8 @@
 import { minioClient } from '$lib/minio';
 import { json } from '@sveltejs/kit';
 
-const bucket = 'gorbulevsv-container';
-
-export async function GET() {
+export async function GET({ url }) {
+	const bucket = url.searchParams.get('bucket') || '';
 	try {
 		const objects = await minioClient.listObjects(bucket, '', true);
 		const folders = new Set<string>();
@@ -29,7 +28,7 @@ export async function GET() {
 }
 
 export async function POST({ request }) {
-	let { folder } = await request.json();
+	let { bucket, folder } = await request.json();
 
 	// folder должен быть без начального слэша, например 'images/2024'
 	const objectName = folder.endsWith('/') ? folder : folder + '/';
@@ -45,7 +44,7 @@ export async function POST({ request }) {
 }
 
 export async function DELETE({ request }) {
-	let { folder } = await request.json();
+	let { bucket, folder } = await request.json();
 
 	const objects = minioClient.listObjects(bucket, folder, true);
 	const removeObjects = [];
