@@ -36,6 +36,7 @@ async function downloadObject(
 	// 2. Получаем путь к папке (без имени файла)
 	const dirPath = dirname(baseDir + '/' + objectName);
 
+	// Если файл уже есть, мы его не скачиваем
 	if (await fileExists(localPath)) return;
 
 	// 3. Создаём все недостающие папки (recursive: true — создаст всю цепочку)
