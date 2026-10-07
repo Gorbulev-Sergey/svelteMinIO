@@ -9,12 +9,13 @@
 	import exifr from 'exifr';
 
 	let { data } = $props();
+	let path = $derived(page.url.searchParams.get('folder') || '');
 	let buckets = $derived(data.buckets);
 	let bucket = $derived(buckets[1].name);
 	let folders = $derived<string[]>(data.folders);
 	let photos = $derived<IPhoto[]>(data.photos);
 
-	let selectedFolder = $state(0);
+	let selectedFolder = $derived(folders.findIndex((f) => f == path));
 	let selectedPhoto = $state<IPhoto>();
 	let selectedPhotoMeta = $state<IEXIF>();
 
@@ -25,8 +26,6 @@
 	let isPhotoFullScreenShow = $state(false);
 	let isDeleteFolderShow = $state(false);
 	let isDeletePhotoShow = $state(false);
-
-	let path = $derived(page.url.searchParams.get('folder') || '');
 </script>
 
 <Block title="Welcome to SvelteKit" _class="bg-opacity-10">
@@ -46,7 +45,6 @@
 							.split('/')
 							.slice(0, i + 1)
 							.join('/');
-						selectedFolder = folders.findIndex((f) => f == selectedPuth);
 						goto(`?folder=${selectedPuth}`, { replaceState: false, noScroll: true });
 					}}>{item}</button
 				>
@@ -92,7 +90,6 @@
 					class="btn btn-sm btn-light text-dark"
 					onclick={async () => {
 						goto(`?folder=${item}`, { replaceState: false, noScroll: true });
-						selectedFolder = folders.findIndex((v) => v == item);
 					}}>{item}</button
 				>
 			{/if}
@@ -248,8 +245,6 @@
 				'content-type': 'application/json'
 			},
 			body: JSON.stringify({ folder: folders[selectedFolder] })
-		}).then(async (r) => {
-			selectedFolder = 0;
 		});
 	}}
 >
