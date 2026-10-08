@@ -9,7 +9,6 @@
 	import type { IEXIF, IPhoto } from '$lib/models/IPhoto.js';
 	import exifr from 'exifr';
 
-	let paramFolder = $derived(page.url.searchParams.get('folder') || '');
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
 
@@ -17,10 +16,12 @@
 
 	let buckets = $derived(data.buckets);
 	let selectedBucket = $derived(page.url.searchParams.get('bucket') || buckets[1].name);
-	let folders = $derived<string[]>(data.folders);
-	let photos = $derived<IPhoto[]>(data.photos);
 
+	let folders = $derived<string[]>(data.folders);
+	let paramFolder = $derived(page.url.searchParams.get('folder') || folders[0]);
 	let selectedFolder = $derived(paramFolder ? folders.findIndex((f) => f == paramFolder) : 0);
+
+	let photos = $derived<IPhoto[]>(data.photos);
 	let selectedPhoto = $state<IPhoto>();
 	let selectedPhotoMeta = $state<IEXIF>();
 
