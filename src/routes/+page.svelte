@@ -11,7 +11,7 @@
 	let { data } = $props();
 	let path = $derived(page.url.searchParams.get('folder') || '');
 	let buckets = $derived(data.buckets);
-	let bucket = $derived(buckets[1].name);
+	let selectedBucket = $derived(page.url.searchParams.get('bucket') || buckets[1].name);
 	let folders = $derived<string[]>(data.folders);
 	let photos = $derived<IPhoto[]>(data.photos);
 
@@ -33,7 +33,7 @@
 		<div class="d-flex align-items-center gap-0">
 			{#each path.split('/') as item, i}
 				{#if i == 0}
-					<small class="text-dark px-1 py-0 rounded-1"><b>{bucket}:</b></small>
+					<small class="text-dark px-1 py-0 rounded-1"><b>{selectedBucket}:</b></small>
 				{/if}
 				<div class="d-flex align-items-end">
 					<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
@@ -56,11 +56,29 @@
 				fetch('/api/minio/bucket/download', {
 					method: 'POST',
 					body: JSON.stringify({
-						bucket
+						selectedBucket
 					})
 				});
 			}}>Скачать весь bucket к себе на компьютер</button
 		>
+	</div>
+</Block>
+
+<Block>
+	<Title title="Баккеты"></Title>
+	<div class="d-flex align-items-center gap-2">
+		{#each buckets as b}
+			<button
+				class="btn btn-sm {selectedBucket === b.name
+					? 'btn-dark text-light'
+					: 'btn-light text-dark'}"
+				onclick={() => {
+					goto(`?bucket=${b.name}`, { replaceState: false, noScroll: true });
+				}}
+			>
+				{b.name}
+			</button>
+		{/each}
 	</div>
 </Block>
 
@@ -111,7 +129,7 @@
 				if (t.files && t.files.length > 0) {
 					files = t.files;
 					const formData = new FormData();
-					formData.append('bucket', bucket);
+					formData.append('bucket', selectedBucket);
 					for (let item of files) {
 						formData.append('files', item);
 					}

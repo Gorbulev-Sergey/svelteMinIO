@@ -3,7 +3,7 @@ import type { BucketItemFromList } from 'minio';
 
 export async function load({ url, fetch }) {
 	let buckets = (await (await fetch('/api/minio/bucket')).json()) as BucketItemFromList[];
-	let bucket = buckets[1].name;
+	let bucket = url.searchParams.get('bucket') || buckets[1].name;
 
 	let res = await fetch(`/api/minio/folder?bucket=${bucket}`);
 	let { folders } = await res.json();
