@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
-	import { getBuckets, getFolders, getPhotos } from '../data.remote';
+	import { getBuckets, getFolders, getPhotos } from '$lib/data.remote';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[1]);
