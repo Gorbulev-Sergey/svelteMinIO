@@ -27,7 +27,7 @@ export const getFolders = query(v.optional(v.string()), async (bucket) => {
 			}
 		}
 
-		return Array.from(folders);
+		return Array.from(folders).sort((a: string, b: string) => a.localeCompare(b, 'ru'));
 	}
 });
 

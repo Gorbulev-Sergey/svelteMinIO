@@ -7,7 +7,10 @@
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import type { IEXIF, IPhoto } from '$lib/models/IPhoto.js';
+	import { store } from '$lib/store.svelte.js';
 	import exifr from 'exifr';
+
+	store.title = 'Загружаем данные из <b>load</b>';
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -35,7 +38,7 @@
 <Column>
 	<Block title="Путь">
 		<div class="d-flex align-items-center justify-content-between w-100 gap-3">
-			<div class="d-flex align-items-center gap-0">
+			<div class="d-flex align-items-center gap-1">
 				{#each paramFolder.split('/') as item, i}
 					{#if i == 0}
 						<small class="text-dark px-1 py-0 rounded-1"><b>{selectedBucket}:</b></small>

@@ -2,6 +2,9 @@
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
 	import { getBuckets, getFolders, getPhotos } from '$lib/data.remote';
+	import { store } from '$lib/store.svelte';
+
+	store.title = 'Загружаем данные из <b>remote functions</b>';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[1]);
@@ -19,7 +22,7 @@
 				<button
 					class="btn btn-sm {selectedBucket.name === bucket.name
 						? 'btn-dark text-light'
-						: 'btn-light text-dark'}"
+						: 'btn-light text-dark'} text-nowrap"
 					onclick={() => {
 						selectedBucket = bucket;
 					}}
@@ -32,12 +35,12 @@
 
 	<Block>
 		<h4>Папки</h4>
-		<div class="d-flex align-items-center gap-2">
+		<div class="d-flex align-items-center gap-2 flex-wrap">
 			{#each folders as folder}
 				<button
 					class="btn btn-sm {selectedFolder === folder
 						? 'btn-dark text-light'
-						: 'btn-light text-dark'}"
+						: 'btn-light text-dark'} text-nowrap"
 					onclick={() => {
 						selectedFolder = folder;
 					}}
