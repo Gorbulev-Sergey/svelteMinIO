@@ -24,7 +24,11 @@
 			<div class="d-flex align-items-center gap-1">
 				{#each selectedFolder.split('/') as item, i}
 					{#if i == 0}
-						<small class="text-dark px-1 py-0 rounded-1"><b>{selectedBucket.name}:</b></small>
+						<button
+							class="btn btn-sm btn-light bg-white text-dark border-0"
+							onclick={async () => (selectedFolder = folders ? folders[0] : '')}
+							><b>{selectedBucket.name}:</b></button
+						>
 					{/if}
 					<div class="d-flex align-items-end">
 						<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
