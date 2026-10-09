@@ -17,7 +17,7 @@ export async function GET({ url }) {
 			}
 		}
 
-		return json({ folders: Array.from(folders) });
+		return new Response(JSON.stringify(Array.from(folders)));
 	} catch (err) {
 		console.error(err);
 		return new Response(JSON.stringify({ error: 'Failed to list folders' }), {

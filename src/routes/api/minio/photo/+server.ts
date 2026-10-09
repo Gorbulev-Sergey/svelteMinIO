@@ -2,12 +2,12 @@ import { minioClient } from '$lib/minio';
 import { json } from '@sveltejs/kit';
 
 export async function GET({ url }) {
-	// читаем префикс из query-параметра, например ?prefix=images
+	// читаем префикс из query-параметра, например ?folder=images
 	const bucket = url.searchParams.get('bucket') || '';
-	const prefix = url.searchParams.get('prefix') || '';
+	const folder = url.searchParams.get('folder') || '';
 
 	try {
-		const objects = await minioClient.listObjects(bucket, prefix, true);
+		const objects = await minioClient.listObjects(bucket, folder, true);
 
 		const images: Array<{ name: string; url: string }> = [];
 
@@ -21,7 +21,7 @@ export async function GET({ url }) {
 			// генерируем presigned URL — он будет работать даже без публичного бакета
 			const presignedUrl = await minioClient.presignedGetObject(bucket, objInfo.name, 24 * 60 * 60);
 
-			if (!objInfo.name.replace(prefix + '/', '').includes('/')) {
+			if (!objInfo.name.replace(folder + '/', '').includes('/')) {
 				images.push({
 					name: objInfo.name,
 					url: presignedUrl
@@ -29,7 +29,13 @@ export async function GET({ url }) {
 			}
 		}
 
-		return json({ images });
+		return new Response(JSON.stringify(images), {
+			// Кэшируем файлы
+			headers: {
+				'Cache-Control': 'public, max-age=604800',
+				Vary: 'Accept-Encoding'
+			}
+		});
 	} catch (err) {
 		console.error(err);
 		return new Response(JSON.stringify({ error: 'Failed to list images' }), {
@@ -38,53 +44,6 @@ export async function GET({ url }) {
 		});
 	}
 }
-
-// export async function POST({ request }) {
-// 	const formData = await request.formData();
-// 	const filePart = formData.get('file');
-// 	const folder = formData.get('folder');
-
-// 	if (!filePart || !(filePart instanceof Blob)) {
-// 		return new Response(JSON.stringify({ error: 'No file provided' }), {
-// 			status: 400,
-// 			headers: { 'Content-Type': 'application/json' }
-// 		});
-// 	}
-
-// 	const file = filePart as Blob & { name: string; type: string };
-// 	const buffer = Buffer.from(await file.arrayBuffer());
-
-// 	await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, buffer.length, {
-// 		'Content-Type': file.type
-// 	});
-
-// 	return new Response(JSON.stringify({ ok: true, name: file.name }));
-// }
-
-// export async function POST({ request }) {
-// 	const formData = await request.formData();
-// 	const fileParts = formData.getAll('files');
-// 	const folder = formData.get('folder');
-
-// 	if (!fileParts || !(fileParts[0] instanceof Blob)) {
-// 		return new Response(JSON.stringify({ error: 'No file provided' }), {
-// 			status: 400,
-// 			headers: { 'Content-Type': 'application/json' }
-// 		});
-// 	}
-
-// 	for (const filePart of fileParts) {
-// 		const file = filePart as Blob & { name: string; type: string };
-// 		console.log(file.name);
-
-// 		let buffer = Buffer.from(await file.arrayBuffer());
-// 		await minioClient.putObject('first', `/${folder}/${file.name}`, buffer, file.size, {
-// 			'Content-Type': file.type
-// 		});
-// 	}
-
-// 	return new Response(JSON.stringify({ ok: true }));
-// }
 
 export async function POST({ request }) {
 	const formData = await request.formData();

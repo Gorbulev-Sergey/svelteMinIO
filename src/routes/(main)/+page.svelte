@@ -15,7 +15,7 @@
 
 	let { data } = $props();
 
-	let buckets = $derived(data.buckets.sort((a, b) => a.name.localeCompare(b.name, 'ru')));
+	let buckets = $derived(data.buckets);
 	let selectedBucket = $derived(page.url.searchParams.get('bucket') || buckets[0].name);
 
 	let folders = $derived<string[]>(data.folders);
