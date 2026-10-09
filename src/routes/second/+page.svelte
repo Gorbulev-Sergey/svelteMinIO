@@ -19,6 +19,33 @@
 {/snippet}
 
 <Column>
+	<Block title="Путь">
+		<div class="d-flex align-items-center justify-content-between w-100 gap-3">
+			<div class="d-flex align-items-center gap-1">
+				{#each selectedFolder.split('/') as item, i}
+					{#if i == 0}
+						<small class="text-dark px-1 py-0 rounded-1"><b>{selectedBucket.name}:</b></small>
+					{/if}
+					<div class="d-flex align-items-end">
+						<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
+					</div>
+					<button
+						class="btn btn-sm btn-light text-dark px-1 py-0"
+						onclick={async () => {
+							selectedFolder = selectedFolder
+								.split('/')
+								.slice(0, i + 1)
+								.join('/');
+							await getPhotos({
+								bucket: selectedBucket?.name,
+								folder: selectedFolder
+							}).refresh();
+						}}>{item}</button
+					>
+				{/each}
+			</div>
+		</div>
+	</Block>
 	<Block>
 		<h4>Баккеты</h4>
 		<div class="d-flex align-items-center gap-2">

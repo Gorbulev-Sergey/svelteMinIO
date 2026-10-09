@@ -15,8 +15,8 @@
 
 	let { data } = $props();
 
-	let buckets = $derived(data.buckets);
-	let selectedBucket = $derived(page.url.searchParams.get('bucket') || buckets[1].name);
+	let buckets = $derived(data.buckets.sort((a, b) => a.name.localeCompare(b.name, 'ru')));
+	let selectedBucket = $derived(page.url.searchParams.get('bucket') || buckets[0].name);
 
 	let folders = $derived<string[]>(data.folders);
 	let paramFolder = $derived(page.url.searchParams.get('folder') || folders[0]);
@@ -57,7 +57,10 @@
 								.split('/')
 								.slice(0, i + 1)
 								.join('/');
-							goto(`?folder=${selectedPuth}`, { replaceState: false, noScroll: true });
+							goto(`?bucket=${selectedBucket}&folder=${selectedPuth}`, {
+								replaceState: false,
+								noScroll: true
+							});
 						}}>{item}</button
 					>
 				{/each}
@@ -120,7 +123,10 @@
 					<button
 						class="btn btn-sm btn-light text-dark"
 						onclick={async () => {
-							goto(`?folder=${item}`, { replaceState: false, noScroll: true });
+							goto(`?bucket=${selectedBucket}&folder=${item}`, {
+								replaceState: false,
+								noScroll: true
+							});
 						}}>{item}</button
 					>
 				{/if}

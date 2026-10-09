@@ -31,15 +31,13 @@
 			</div>
 		</div>
 
-		<div class="d-flex align-items-center justify-content-end gap-1 w-100">
+		<div class="d-flex align-items-center justify-content-end gap-0 w-100">
 			<a
-				class="btn btn-sm btn-light bg-light text-dark border-0 {page.url.pathname == '/'
-					? 'fw-bold'
-					: ''}"
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/' ? 'fw-bold' : ''}"
 				href="/">Load</a
 			>
 			<a
-				class="btn btn-sm btn-light bg-light text-dark border-0 {page.url.pathname == '/second'
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/second'
 					? 'fw-bold'
 					: ''}"
 				href="/second">Remote functions</a

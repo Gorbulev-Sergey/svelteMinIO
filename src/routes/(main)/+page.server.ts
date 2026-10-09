@@ -3,13 +3,11 @@ import type { BucketItemFromList } from 'minio';
 
 export async function load({ url, fetch, setHeaders }) {
 	// Добавляем кэширование фотографий, чтобы они загружались из кэша при повторной загрузке
-	setHeaders({
-		'Cache-Control': 'public, max-age=604800', // Кэш на 1-ну неделю
-		Vary: 'Accept-Encoding'
-	});
 
 	let buckets = (await (await fetch('/api/minio/bucket')).json()) as BucketItemFromList[];
-	let bucket = url.searchParams.get('bucket') || buckets[0].name;
+	let bucket =
+		url.searchParams.get('bucket') ||
+		buckets.sort((a, b) => a.name.localeCompare(b.name, 'ru'))[0].name;
 
 	let res = await fetch(`/api/minio/folder?bucket=${bucket}`);
 	let { folders } = await res.json();
@@ -25,6 +23,11 @@ export async function load({ url, fetch, setHeaders }) {
 		let { images } = await res1.json();
 		photos = images;
 	}
+
+	setHeaders({
+		'Cache-Control': 'public, max-age=604800', // Кэш на 1-ну неделю
+		Vary: 'Accept-Encoding'
+	});
 
 	return {
 		buckets,
