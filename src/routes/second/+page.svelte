@@ -4,15 +4,19 @@
 	import { getBuckets, getFolders, getPhotos } from '$lib/data.remote';
 	import { store } from '$lib/store.svelte';
 
-	store.title = 'Загружаем данные из <b>remote functions</b>';
-
 	let buckets = $derived(await getBuckets());
-	let selectedBucket = $derived(buckets[1]);
+	let selectedBucket = $derived(buckets[0]);
 	let folders = $derived(await getFolders(selectedBucket?.name));
 	let selectedFolder = $derived(folders ? folders[0] : '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
 	let selectedPhoto = $derived(photos ? photos[0] : { url: '', name: '' });
+
+	store.title = title;
 </script>
+
+{#snippet title()}
+	<div>Загружаем данные из <b>remote functions</b></div>
+{/snippet}
 
 <Column>
 	<Block>

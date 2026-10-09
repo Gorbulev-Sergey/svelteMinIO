@@ -1,5 +1,9 @@
-export const store = $state({
-	title: (t: string) => {
-		return t;
-	}
+import type { Snippet } from 'svelte';
+
+interface IStore {
+	title: Snippet<[]> | null;
+}
+
+export let store = $state<IStore>({
+	title: null
 });

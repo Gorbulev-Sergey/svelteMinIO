@@ -1,5 +1,6 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
+	import RenderTitle from '$lib/components/RenderTitle.svelte';
 	import { store } from '$lib/store.svelte';
 
 	let { children } = $props();
@@ -15,12 +16,16 @@
 			<a class="btn btn-sm btn-light bg-white text-dark border-0 text-nowrap" href="/"
 				>Svelte <b>MinIO</b></a
 			>
-			<div class="d-flex align-items-center gap-1">
+			<div class="d-flex align-items-center gap-2">
 				<div class="d-flex align-items-end">
-					<i style="" class="fa-solid fa-angle-right"></i>
+					<i style="font-size: .8em;" class="fa-solid fa-angle-right"></i>
 				</div>
 				<div class="my-0 text-nowrap text-uppercase">
-					{@html store.title}
+					<RenderTitle>
+						{#if store.title}
+							{@render store.title?.()}
+						{/if}
+					</RenderTitle>
 				</div>
 			</div>
 		</div>

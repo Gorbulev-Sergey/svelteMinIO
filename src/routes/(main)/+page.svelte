@@ -10,8 +10,6 @@
 	import { store } from '$lib/store.svelte.js';
 	import exifr from 'exifr';
 
-	store.title = 'Загружаем данные из <b>load</b>';
-
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
 
@@ -33,7 +31,13 @@
 	let isPhotoFullScreenShow = $state(false);
 	let isDeleteFolderShow = $state(false);
 	let isDeletePhotoShow = $state(false);
+
+	store.title = title;
 </script>
+
+{#snippet title()}
+	<div>Загружаем данные из <b>load</b></div>
+{/snippet}
 
 <Column>
 	<Block title="Путь">
