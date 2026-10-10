@@ -13,10 +13,16 @@
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
 	let selectedPhoto = $derived(photos ? photos[0] : { url: '', name: '' });
 
-	let selected = $derived({
-		bucket: buckets[0],
-		folder: folders ? folders[0] : '',
-		photo: photos ? photos[0] : { url: '', name: '' }
+	let isModalShow = $state({
+		bucket: { add: false, delete: false },
+		folder: { add: false, delete: false },
+		photo: { add: false, delete: false }
+	});
+
+	let newObject = $state({
+		bucket: '',
+		folder: '',
+		photo: ''
 	});
 
 	store.title = title;
@@ -61,12 +67,8 @@
 
 	<Block>
 		<Title title="Баккеты">
-			<button
-				class="btn btn-sm btn-dark text-light"
-				onclick={async () => {
-					await addBucket('new-bucket');
-					await getBuckets().refresh();
-				}}>Добавить</button
+			<button class="btn btn-sm btn-dark text-light" onclick={() => (isModalShow.bucket.add = true)}
+				>Добавить</button
 			>
 		</Title>
 		<div class="d-flex align-items-center gap-2">
@@ -140,21 +142,21 @@
 	</Block>
 </Column>
 
-<!-- <Modal
-		title="Добавить папку?"
-		bind:isShow={isFolderCreateShow}
-		onOkTitle="Добавить"
-		onOk={() => {
-			fetch('api/minio/folder', {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify({
-					folder: newFolder
-				})
-			});
-		}}
-	>
-		<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
-	</Modal> -->
+<Modal
+	title="Добавить бакет?"
+	bind:isShow={isModalShow.bucket.add}
+	onOkTitle="Добавить"
+	onOk={async () => {
+		await addBucket(newObject.bucket);
+		await getBuckets().refresh();
+		newObject.bucket = '';
+	}}
+	onClose={() => {
+		newObject.bucket = '';
+	}}
+>
+	<div class="bg-info bg-opacity-10 rounded-1 px-3 py-2">
+		Название бакета должно содержать только латинские буквы!
+	</div>
+	<input class="form-control" placeholder="Название бакета" bind:value={newObject.bucket} />
+</Modal>

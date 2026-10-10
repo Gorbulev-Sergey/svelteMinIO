@@ -41,7 +41,7 @@
 					}}
 				></button>
 			</div>
-			<div class="px-2 py-1">
+			<div class="d-flex flex-column gap-2 px-2 py-1">
 				{@render children?.()}
 			</div>
 			<div class="d-flex align-items-center justify-content-between p-2">
