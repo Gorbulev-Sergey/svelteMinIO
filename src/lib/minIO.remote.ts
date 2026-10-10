@@ -67,6 +67,17 @@ export const addFolder = command(folderSchema, async (data) => {
 	);
 });
 
+export const deleteFolder = command(folderSchema, async (data) => {
+	const objects = minioClient.listObjects(data.bucket, data.folder, true);
+	const removeObjects = [];
+
+	for await (const obj of objects) {
+		removeObjects.push({ name: obj.name });
+	}
+
+	if (removeObjects.length != 0) await minioClient.removeObjects(data.bucket, removeObjects);
+});
+
 export const getPhotos = query(photoSchema, async (data) => {
 	if (data.bucket && data.folder) {
 		const objects = await minioClient.listObjects(data.bucket, data.folder, true);

@@ -7,6 +7,7 @@
 		addBucket,
 		addFolder,
 		deleteBucket,
+		deleteFolder,
 		getBuckets,
 		getFolders,
 		getPhotos
@@ -116,16 +117,30 @@
 		</Title>
 		<div class="d-flex align-items-center gap-2 flex-wrap">
 			{#each folders as folder}
-				<button
-					class="btn btn-sm {selectedFolder === folder
-						? 'btn-dark text-light'
-						: 'btn-light text-dark'} text-nowrap"
-					onclick={() => {
-						selectedFolder = folder;
-					}}
-				>
-					{folder}
-				</button>
+				<div class="d-flex align-items-center">
+					<button
+						class="btn btn-sm {selectedFolder === folder
+							? 'btn-dark text-light'
+							: 'btn-light text-dark'} text-nowrap rounded-end-0"
+						onclick={() => {
+							selectedFolder = folder;
+						}}
+					>
+						{folder}
+					</button>
+					<button
+						title="Удалить бакет"
+						class="btn btn-sm {selectedFolder === folder
+							? 'btn-dark'
+							: 'btn-light'} text-danger text-nowrap rounded-start-0"
+						onclick={() => {
+							selectedFolder = folder;
+							isModalShow.folder.delete = true;
+						}}
+					>
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
 			{/each}
 		</div>
 	</Block>
@@ -228,5 +243,39 @@
 	}}
 	autoCloseOnOk={false}
 >
+	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
+</Modal>
+
+<Modal
+	title="Удалить папку {selectedFolder}?"
+	bind:isShow={isModalShow.folder.delete}
+	buttonOkTitle="Удалить"
+	onOk={async () => {
+		if (selectedFolder === newObject.folder) {
+			isModalShow.folder.delete = false;
+			await deleteFolder({ bucket: selectedBucket.name, folder: newObject.folder });
+			await getFolders(selectedBucket.name).refresh();
+			newObject.folder = '';
+		}
+	}}
+	onCancel={() => {
+		newObject.folder = '';
+	}}
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3"
+	>
+		{#if photos && photos.length > 0}
+			<div>Папка <b>{selectedFolder}</b> не пустая!</div>
+		{/if}
+		<div>Вы точно хотите удалить эту папку?</div>
+		<div>
+			Для удаления паки <b class="bg-danger text-light px-1 rounded-1 text-nowrap"
+				>{selectedFolder}</b
+			> введите её название!
+		</div>
+	</div>
+
 	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
 </Modal>
