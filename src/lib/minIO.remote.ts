@@ -1,4 +1,4 @@
-import { query } from '$app/server';
+import { command, query } from '$app/server';
 import { minioClient } from '$lib/minio';
 import * as v from 'valibot';
 
@@ -8,8 +8,7 @@ const photoSchema = v.object({
 });
 
 export const getBuckets = query(async () => {
-	const buckets = minioClient.listBuckets();
-	return buckets;
+	return minioClient.listBuckets();
 });
 
 export const getFolders = query(v.optional(v.string()), async (bucket) => {
@@ -61,4 +60,22 @@ export const getPhotos = query(photoSchema, async (data) => {
 
 		return images;
 	}
+});
+
+export const addBucket = command(v.string(), async (bucket) => {
+	if (await minioClient.bucketExists(bucket)) return;
+
+	await minioClient.makeBucket(bucket);
+});
+
+export const deleteBucket = command(v.string(), async (bucket) => {
+	// Удаляем содержимое бакета
+	const objectsStream = minioClient.listObjects(bucket, '', true);
+	for await (const obj of objectsStream) {
+		if (obj.isDir) continue;
+		await minioClient.removeObject(bucket, obj.name);
+	}
+
+	// Удаляем сам бакет
+	await minioClient.removeBucket(bucket);
 });

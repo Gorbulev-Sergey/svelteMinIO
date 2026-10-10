@@ -19,7 +19,7 @@
 	let selectedBucket = $derived(page.url.searchParams.get('bucket') || buckets[0].name);
 
 	let folders = $derived<string[]>(data.folders);
-	let paramFolder = $derived(page.url.searchParams.get('folder') || folders[0]);
+	let paramFolder = $derived(page.url.searchParams.get('folder') || folders[0] || '');
 	let selectedFolder = $derived(paramFolder ? folders.findIndex((f) => f == paramFolder) : 0);
 
 	let photos = $derived<IPhoto[]>(data.photos);
@@ -43,7 +43,7 @@
 	<Block title="Путь">
 		<div class="d-flex align-items-center justify-content-between w-100 gap-3">
 			<div class="d-flex align-items-center gap-1">
-				{#each paramFolder.split('/') as item, i}
+				{#each paramFolder?.split('/') as item, i}
 					{#if i == 0}
 						<small class="text-dark px-1 py-0 rounded-1"><b>{selectedBucket}:</b></small>
 					{/if}
@@ -54,9 +54,9 @@
 						class="btn btn-sm btn-light text-dark px-1 py-0"
 						onclick={() => {
 							let selectedPuth = paramFolder
-								.split('/')
-								.slice(0, i + 1)
-								.join('/');
+								?.split('/')
+								?.slice(0, i + 1)
+								?.join('/');
 							goto(`?bucket=${selectedBucket}&folder=${selectedPuth}`, {
 								replaceState: false,
 								noScroll: true
@@ -156,8 +156,7 @@
 						await fetch('api/minio/photo', {
 							method: 'POST',
 							body: formData
-						});
-						invalidateAll();
+						}).then(() => invalidateAll());
 					}
 				}}
 			/>

@@ -1,15 +1,23 @@
 <script lang="ts">
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
-	import { getBuckets, getFolders, getPhotos } from '$lib/data.remote';
+	import Modal from '$lib/components/Modal.svelte';
+	import Title from '$lib/components/Title.svelte';
+	import { addBucket, deleteBucket, getBuckets, getFolders, getPhotos } from '$lib/minIO.remote';
 	import { store } from '$lib/store.svelte';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[0]);
-	let folders = $derived(await getFolders(selectedBucket?.name));
+	let folders = $derived((await getFolders(selectedBucket?.name)) || []);
 	let selectedFolder = $derived(folders ? folders[0] : '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
 	let selectedPhoto = $derived(photos ? photos[0] : { url: '', name: '' });
+
+	let selected = $derived({
+		bucket: buckets[0],
+		folder: folders ? folders[0] : '',
+		photo: photos ? photos[0] : { url: '', name: '' }
+	});
 
 	store.title = title;
 </script>
@@ -22,7 +30,7 @@
 	<Block title="Путь">
 		<div class="d-flex align-items-center justify-content-between w-100 gap-3">
 			<div class="d-flex align-items-center gap-1">
-				{#each selectedFolder.split('/') as item, i}
+				{#each selectedFolder?.split('/') as item, i}
 					{#if i == 0}
 						<button
 							class="btn btn-sm btn-light bg-white text-dark border-0"
@@ -37,9 +45,9 @@
 						class="btn btn-sm btn-light text-dark px-1 py-0"
 						onclick={async () => {
 							selectedFolder = selectedFolder
-								.split('/')
-								.slice(0, i + 1)
-								.join('/');
+								?.split('/')
+								?.slice(0, i + 1)
+								?.join('/');
 							await getPhotos({
 								bucket: selectedBucket?.name,
 								folder: selectedFolder
@@ -50,26 +58,48 @@
 			</div>
 		</div>
 	</Block>
+
 	<Block>
-		<h4>Баккеты</h4>
+		<Title title="Баккеты">
+			<button
+				class="btn btn-sm btn-dark text-light"
+				onclick={async () => {
+					await addBucket('new-bucket');
+					await getBuckets().refresh();
+				}}>Добавить</button
+			>
+		</Title>
 		<div class="d-flex align-items-center gap-2">
 			{#each buckets as bucket}
-				<button
-					class="btn btn-sm {selectedBucket.name === bucket.name
-						? 'btn-dark text-light'
-						: 'btn-light text-dark'} text-nowrap"
-					onclick={() => {
-						selectedBucket = bucket;
-					}}
-				>
-					{bucket.name}
-				</button>
+				<div class="d-flex align-items-center">
+					<button
+						class="btn btn-sm {selectedBucket.name === bucket.name
+							? 'btn-dark text-light'
+							: 'btn-light text-dark'} text-nowrap rounded-end-0"
+						onclick={() => {
+							selectedBucket = bucket;
+						}}
+					>
+						{bucket.name}
+					</button>
+					<button
+						title="Удалить бакет"
+						class="btn btn-sm {selectedBucket.name === bucket.name
+							? 'btn-dark'
+							: 'btn-light'} text-danger text-nowrap rounded-start-0"
+						onclick={async () => {
+							await deleteBucket(bucket.name);
+							await getBuckets().refresh();
+						}}
+					>
+						<i class="fa-solid fa-xmark"></i>
+					</button>
+				</div>
 			{/each}
 		</div>
 	</Block>
 
-	<Block>
-		<h4>Папки</h4>
+	<Block title="Папки">
 		<div class="d-flex align-items-center gap-2 flex-wrap">
 			{#each folders as folder}
 				<button
@@ -86,8 +116,7 @@
 		</div>
 	</Block>
 
-	<Block>
-		<h4>Фотографии</h4>
+	<Block title="Фотографии">
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
 			{#each photos as photo}
 				<div class="col">
@@ -110,3 +139,22 @@
 		</div>
 	</Block>
 </Column>
+
+<!-- <Modal
+		title="Добавить папку?"
+		bind:isShow={isFolderCreateShow}
+		onOkTitle="Добавить"
+		onOk={() => {
+			fetch('api/minio/folder', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					folder: newFolder
+				})
+			});
+		}}
+	>
+		<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
+	</Modal> -->

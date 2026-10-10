@@ -33,14 +33,14 @@
 
 		<div class="d-flex align-items-center justify-content-end gap-0 w-100">
 			<a
-				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/' ? 'fw-bold' : ''}"
-				href="/">Load</a
-			>
-			<a
-				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/second'
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/main'
 					? 'fw-bold'
 					: ''}"
-				href="/second">Remote functions</a
+				href="/main">Load</a
+			>
+			<a
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/' ? 'fw-bold' : ''}"
+				href="/">Remote functions</a
 			>
 		</div>
 	</div>

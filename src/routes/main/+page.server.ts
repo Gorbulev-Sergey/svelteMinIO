@@ -1,4 +1,3 @@
-import type { IPhoto } from '$lib/models/IPhoto.js';
 import type { BucketItemFromList } from 'minio';
 
 export async function load({ url, fetch, setHeaders }) {
