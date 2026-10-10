@@ -2,22 +2,6 @@ import { command, query } from '$app/server';
 import { minioClient } from '$lib/minio';
 import * as v from 'valibot';
 
-const folderSchema = v.object({
-	bucket: v.string(),
-	folder: v.string()
-});
-
-const getPhotoSchema = v.object({
-	bucket: v.optional(v.string()),
-	folder: v.optional(v.string())
-});
-
-const photosSchema = v.object({
-	bucket: v.string(),
-	folder: v.string(),
-	photos: v.array(v.blob())
-});
-
 export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
 });
@@ -59,78 +43,103 @@ export const getFolders = query(v.optional(v.string()), async (bucket) => {
 	}
 });
 
-export const addFolder = command(folderSchema, async (data) => {
-	if (data.bucket.trim() === '' && data.folder.trim() === '') return;
+export const addFolder = command(
+	v.object({
+		bucket: v.string(),
+		folder: v.string()
+	}),
+	async (data) => {
+		if (data.bucket.trim() === '' && data.folder.trim() === '') return;
 
-	// folder должен быть без начального слэша, например 'images/2024'
-	const objectName = data.folder.endsWith('/') ? data.folder : data.folder + '/';
+		// folder должен быть без начального слэша, например 'images/2024'
+		const objectName = data.folder.endsWith('/') ? data.folder : data.folder + '/';
 
-	await minioClient.putObject(
-		data.bucket,
-		objectName,
-		Buffer.alloc(0), // пустой буфер
-		0 // длина
-	);
-});
-
-export const deleteFolder = command(folderSchema, async (data) => {
-	const objects = minioClient.listObjects(data.bucket, data.folder, true);
-	const removeObjects = [];
-
-	for await (const obj of objects) {
-		removeObjects.push({ name: obj.name });
+		await minioClient.putObject(
+			data.bucket,
+			objectName,
+			Buffer.alloc(0), // пустой буфер
+			0 // длина
+		);
 	}
+);
 
-	if (removeObjects.length != 0) await minioClient.removeObjects(data.bucket, removeObjects);
-});
+export const deleteFolder = command(
+	v.object({
+		bucket: v.string(),
+		folder: v.string()
+	}),
+	async (data) => {
+		const objects = minioClient.listObjects(data.bucket, data.folder, true);
+		const removeObjects = [];
 
-export const getPhotos = query(getPhotoSchema, async (data) => {
-	if (data.bucket && data.folder) {
-		const objects = await minioClient.listObjects(data.bucket, data.folder, true);
-
-		const images: Array<{ name: string; url: string }> = [];
-
-		for await (const objInfo of objects) {
-			// берём только файлы с расширениями картинок
-			const ext = objInfo.name.split('.').pop()?.toLowerCase();
-			if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'].includes(ext ?? '')) {
-				continue;
-			}
-
-			// генерируем presigned URL — он будет работать даже без публичного бакета
-			const presignedUrl = await minioClient.presignedGetObject(
-				data.bucket,
-				objInfo.name,
-				24 * 60 * 60
-			);
-
-			if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
-				images.push({
-					name: objInfo.name,
-					url: presignedUrl
-				});
-			}
+		for await (const obj of objects) {
+			removeObjects.push({ name: obj.name });
 		}
 
-		return images;
+		if (removeObjects.length != 0) await minioClient.removeObjects(data.bucket, removeObjects);
 	}
-});
+);
 
-export const addPhotos = command(photosSchema, async (data) => {
-	if (!data.photos || !(data.photos[0] instanceof Blob)) return;
+export const getPhotos = query(
+	v.object({
+		bucket: v.optional(v.string()),
+		folder: v.optional(v.string())
+	}),
+	async (data) => {
+		if (data.bucket && data.folder) {
+			const objects = await minioClient.listObjects(data.bucket, data.folder, true);
 
-	console.log(data.photos);
+			const images: Array<{ name: string; url: string }> = [];
 
-	for (const f of data.photos) {
-		const file = f as Blob & { name: string; type: string };
-		console.log(file.name);
+			for await (const objInfo of objects) {
+				// берём только файлы с расширениями картинок
+				const ext = objInfo.name.split('.').pop()?.toLowerCase();
+				if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'].includes(ext ?? '')) {
+					continue;
+				}
 
-		let buffer = Buffer.from(await file.arrayBuffer());
-		await minioClient.putObject(data.bucket, `${data.folder}/${file.name}`, buffer, file.size, {
-			'Content-Type': file.type
-		});
+				// генерируем presigned URL — он будет работать даже без публичного бакета
+				const presignedUrl = await minioClient.presignedGetObject(
+					data.bucket,
+					objInfo.name,
+					24 * 60 * 60
+				);
+
+				if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
+					images.push({
+						name: objInfo.name,
+						url: presignedUrl
+					});
+				}
+			}
+
+			return images;
+		}
 	}
-});
+);
+
+export const addPhotos = command(
+	v.object({
+		bucket: v.string(),
+		folder: v.string(),
+		photos: v.array(v.blob())
+	}),
+	async (data) => {
+		if (!data.photos || !(data.photos[0] instanceof Blob)) return;
+
+		console.log(data.photos);
+
+		for (const f of data.photos) {
+			const file = f as Blob & { name: string; type: string };
+			console.log(file.name);
+
+			let buffer = Buffer.from(await file.arrayBuffer());
+			await minioClient.putObject(data.bucket, `${data.folder}/${file.name}`, buffer, file.size, {
+				'Content-Type': file.type
+			});
+		}
+	}
+);
 
 export const deletePhoto = command(
 	v.object({
