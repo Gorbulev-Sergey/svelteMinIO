@@ -143,17 +143,21 @@
 </Column>
 
 <Modal
-	title="Добавить бакет?"
+	title="Добавить <b>{newObject.bucket}</b> бакет?"
 	bind:isShow={isModalShow.bucket.add}
-	onOkTitle="Добавить"
+	buttonOkTitle="Добавить"
 	onOk={async () => {
-		await addBucket(newObject.bucket);
-		await getBuckets().refresh();
+		if (newObject.bucket.trim() != '') {
+			isModalShow.bucket.add = false;
+			await addBucket(newObject.bucket);
+			await getBuckets().refresh();
+			newObject.bucket = '';
+		}
+	}}
+	onCancel={() => {
 		newObject.bucket = '';
 	}}
-	onClose={() => {
-		newObject.bucket = '';
-	}}
+	autoCloseOnOk={false}
 >
 	<div class="bg-info text-dark bg-opacity-10 rounded-1 px-3 py-2">
 		Название бакета должно содержать только латинские буквы!
@@ -164,17 +168,19 @@
 <Modal
 	title="Удалить бакет {selectedBucket.name}?"
 	bind:isShow={isModalShow.bucket.delete}
-	onOkTitle="Удалить"
+	buttonOkTitle="Удалить"
 	onOk={async () => {
 		if (selectedBucket.name === newObject.bucket) {
+			isModalShow.bucket.delete = false;
 			await deleteBucket(newObject.bucket);
 			await getBuckets().refresh();
 			newObject.bucket = '';
 		}
 	}}
-	onClose={() => {
+	onCancel={() => {
 		newObject.bucket = '';
 	}}
+	autoCloseOnOk={false}
 >
 	<div
 		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 px-3 py-2"

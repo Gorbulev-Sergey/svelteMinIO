@@ -7,7 +7,7 @@
 		_class?: string;
 		children?: Snippet<[]>;
 		onSave?: () => void;
-		onClose?: () => void;
+		onCancel?: () => void;
 	}
 	let {
 		title,
@@ -15,7 +15,7 @@
 		_class,
 		children,
 		onSave = () => {},
-		onClose = () => {}
+		onCancel = () => {}
 	}: IProps = $props();
 </script>
 
@@ -34,7 +34,7 @@
 				style="top: .7em; right:.7em;"
 				onclick={() => {
 					isShow = false;
-					onClose();
+					onCancel();
 				}}
 			></button>
 			{@render children?.()}

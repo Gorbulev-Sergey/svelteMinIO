@@ -3,21 +3,25 @@
 
 	interface IProps {
 		title?: string;
-		onOkTitle?: string;
+		buttonOkTitle?: string;
+		buttonCancelTitle?: string;
 		isShow?: boolean;
+		autoCloseOnOk?: boolean;
 		_class?: string;
 		children?: Snippet<[]>;
 		onOk?: () => void;
-		onClose?: () => void;
+		onCancel?: () => void;
 	}
 	let {
 		title,
-		onOkTitle = 'Ок',
+		buttonOkTitle = 'Ок',
+		buttonCancelTitle = 'Отмена',
+		autoCloseOnOk = true,
 		isShow = $bindable(false),
 		_class,
 		children,
 		onOk = () => {},
-		onClose = () => {}
+		onCancel = () => {}
 	}: IProps = $props();
 </script>
 
@@ -26,40 +30,41 @@
 	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.06em);"
 >
 	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" tabindex="-1">
-		<div
-			class="modal-content rounded shadow-sm w-100 bg-white p-1 {_class}"
-			style="border-width: 0;"
-		>
-			<div class="d-flex align-self-center justify-content-between p-2 w-100">
-				<b class="ps-1 mb-0">{title}</b>
-				<button
-					aria-label="Закрыть"
-					class="btn-close"
-					onclick={() => {
-						isShow = false;
-						onClose();
-					}}
-				></button>
-			</div>
-			<div class="d-flex flex-column gap-2 px-2 py-1">
-				{@render children?.()}
-			</div>
-			<div class="d-flex align-items-center justify-content-between p-2">
-				<button
-					class="btn btn-sm btn-light text-dark"
-					onclick={() => {
-						isShow = false;
-						onClose();
-					}}>Отмена</button
-				>
-				<button
-					class="btn btn-sm btn-dark text-light"
-					onclick={() => {
-						isShow = false;
-						onOk();
-						onClose();
-					}}>{onOkTitle}</button
-				>
+		<div class="modal-content rounded shadow-sm border-0 w-100 bg-white {_class}">
+			<div class="d-flex flex-column gap-2 p-2">
+				<div class="d-flex align-self-center justify-content-between w-100">
+					<b class="ps-1 mb-0">{@html title}</b>
+					<button
+						aria-label="Закрыть"
+						class="btn-close"
+						onclick={() => {
+							isShow = false;
+							onCancel();
+						}}
+					></button>
+				</div>
+				<div class="d-flex flex-column gap-2 px-1">
+					{@render children?.()}
+				</div>
+				<div class="d-flex align-items-center justify-content-between">
+					<button
+						class="btn btn-sm btn-light text-dark"
+						onclick={() => {
+							isShow = false;
+							onCancel();
+						}}>{buttonCancelTitle}</button
+					>
+					<button
+						class="btn btn-sm btn-dark text-light"
+						onclick={() => {
+							onOk();
+							if (autoCloseOnOk) {
+								isShow = false;
+								onCancel();
+							}
+						}}>{buttonOkTitle}</button
+					>
+				</div>
 			</div>
 		</div>
 	</div>

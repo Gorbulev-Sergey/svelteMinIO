@@ -215,7 +215,7 @@
 	<Modal
 		title="Добавить папку?"
 		bind:isShow={isFolderCreateShow}
-		onOkTitle="Добавить"
+		buttonOkTitle="Добавить"
 		onOk={() => {
 			fetch('api/minio/folder', {
 				method: 'POST',
@@ -273,7 +273,7 @@
 	<Modal
 		title="Удалить папку?"
 		bind:isShow={isDeleteFolderShow}
-		onOkTitle="Удалить"
+		buttonOkTitle="Удалить"
 		onOk={() => {
 			fetch('/api/minio/folder', {
 				method: 'DELETE',
@@ -292,7 +292,7 @@
 	<Modal
 		title="Удалить этот файл?"
 		bind:isShow={isDeletePhotoShow}
-		onOkTitle="Удалить"
+		buttonOkTitle="Удалить"
 		onOk={() => {
 			fetch('api/minio/photo/url', {
 				method: 'DELETE',
