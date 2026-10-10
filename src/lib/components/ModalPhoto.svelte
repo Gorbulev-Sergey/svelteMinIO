@@ -1,27 +1,39 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onMount } from 'svelte';
 
 	interface IProps {
-		title?: string;
 		url: string;
 		isShow?: boolean;
-		_class?: string;
 		onCancel?: () => void;
 	}
-	let { title, url, isShow = $bindable(false), _class, onCancel = () => {} }: IProps = $props();
+	let { url, isShow = $bindable(false), onCancel = () => {} }: IProps = $props();
+
+	function hideScroll(isHide: boolean) {
+		document.body.style.overflow = isHide ? 'hidden' : '';
+	}
+
+	$effect(() => {
+		hideScroll(isShow);
+	});
 </script>
 
 <div
 	class="modal modal-fullscreen {isShow ? 'show' : 'fade'} bg-dark bg-opacity-75 p-1"
 	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.06em);"
 >
-	<div
-		class="rounded h-100 d-flex align-items-start justify-content-end {_class}"
-		style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: contain; min-height:13em;"
-	>
+	<div class="position-relative w-100 h-100">
+		<div class="d-flex justify-content-center align-items-center w-100 h-100">
+			<img
+				class="img-fluid h-100 rounded-1"
+				src={url}
+				style="background-position: center; background-size: contain;"
+				alt=""
+			/>
+		</div>
 		<button
 			aria-label="Закрыть"
-			class="btn btn-sm btn-dark bg-dark me-1 p-1 bg-opacity-10 border-0 position-fixed z-3"
+			class="btn btn-sm btn-dark bg-dark me-1 p-1 bg-opacity-10 border-0 position-fixed"
+			style="top:.25rem; right:.25rem"
 			onclick={(e) => {
 				e.stopPropagation();
 				isShow = false;
