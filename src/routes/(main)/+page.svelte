@@ -143,7 +143,7 @@
 				name="files"
 				multiple
 				bind:this={inputFiles}
-				onchange={(e: Event) => {
+				onchange={async (e: Event) => {
 					const t = e.target as HTMLInputElement;
 					if (t.files && t.files.length > 0) {
 						files = t.files;
@@ -153,12 +153,11 @@
 							formData.append('files', item);
 						}
 						formData.append('folder', folders[selectedFolder]);
-						fetch('api/minio/photo', {
+						await fetch('api/minio/photo', {
 							method: 'POST',
 							body: formData
-						}).then(() => {
-							invalidateAll();
 						});
+						invalidateAll();
 					}
 				}}
 			/>

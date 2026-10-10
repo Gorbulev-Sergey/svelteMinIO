@@ -1,5 +1,4 @@
 import { minioClient } from '$lib/minio';
-import { json } from '@sveltejs/kit';
 
 export async function GET({ url }) {
 	// читаем префикс из query-параметра, например ?folder=images
