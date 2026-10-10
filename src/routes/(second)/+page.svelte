@@ -2,6 +2,7 @@
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
 	import Modal from '$lib/components/Modal.svelte';
+	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import {
 		addBucket,
@@ -29,7 +30,7 @@
 	let isModalShow = $state({
 		bucket: { add: false, delete: false },
 		folder: { add: false, delete: false },
-		photo: { add: false, delete: false }
+		photo: { add: false, delete: false, fullScreen: false }
 	});
 
 	let newObject = $state({
@@ -186,9 +187,11 @@
 						style="padding: .13em;"
 						onmouseover={() => (selectedPhoto = photo)}
 					>
+						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<div
 							class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
 							style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
+							onclick={() => (isModalShow.photo.fullScreen = true)}
 						>
 							<button
 								title="Удалить фото"
@@ -347,3 +350,5 @@
 		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
 	></div>
 </Modal>
+
+<ModalPhoto bind:isShow={isModalShow.photo.fullScreen} url={selectedPhoto.url}></ModalPhoto>
