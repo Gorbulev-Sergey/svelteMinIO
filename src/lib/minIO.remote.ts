@@ -2,6 +2,11 @@ import { command, query } from '$app/server';
 import { minioClient } from '$lib/minio';
 import * as v from 'valibot';
 
+const folderSchema = v.object({
+	bucket: v.string(),
+	folder: v.string()
+});
+
 const photoSchema = v.object({
 	bucket: v.optional(v.string()),
 	folder: v.optional(v.string())
@@ -9,6 +14,24 @@ const photoSchema = v.object({
 
 export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
+});
+
+export const addBucket = command(v.string(), async (bucket) => {
+	if (await minioClient.bucketExists(bucket)) return;
+
+	await minioClient.makeBucket(bucket);
+});
+
+export const deleteBucket = command(v.string(), async (bucket) => {
+	// Удаляем содержимое бакета
+	const objectsStream = minioClient.listObjects(bucket, '', true);
+	for await (const obj of objectsStream) {
+		if (obj.isDir) continue;
+		await minioClient.removeObject(bucket, obj.name);
+	}
+
+	// Удаляем сам бакет
+	await minioClient.removeBucket(bucket);
 });
 
 export const getFolders = query(v.optional(v.string()), async (bucket) => {
@@ -28,6 +51,20 @@ export const getFolders = query(v.optional(v.string()), async (bucket) => {
 
 		return Array.from(folders).sort((a: string, b: string) => a.localeCompare(b, 'ru'));
 	}
+});
+
+export const addFolder = command(folderSchema, async (data) => {
+	if (data.bucket.trim() === '' && data.folder.trim() === '') return;
+
+	// folder должен быть без начального слэша, например 'images/2024'
+	const objectName = data.folder.endsWith('/') ? data.folder : data.folder + '/';
+
+	await minioClient.putObject(
+		data.bucket,
+		objectName,
+		Buffer.alloc(0), // пустой буфер
+		0 // длина
+	);
 });
 
 export const getPhotos = query(photoSchema, async (data) => {
@@ -60,22 +97,4 @@ export const getPhotos = query(photoSchema, async (data) => {
 
 		return images;
 	}
-});
-
-export const addBucket = command(v.string(), async (bucket) => {
-	if (await minioClient.bucketExists(bucket)) return;
-
-	await minioClient.makeBucket(bucket);
-});
-
-export const deleteBucket = command(v.string(), async (bucket) => {
-	// Удаляем содержимое бакета
-	const objectsStream = minioClient.listObjects(bucket, '', true);
-	for await (const obj of objectsStream) {
-		if (obj.isDir) continue;
-		await minioClient.removeObject(bucket, obj.name);
-	}
-
-	// Удаляем сам бакет
-	await minioClient.removeBucket(bucket);
 });

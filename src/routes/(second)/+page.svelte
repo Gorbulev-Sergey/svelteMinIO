@@ -3,7 +3,14 @@
 	import Column from '$lib/components/Column.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Title from '$lib/components/Title.svelte';
-	import { addBucket, deleteBucket, getBuckets, getFolders, getPhotos } from '$lib/minIO.remote';
+	import {
+		addBucket,
+		addFolder,
+		deleteBucket,
+		getBuckets,
+		getFolders,
+		getPhotos
+	} from '$lib/minIO.remote';
 	import { store } from '$lib/store.svelte';
 
 	let buckets = $derived(await getBuckets());
@@ -101,7 +108,12 @@
 		</div>
 	</Block>
 
-	<Block title="Папки">
+	<Block>
+		<Title title="Папки">
+			<button class="btn btn-sm btn-dark text-light" onclick={() => (isModalShow.folder.add = true)}
+				>Добавить</button
+			>
+		</Title>
 		<div class="d-flex align-items-center gap-2 flex-wrap">
 			{#each folders as folder}
 				<button
@@ -197,4 +209,24 @@
 	</div>
 
 	<input class="form-control" placeholder="Название бакета" bind:value={newObject.bucket} />
+</Modal>
+
+<Modal
+	title="Добавить <b>{newObject.folder}</b> папку?"
+	bind:isShow={isModalShow.folder.add}
+	buttonOkTitle="Добавить"
+	onOk={async () => {
+		if (newObject.folder.trim() !== '') {
+			isModalShow.folder.add = false;
+			await addFolder({ bucket: selectedBucket.name, folder: newObject.folder });
+			await getFolders(selectedBucket.name).refresh();
+			newObject.folder = '';
+		}
+	}}
+	onCancel={() => {
+		newObject.folder = '';
+	}}
+	autoCloseOnOk={false}
+>
+	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
 </Modal>
