@@ -89,9 +89,9 @@
 						class="btn btn-sm {selectedBucket.name === bucket.name
 							? 'btn-dark'
 							: 'btn-light'} text-danger text-nowrap rounded-start-0"
-						onclick={async () => {
-							await deleteBucket(bucket.name);
-							await getBuckets().refresh();
+						onclick={() => {
+							selectedBucket = bucket;
+							isModalShow.bucket.delete = true;
 						}}
 					>
 						<i class="fa-solid fa-xmark"></i>
@@ -155,8 +155,40 @@
 		newObject.bucket = '';
 	}}
 >
-	<div class="bg-info bg-opacity-10 rounded-1 px-3 py-2">
+	<div class="bg-info text-dark bg-opacity-10 rounded-1 px-3 py-2">
 		Название бакета должно содержать только латинские буквы!
 	</div>
+	<input class="form-control" placeholder="Название бакета" bind:value={newObject.bucket} />
+</Modal>
+
+<Modal
+	title="Удалить бакет {selectedBucket.name}?"
+	bind:isShow={isModalShow.bucket.delete}
+	onOkTitle="Удалить"
+	onOk={async () => {
+		if (selectedBucket.name === newObject.bucket) {
+			await deleteBucket(newObject.bucket);
+			await getBuckets().refresh();
+			newObject.bucket = '';
+		}
+	}}
+	onClose={() => {
+		newObject.bucket = '';
+	}}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 px-3 py-2"
+	>
+		{#if folders.length > 0}
+			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
+		{/if}
+		<div>Вы точно хотите удалить бакет{folders.length > 0 ? ' со всем его содержимым' : ''}!</div>
+		<div>
+			Для удаления бакета <b class="bg-danger text-light px-1 rounded-1 text-nowrap"
+				>{selectedBucket.name}</b
+			> введите его название!
+		</div>
+	</div>
+
 	<input class="form-control" placeholder="Название бакета" bind:value={newObject.bucket} />
 </Modal>

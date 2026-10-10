@@ -23,7 +23,7 @@
 
 <div
 	class="modal {isShow ? 'show' : 'fade'} bg-dark bg-opacity-10"
-	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.04em);"
+	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.06em);"
 >
 	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" tabindex="-1">
 		<div
