@@ -6,6 +6,7 @@
 	import {
 		addBucket,
 		addFolder,
+		addPhotos,
 		deleteBucket,
 		deleteFolder,
 		getBuckets,
@@ -20,6 +21,9 @@
 	let selectedFolder = $derived(folders ? folders[0] : '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
 	let selectedPhoto = $derived(photos ? photos[0] : { url: '', name: '' });
+
+	let files = $state<null | FileList>();
+	let inputFiles = $state<HTMLInputElement>();
 
 	let isModalShow = $state({
 		bucket: { add: false, delete: false },
@@ -145,7 +149,30 @@
 		</div>
 	</Block>
 
-	<Block title="Фотографии">
+	<Block>
+		<Title title="Фотографии">
+			<input
+				hidden
+				class="form-control"
+				type="file"
+				name="files"
+				multiple
+				bind:this={inputFiles}
+				onchange={async (e: Event) => {
+					const t = e.target as HTMLInputElement;
+					if (t.files && t.files.length > 0) {
+						const blobs = Array.from(t.files as FileList).map((f) => f as Blob);
+						isModalShow.photo.add = true;
+						await addPhotos({ bucket: selectedBucket.name, folder: selectedFolder, photos: blobs });
+						isModalShow.photo.add = false;
+						await getPhotos({ bucket: selectedBucket.name, folder: selectedFolder }).refresh();
+					}
+				}}
+			/>
+			<button class="btn btn-sm btn-dark text-light" onclick={() => inputFiles?.click()}
+				>{isModalShow.photo.add ? 'Загрузка...' : 'Добавить'}</button
+			>
+		</Title>
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
 			{#each photos as photo}
 				<div class="col">

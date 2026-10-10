@@ -7,9 +7,15 @@ const folderSchema = v.object({
 	folder: v.string()
 });
 
-const photoSchema = v.object({
+const getPhotoSchema = v.object({
 	bucket: v.optional(v.string()),
 	folder: v.optional(v.string())
+});
+
+const photosSchema = v.object({
+	bucket: v.string(),
+	folder: v.string(),
+	photos: v.array(v.blob())
 });
 
 export const getBuckets = query(async () => {
@@ -78,7 +84,7 @@ export const deleteFolder = command(folderSchema, async (data) => {
 	if (removeObjects.length != 0) await minioClient.removeObjects(data.bucket, removeObjects);
 });
 
-export const getPhotos = query(photoSchema, async (data) => {
+export const getPhotos = query(getPhotoSchema, async (data) => {
 	if (data.bucket && data.folder) {
 		const objects = await minioClient.listObjects(data.bucket, data.folder, true);
 
@@ -107,5 +113,21 @@ export const getPhotos = query(photoSchema, async (data) => {
 		}
 
 		return images;
+	}
+});
+
+export const addPhotos = command(photosSchema, async (data) => {
+	if (!data.photos || !(data.photos[0] instanceof Blob)) return;
+
+	console.log(data.photos);
+
+	for (const f of data.photos) {
+		const file = f as Blob & { name: string; type: string };
+		console.log(file.name);
+
+		let buffer = Buffer.from(await file.arrayBuffer());
+		await minioClient.putObject(data.bucket, `${data.folder}/${file.name}`, buffer, file.size, {
+			'Content-Type': file.type
+		});
 	}
 });
