@@ -181,8 +181,7 @@
 					<div
 						class="d-flex flex-column {selectedPhoto.url === photo.url
 							? 'bg-dark'
-							: 'bg-secondary bg-opacity-10'}   rounded"
-						style="padding:3.5px"
+							: 'bg-secondary bg-opacity-10'} p-1 rounded"
 						onclick={() => (selectedPhoto = photo)}
 					>
 						<div
@@ -202,9 +201,9 @@
 	buttonOkTitle="Добавить"
 	onOk={async () => {
 		if (newObject.bucket.trim() != '') {
-			isModalShow.bucket.add = false;
 			await addBucket(newObject.bucket);
 			await getBuckets().refresh();
+			isModalShow.bucket.add = false;
 			newObject.bucket = '';
 		}
 	}}
@@ -225,9 +224,9 @@
 	buttonOkTitle="Удалить"
 	onOk={async () => {
 		if (selectedBucket.name === newObject.bucket) {
-			isModalShow.bucket.delete = false;
 			await deleteBucket(newObject.bucket);
 			await getBuckets().refresh();
+			isModalShow.bucket.delete = false;
 			newObject.bucket = '';
 		}
 	}}
@@ -259,9 +258,9 @@
 	buttonOkTitle="Добавить"
 	onOk={async () => {
 		if (newObject.folder.trim() !== '') {
-			isModalShow.folder.add = false;
 			await addFolder({ bucket: selectedBucket.name, folder: newObject.folder });
 			await getFolders(selectedBucket.name).refresh();
+			isModalShow.folder.add = false;
 			newObject.folder = '';
 		}
 	}}
@@ -279,9 +278,9 @@
 	buttonOkTitle="Удалить"
 	onOk={async () => {
 		if (selectedFolder === newObject.folder) {
-			isModalShow.folder.delete = false;
 			await deleteFolder({ bucket: selectedBucket.name, folder: newObject.folder });
 			await getFolders(selectedBucket.name).refresh();
+			isModalShow.folder.delete = false;
 			newObject.folder = '';
 		}
 	}}
