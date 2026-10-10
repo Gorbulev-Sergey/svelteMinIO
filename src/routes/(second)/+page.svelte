@@ -9,6 +9,7 @@
 		addPhotos,
 		deleteBucket,
 		deleteFolder,
+		deletePhoto,
 		getBuckets,
 		getFolders,
 		getPhotos
@@ -176,18 +177,30 @@
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
 			{#each photos as photo}
 				<div class="col">
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<!-- svelte-ignore a11y_mouse_events_have_key_events -->
 					<div
 						class="d-flex flex-column {selectedPhoto.url === photo.url
 							? 'bg-dark'
-							: 'bg-secondary bg-opacity-10'} p-1 rounded"
-						onclick={() => (selectedPhoto = photo)}
+							: 'bg-secondary bg-opacity-10'} rounded"
+						style="padding: .13em;"
+						onmouseover={() => (selectedPhoto = photo)}
 					>
 						<div
-							class="h-100 rounded position-relative"
+							class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
 							style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
-						></div>
+						>
+							<button
+								title="Удалить фото"
+								class="btn btn-sm btn-danger bg-danger m-1 p-1 bg-opacity-25 border-0"
+								onclick={async (e) => {
+									e.stopPropagation();
+									isModalShow.photo.delete = true;
+								}}
+							>
+								<i class="fa-solid fa-xmark text-danger"></i>
+							</button>
+						</div>
 					</div>
 				</div>
 			{/each}
@@ -304,4 +317,33 @@
 	</div>
 
 	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
+</Modal>
+
+<Modal
+	title="Удалить фото?"
+	bind:isShow={isModalShow.photo.delete}
+	buttonOkTitle="Удалить"
+	onOk={async () => {
+		await deletePhoto({
+			bucket: selectedBucket.name,
+			photo: selectedPhoto.name
+		});
+		await getPhotos({ bucket: selectedBucket.name, folder: selectedFolder }).refresh();
+		isModalShow.photo.delete = false;
+		newObject.photo = '';
+	}}
+	onCancel={() => {
+		newObject.folder = '';
+	}}
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3"
+	>
+		<div>Вы точно хотите удалить это фото?</div>
+	</div>
+	<div
+		class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
+		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
+	></div>
 </Modal>

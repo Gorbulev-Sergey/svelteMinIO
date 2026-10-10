@@ -131,3 +131,13 @@ export const addPhotos = command(photosSchema, async (data) => {
 		});
 	}
 });
+
+export const deletePhoto = command(
+	v.object({
+		bucket: v.string(),
+		photo: v.string()
+	}),
+	async (data) => {
+		await minioClient.removeObject(data.bucket, data.photo);
+	}
+);
