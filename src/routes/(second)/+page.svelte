@@ -188,7 +188,7 @@
 		{#if folders.length > 0}
 			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
 		{/if}
-		<div>Вы точно хотите удалить бакет{folders.length > 0 ? ' со всем его содержимым' : ''}!</div>
+		<div>Вы точно хотите удалить этот бакет?</div>
 		<div>
 			Для удаления бакета <b class="bg-danger text-light px-1 rounded-1 text-nowrap"
 				>{selectedBucket.name}</b
