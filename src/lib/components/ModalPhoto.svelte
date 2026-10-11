@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	interface IProps {
 		url: string;
 		isShow?: boolean;
 		onCancel?: () => void;
+		children?: Snippet<[]>;
 	}
-	let { url, isShow = $bindable(false), onCancel = () => {} }: IProps = $props();
+	let { url, isShow = $bindable(false), onCancel = () => {}, children }: IProps = $props();
 
 	function hideScroll(isHide: boolean) {
 		document.body.style.overflow = isHide ? 'hidden' : '';
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		document.addEventListener('keydown', (e) => {
 			if (e.key !== 'Escape') return;
 			isShow = false;
@@ -38,6 +39,9 @@
 				style="background-position: center; background-size: contain;"
 				alt=""
 			/>
+			{#if children}
+				{@render children?.()}
+			{/if}
 		</div>
 		<button
 			aria-label="Закрыть"

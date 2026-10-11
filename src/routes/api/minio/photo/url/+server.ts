@@ -1,8 +1,19 @@
-import { minioClient } from '$lib/minio';
+import { minioClient } from '$lib/minIO';
+import ExifReader from 'exifreader';
 
-const bucket = 'gorbulevsv-container';
+export async function POST({ request, fetch }) {
+	const { url } = await request.json();
+	const res = await fetch(url);
+	const arrayBuffer = await res.arrayBuffer();
+
+	// Синхронный парсинг буфера
+	const tags = ExifReader.load(arrayBuffer, { expanded: true });
+	const exif = tags?.exif;
+	return new Response(JSON.stringify(exif));
+}
 
 export async function DELETE({ request }) {
+	let { bucket } = await request.json();
 	let { name } = await request.json();
 	try {
 		await minioClient.removeObject(bucket, name);

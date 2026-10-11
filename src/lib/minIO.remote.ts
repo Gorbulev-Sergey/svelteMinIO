@@ -1,5 +1,6 @@
 import { command, query } from '$app/server';
 import { minioClient } from '$lib/minIO';
+import { json } from '@sveltejs/kit';
 import * as v from 'valibot';
 
 export const getBuckets = query(async () => {
@@ -148,3 +149,8 @@ export const deletePhoto = command(
 		await minioClient.removeObject(data.bucket, data.photo);
 	}
 );
+
+export const getPhoto = query(v.string(), async (photo) => {
+	const res = await fetch(photo);
+	return json(await res.blob());
+});

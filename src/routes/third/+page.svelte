@@ -4,7 +4,6 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Subtitle from '$lib/components/Subtitle.svelte';
-	import Title from '$lib/components/Title.svelte';
 	import {
 		addBucket,
 		addFolder,
@@ -14,9 +13,11 @@
 		deletePhoto,
 		getBuckets,
 		getFolders,
+		getPhoto,
 		getPhotos
 	} from '$lib/minIO.remote';
 	import { store } from '$lib/store.svelte';
+	import ExifReader from 'exifreader';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[0]);
@@ -202,7 +203,7 @@
 				</section>
 
 				<div class="flex-grow-1 w-100">
-					<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
+					<div class="row row-cols-1 row-cols-md-4 g-2 w-100 m-auto">
 						{#each photos as photo}
 							<div class="col">
 								<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -385,4 +386,22 @@
 	></div>
 </Modal>
 
-<ModalPhoto bind:isShow={isModalShow.photo.fullScreen} url={selectedPhoto.url}></ModalPhoto>
+<ModalPhoto bind:isShow={isModalShow.photo.fullScreen} url={selectedPhoto.url}>
+	<div class="d-flex flex-column gap-1 p-2 rounded-1 bg-light bg-opacity-25 position-absolute">
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			class="text-light"
+			onclick={async () => {
+				const res = await fetch('/api/minio/photo/url', {
+					method: 'POST',
+					body: JSON.stringify({ url: selectedPhoto.url })
+				});
+
+				console.log(await res.json());
+			}}
+		>
+			dfgdfgh
+		</div>
+	</div>
+</ModalPhoto>
