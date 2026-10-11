@@ -3,12 +3,12 @@
 
 <div class="dropdown">
 	<div class="d-inline">
-		<button class="btn btn-sm btn-light dropbtn">Выпадающее меню</button>
-		<button class="btn btn-light px-1 rounded-end" data-bs-toggle="dropdown" aria-label="">
+		<button class="btn btn-sm btn-light dropbtn rounded-1">Выпадающее меню</button>
+		<button class="btn btn-sm btn-light px-1 rounded-end-1" data-bs-toggle="dropdown" aria-label="">
 			<i class="fa-solid fa-angles-down"></i>
 		</button>
 	</div>
-	<div class="dropdown-content rounded shadow-sm">
+	<div class="dropdown-content rounded-1 shadow-sm">
 		{#each [...new Array(5)] as item, i}
 			<a
 				class="btn btn-sm btn-light rounded-0 w-100 text-start {i == 0 ? 'rounded-top' : ''} {i ==

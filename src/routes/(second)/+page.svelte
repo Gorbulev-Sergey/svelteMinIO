@@ -184,18 +184,18 @@
 						class="d-flex flex-column {selectedPhoto.url === photo.url
 							? 'bg-dark'
 							: 'bg-secondary bg-opacity-10'} rounded"
-						style="padding: .13em;"
+						style="padding: .1em;"
 						onmouseover={() => (selectedPhoto = photo)}
 					>
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<div
-							class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
-							style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
+							class="h-100 rounded-1 position-relative w-100 d-flex align-items-start justify-content-end"
+							style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
 							onclick={() => (isModalShow.photo.fullScreen = true)}
 						>
 							<button
 								title="Удалить фото"
-								class="btn btn-sm btn-danger bg-danger m-1 p-1 bg-opacity-25 border-0"
+								class="btn btn-sm btn-danger bg-light m-1 p-1 bg-opacity-10 border-0"
 								onclick={async (e) => {
 									e.stopPropagation();
 									isModalShow.photo.delete = true;

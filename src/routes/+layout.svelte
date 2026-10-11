@@ -33,10 +33,22 @@
 
 		<div class="d-flex align-items-center justify-content-end gap-0 w-100">
 			<a
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/dropmenu'
+					? 'fw-bold'
+					: ''}"
+				href="/dropmenu">Dropmenu</a
+			>
+			<a
 				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/main'
 					? 'fw-bold'
 					: ''}"
 				href="/main">Load</a
+			>
+			<a
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/third'
+					? 'fw-bold'
+					: ''}"
+				href="/third">New maket</a
 			>
 			<a
 				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/' ? 'fw-bold' : ''}"

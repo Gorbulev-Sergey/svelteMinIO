@@ -41,7 +41,7 @@
 		</div>
 		<button
 			aria-label="Закрыть"
-			class="btn btn-sm btn-dark bg-dark me-1 p-1 bg-opacity-10 border-0 position-fixed"
+			class="btn btn-sm btn-dark bg-light me-1 p-1 bg-opacity-10 border-0 position-fixed"
 			style="top:.25rem; right:.25rem"
 			onclick={(e) => {
 				e.stopPropagation();
