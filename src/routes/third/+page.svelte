@@ -44,7 +44,7 @@
 </script>
 
 {#snippet title()}
-	<div>Загружаем данные из <b>remote functions</b></div>
+	<div><b>Новый макет</b></div>
 {/snippet}
 
 <Column>
@@ -86,16 +86,18 @@
 						class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-1"
 						aria-labelledby="dropdownMenuButton1"
 					>
-						<li>
-							<button class="dropdown-item" onclick={() => (isModalShow.bucket.add = true)}
-								>Бакет</button
-							>
-						</li>
-						<li>
-							<button class="dropdown-item" onclick={() => (isModalShow.folder.add = true)}>
-								Папку
-							</button>
-						</li>
+						<button
+							class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
+							onclick={() => (isModalShow.bucket.add = true)}>Бакет</button
+						>
+
+						<button
+							class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
+							onclick={() => (isModalShow.folder.add = true)}
+						>
+							Папка
+						</button>
+
 						<input
 							hidden
 							class="form-control"
@@ -121,11 +123,11 @@
 								}
 							}}
 						/>
-						<li>
-							<button class="dropdown-item" onclick={() => inputFiles?.click()}
-								>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button
-							>
-						</li>
+						<button
+							class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
+							onclick={() => inputFiles?.click()}
+							>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button
+						>
 					</ul>
 				</div>
 			</div>
@@ -150,7 +152,7 @@
 									title="Удалить бакет"
 									class="btn btn-sm {selectedBucket.name === bucket.name
 										? 'btn-dark'
-										: 'btn-light'} text-danger text-nowrap rounded-start-0"
+										: 'btn-light'} text-danger text-nowrap rounded-start-0 p-1"
 									onclick={() => {
 										selectedBucket = bucket;
 										isModalShow.bucket.delete = true;
@@ -180,7 +182,7 @@
 									title="Удалить бакет"
 									class="btn btn-sm {selectedFolder === folder
 										? 'btn-dark'
-										: 'btn-light'} text-danger text-nowrap rounded-start-0"
+										: 'btn-light'} text-danger text-nowrap rounded-start-0 p-1"
 									onclick={() => {
 										selectedFolder = folder;
 										isModalShow.folder.delete = true;
