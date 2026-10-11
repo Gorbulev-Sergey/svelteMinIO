@@ -3,6 +3,7 @@
 	import Column from '$lib/components/Column.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
+	import Subtitle from '$lib/components/Subtitle.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import {
 		addBucket,
@@ -132,7 +133,7 @@
 			<div class="d-flex gap-2 w-100">
 				<section class="d-flex flex-column gap-3">
 					<section class="d-flex flex-column align-items-stretch gap-1">
-						<b>Бакеты:</b>
+						<Subtitle title="Бакеты:"></Subtitle>
 						{#each buckets as bucket}
 							<div class="d-flex align-items-center">
 								<button
@@ -162,7 +163,7 @@
 					</section>
 
 					<div class="d-flex flex-column align-items-stretch gap-1">
-						<b>Папки:</b>
+						<Subtitle title="Папки:"></Subtitle>
 						{#each folders as folder}
 							<div class="d-flex align-items-center">
 								<button
@@ -208,7 +209,7 @@
 									<!-- svelte-ignore a11y_click_events_have_key_events -->
 									<div
 										class="h-100 rounded-1 position-relative w-100 d-flex align-items-start justify-content-end"
-										style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
+										style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:10em; cursor:pointer"
 										onclick={() => (isModalShow.photo.fullScreen = true)}
 									>
 										<button
