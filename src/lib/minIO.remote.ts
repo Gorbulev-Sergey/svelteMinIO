@@ -1,5 +1,5 @@
 import { command, query } from '$app/server';
-import { minioClient } from '$lib/minio';
+import { minioClient } from '$lib/minIO';
 import * as v from 'valibot';
 
 export const getBuckets = query(async () => {
@@ -126,8 +126,6 @@ export const addPhotos = command(
 	}),
 	async (data) => {
 		if (!data.photos || !(data.photos[0] instanceof Blob)) return;
-
-		console.log(data.photos);
 
 		for (const f of data.photos) {
 			const file = f as Blob & { name: string; type: string };

@@ -12,14 +12,23 @@
 		document.body.style.overflow = isHide ? 'hidden' : '';
 	}
 
+	onMount(() => {
+		document.addEventListener('keydown', (e) => {
+			if (e.key !== 'Escape') return;
+			isShow = false;
+		});
+	});
+
 	$effect(() => {
 		hideScroll(isShow);
 	});
 </script>
 
 <div
-	class="modal modal-fullscreen {isShow ? 'show' : 'fade'} bg-dark bg-opacity-75 p-1"
-	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.06em);"
+	class="modal modal-fullscreen {isShow ? 'show' : 'fade'} p-1"
+	style="background-color: #212529f0; display: {isShow
+		? 'block'
+		: 'none'}; backdrop-filter: blur(1em);"
 >
 	<div class="position-relative w-100 h-100">
 		<div class="d-flex justify-content-center align-items-center w-100 h-100">
