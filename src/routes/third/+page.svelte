@@ -78,57 +78,63 @@
 						>
 					{/each}
 				</section>
-				<div class="dropdown">
-					<button class="btn btn-sm btn-dark" id="dropdownMenuButton1" data-bs-toggle="dropdown">
-						Добавить
-					</button>
-					<ul
-						class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-1"
-						aria-labelledby="dropdownMenuButton1"
+				<div class="d-flex align-items-center gap-2">
+					<small class="bg-light text-dark rounded-1 px-1"
+						>в папке: <b>{photos?.length} фото</b></small
 					>
-						<button
-							class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
-							onclick={() => (isModalShow.bucket.add = true)}>Бакет</button
-						>
 
-						<button
-							class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
-							onclick={() => (isModalShow.folder.add = true)}
-						>
-							Папка
+					<div class="dropdown">
+						<button class="btn btn-sm btn-dark" id="dropdownMenuButton1" data-bs-toggle="dropdown">
+							Добавить
 						</button>
-
-						<input
-							hidden
-							class="form-control"
-							type="file"
-							name="files"
-							multiple
-							bind:this={inputFiles}
-							onchange={async (e: Event) => {
-								const t = e.target as HTMLInputElement;
-								if (t.files && t.files.length > 0) {
-									const blobs = Array.from(t.files as FileList).map((f) => f as Blob);
-									isModalShow.photo.add = true;
-									await addPhotos({
-										bucket: selectedBucket.name,
-										folder: selectedFolder,
-										photos: blobs
-									});
-									isModalShow.photo.add = false;
-									await getPhotos({
-										bucket: selectedBucket.name,
-										folder: selectedFolder
-									}).refresh();
-								}
-							}}
-						/>
-						<button
-							class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
-							onclick={() => inputFiles?.click()}
-							>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button
+						<ul
+							class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-1"
+							aria-labelledby="dropdownMenuButton1"
 						>
-					</ul>
+							<button
+								class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
+								onclick={() => (isModalShow.bucket.add = true)}>Бакет</button
+							>
+
+							<button
+								class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
+								onclick={() => (isModalShow.folder.add = true)}
+							>
+								Папка
+							</button>
+
+							<input
+								hidden
+								class="form-control"
+								type="file"
+								name="files"
+								multiple
+								bind:this={inputFiles}
+								onchange={async (e: Event) => {
+									const t = e.target as HTMLInputElement;
+									if (t.files && t.files.length > 0) {
+										const blobs = Array.from(t.files as FileList).map((f) => f as Blob);
+										isModalShow.photo.add = true;
+										await addPhotos({
+											bucket: selectedBucket.name,
+											folder: selectedFolder,
+											photos: blobs
+										});
+										isModalShow.photo.add = false;
+										await getPhotos({
+											bucket: selectedBucket.name,
+											folder: selectedFolder
+										}).refresh();
+									}
+								}}
+							/>
+							<button
+								class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
+								onclick={() => inputFiles?.click()}
+								>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button
+							>
+						</ul>
+					</div>
 				</div>
 			</div>
 
@@ -293,7 +299,7 @@
 </Modal>
 
 <Modal
-	title="Добавить <b>{newObject.folder}</b> папку?"
+	title="Добавить папку"
 	bind:isShow={isModalShow.folder.add}
 	buttonOkTitle="Добавить"
 	onOk={async () => {
@@ -309,6 +315,10 @@
 	}}
 	autoCloseOnOk={false}
 >
+	<small
+		><b class="bg-light text-dark px-1 rounded-1">{selectedBucket.name}:</b>
+		{selectedFolder}/<b>{newObject.folder}</b></small
+	>
 	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
 </Modal>
 
