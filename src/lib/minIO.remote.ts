@@ -1,6 +1,7 @@
 import { command, query } from '$app/server';
 import { minioClient } from '$lib/minIO';
 import { json } from '@sveltejs/kit';
+import ExifReader from 'exifreader';
 import * as v from 'valibot';
 
 export const getBuckets = query(async () => {
@@ -150,7 +151,11 @@ export const deletePhoto = command(
 	}
 );
 
-export const getPhoto = query(v.string(), async (photo) => {
+export const getPhotoEXIF = query(v.string(), async (photo) => {
 	const res = await fetch(photo);
-	return json(await res.blob());
+	const arrayBuffer = await res.arrayBuffer();
+
+	const tags = ExifReader.load(arrayBuffer, { expanded: true });
+	const exif = tags?.exif;
+	return exif;
 });

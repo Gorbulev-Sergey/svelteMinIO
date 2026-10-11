@@ -13,11 +13,10 @@
 		deletePhoto,
 		getBuckets,
 		getFolders,
-		getPhoto,
+		getPhotoEXIF,
 		getPhotos
 	} from '$lib/minIO.remote';
 	import { store } from '$lib/store.svelte';
-	import ExifReader from 'exifreader';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[0]);
@@ -25,6 +24,7 @@
 	let selectedFolder = $derived(folders ? folders[0] : '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
 	let selectedPhoto = $derived(photos ? photos[0] : { url: '', name: '' });
+	let selectedPhotoEXIF = $derived(await getPhotoEXIF(selectedPhoto.url));
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -386,22 +386,8 @@
 	></div>
 </Modal>
 
-<ModalPhoto bind:isShow={isModalShow.photo.fullScreen} url={selectedPhoto.url}>
-	<div class="d-flex flex-column gap-1 p-2 rounded-1 bg-light bg-opacity-25 position-absolute">
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
-			class="text-light"
-			onclick={async () => {
-				const res = await fetch('/api/minio/photo/url', {
-					method: 'POST',
-					body: JSON.stringify({ url: selectedPhoto.url })
-				});
-
-				console.log(await res.json());
-			}}
-		>
-			dfgdfgh
-		</div>
-	</div>
-</ModalPhoto>
+<ModalPhoto
+	bind:isShow={isModalShow.photo.fullScreen}
+	url={selectedPhoto.url}
+	exif={selectedPhotoEXIF}
+></ModalPhoto>

@@ -1,19 +1,28 @@
 <script lang="ts">
+	import { getPhotoEXIF } from '$lib/minIO.remote';
 	import { onMount, type Snippet } from 'svelte';
 
 	interface IProps {
 		url: string;
+		exif?: ExifReader.ExifTags;
 		isShow?: boolean;
 		onCancel?: () => void;
 		children?: Snippet<[]>;
 	}
-	let { url, isShow = $bindable(false), onCancel = () => {}, children }: IProps = $props();
+	let {
+		url = '',
+		exif,
+		isShow = $bindable(false),
+		onCancel = () => {},
+		children
+	}: IProps = $props();
 
 	function hideScroll(isHide: boolean) {
 		document.body.style.overflow = isHide ? 'hidden' : '';
 	}
 
 	onMount(async () => {
+		await getPhotoEXIF(url);
 		document.addEventListener('keydown', (e) => {
 			if (e.key !== 'Escape') return;
 			isShow = false;
@@ -43,6 +52,29 @@
 				{@render children?.()}
 			{/if}
 		</div>
+		{#if exif}
+			<div class="position-fixed bottom-0 w-100 start-0 d-flex justify-content-center p-2">
+				<div
+					class="d-flex flex-column gap-0 bg-dark bg-opacity-25 rounded-1 p-2 flex-wrap"
+					style="max-height: 20em;"
+				>
+					<div class="text-light">Model: <b>{JSON.stringify(exif.Model?.description)}</b></div>
+					<div class="text-light">
+						Lens Model: <b>{exif.LensModel?.description}</b>
+					</div>
+					<div class="text-light">
+						Экспозиция: <b>{exif.ExposureMode?.description}</b>
+					</div>
+					<div class="text-light">
+						Автор: <b>{exif.Artist?.description}</b>
+					</div>
+					<div class="text-light">
+						Дата: <b>{exif.DateTime?.description}</b>
+					</div>
+				</div>
+			</div>
+		{/if}
+
 		<button
 			aria-label="Закрыть"
 			class="btn btn-sm btn-dark bg-light me-1 p-1 bg-opacity-10 border-0 position-fixed"

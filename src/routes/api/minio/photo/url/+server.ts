@@ -1,7 +1,7 @@
 import { minioClient } from '$lib/minIO';
 import ExifReader from 'exifreader';
 
-export async function POST({ request, fetch }) {
+export async function POST({ fetch, request }) {
 	const { url } = await request.json();
 	const res = await fetch(url);
 	const arrayBuffer = await res.arrayBuffer();
@@ -9,6 +9,7 @@ export async function POST({ request, fetch }) {
 	// Синхронный парсинг буфера
 	const tags = ExifReader.load(arrayBuffer, { expanded: true });
 	const exif = tags?.exif;
+	console.log(exif);
 	return new Response(JSON.stringify(exif));
 }
 
