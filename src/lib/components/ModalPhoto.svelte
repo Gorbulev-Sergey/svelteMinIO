@@ -28,8 +28,7 @@
 				let index = photos.indexOf(photo);
 				if (e.deltaY > 0) {
 					index = photos.indexOf(photo) < photos.length - 1 ? photos.indexOf(photo) + 1 : 0;
-				}
-				if (e.deltaY < 0) {
+				} else if (e.deltaY < 0) {
 					index = photos.indexOf(photo) > 0 ? photos.indexOf(photo) - 1 : photos.length - 1;
 				}
 				photo = photos[index];
@@ -61,36 +60,54 @@
 				<div
 					class="d-flex flex-column gap-0 bg-dark bg-opacity-25 rounded-1 mb-1 p-2 flex-wrap"
 					style="max-height: 20em;">
-					<div class="text-light">Камера: <b>{exif.Model}</b></div>
-					<div class="text-light">
-						Объектив: <b>{exif.LensModel}</b>
-					</div>
-					<div class="text-light">
-						Фокусное расстояние: <b>{exif.FocalLength} мм</b>
-					</div>
-					<div class="text-light">
-						Диафрагма: <b>{exif.FNumber}</b>
-					</div>
-					<div class="text-light">
-						ISO: <b>{exif.ISO}</b>
-					</div>
-
-					<div class="text-light">
-						Экспозиция: <b>{exif.ExposureMode}</b>
-					</div>
-
-					<div class="text-light">
-						Баланс белого: <b>{exif.WhiteBalance}</b>
-					</div>
-					<div class="text-light">
-						Разрешение: <b>{exif.ExifImageWidth}*{exif.ExifImageHeight} пикселей</b>
-					</div>
-					<div class="text-light">
-						Автор: <b>{exif.Artist}</b>
-					</div>
-					<div class="text-light">
-						Дата: <b>{exif.DateTime}</b>
-					</div>
+					{#if exif.Model}
+						<div class="text-light">Камера: <b>{exif.Model}</b></div>
+					{/if}
+					{#if exif.LensModel}
+						<div class="text-light">
+							Объектив: <b>{exif.LensModel}</b>
+						</div>
+					{/if}
+					{#if exif.FocalLength}
+						<div class="text-light">
+							Фокусное расстояние: <b>{exif.FocalLength} мм</b>
+						</div>
+					{/if}
+					{#if exif.FNumber}
+						<div class="text-light">
+							Диафрагма: <b>{exif.FNumber}</b>
+						</div>
+					{/if}
+					{#if exif.ISO}
+						<div class="text-light">
+							ISO: <b>{exif.ISO}</b>
+						</div>
+					{/if}
+					{#if exif.ExposureMode}
+						<div class="text-light">
+							Экспозиция: <b>{exif.ExposureMode}</b>
+						</div>
+					{/if}
+					{#if exif.WhiteBalance}
+						<div class="text-light">
+							Баланс белого: <b>{exif.WhiteBalance}</b>
+						</div>
+					{/if}
+					{#if exif.ExifImageHeight}
+						<div class="text-light">
+							Разрешение: <b>{exif.ExifImageWidth}*{exif.ExifImageHeight} пикселей</b>
+						</div>
+					{/if}
+					{#if exif.Artist}
+						<div class="text-light">
+							Автор: <b>{exif.Artist}</b>
+						</div>
+					{/if}
+					{#if exif.DateTime}
+						<div class="text-light">
+							Дата: <b>{exif.DateTime}</b>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/if}
