@@ -8,7 +8,6 @@
 	import Title from '$lib/components/Title.svelte';
 	import type { IEXIF, IPhoto } from '$lib/models/IPhoto.js';
 	import { store } from '$lib/store.svelte.js';
-	import exifr from 'exifr';
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -20,7 +19,7 @@
 
 	let folders = $derived<string[]>(data.folders);
 	let paramFolder = $derived(page.url.searchParams.get('folder') || folders[0] || '');
-	let selectedFolder = $derived(paramFolder ? folders.findIndex((f) => f == paramFolder) : 0);
+	let selectedFolder = $derived(paramFolder ? folders.findIndex(f => f == paramFolder) : 0);
 
 	let photos = $derived<IPhoto[]>(data.photos);
 	let selectedPhoto = $state<IPhoto>();
@@ -48,7 +47,9 @@
 						<small class="text-dark px-1 py-0 rounded-1"><b>{selectedBucket}:</b></small>
 					{/if}
 					<div class="d-flex align-items-end">
-						<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
+						<i
+							style="font-size: .8em; padding-top:.2em"
+							class="fa-solid fa-angle-right"></i>
 					</div>
 					<button
 						class="btn btn-sm btn-light text-dark px-1 py-0"
@@ -61,8 +62,7 @@
 								replaceState: false,
 								noScroll: true
 							});
-						}}>{item}</button
-					>
+						}}>{item}</button>
 				{/each}
 			</div>
 		</div>
@@ -79,19 +79,15 @@
 							bucket: selectedBucket
 						})
 					});
-				}}>Скачать bucket <b>{selectedBucket}</b> к себе на компьютер</button
-			>
+				}}>Скачать bucket <b>{selectedBucket}</b> к себе на компьютер</button>
 		</Title>
 		<div class="d-flex align-items-center gap-2">
 			{#each buckets as b}
 				<button
-					class="btn btn-sm {selectedBucket === b.name
-						? 'btn-dark text-light'
-						: 'btn-light text-dark'}"
+					class="btn btn-sm {selectedBucket === b.name ? 'btn-dark text-light' : 'btn-light text-dark'}"
 					onclick={() => {
 						goto(`?bucket=${b.name}`, { replaceState: false, noScroll: true });
-					}}
-				>
+					}}>
 					{b.name}
 				</button>
 			{/each}
@@ -105,15 +101,13 @@
 				class="btn btn-sm btn-danger text-light"
 				onclick={() => {
 					isDeleteFolderShow = true;
-				}}>Удалить</button
-			>
+				}}>Удалить</button>
 			<button
 				type="button"
 				class="btn btn-sm btn-dark text-light"
 				onclick={async () => {
 					isFolderCreateShow = true;
-				}}>Добавить</button
-			>
+				}}>Добавить</button>
 		</Title>
 		<div class="d-flex flex-wrap align-items-start gap-1">
 			{#each folders as item}
@@ -127,8 +121,7 @@
 								replaceState: false,
 								noScroll: true
 							});
-						}}>{item}</button
-					>
+						}}>{item}</button>
 				{/if}
 			{/each}
 		</div>
@@ -158,27 +151,27 @@
 							body: formData
 						}).then(() => invalidateAll());
 					}
-				}}
-			/>
+				}} />
 			<button
 				type="button"
 				class="btn btn-sm btn-dark text-light"
 				onclick={() => {
 					inputFiles?.click();
-				}}>Добавить</button
-			>
+				}}>Добавить</button>
 		</Title>
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
 			{#each photos as { name, url }}
 				<div class="col">
-					<div class="d-flex flex-column bg-secondary bg-opacity-10 rounded" style="padding:3.5px">
+					<div
+						class="d-flex flex-column bg-secondary bg-opacity-10 rounded"
+						style="padding:3.5px">
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							class="h-100 rounded position-relative"
 							style="background-image: url({url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
 							onclick={async () => {
-								selectedPhoto = photos.find((pf) => pf.url == url);
+								selectedPhoto = photos.find(pf => pf.url == url);
 								isPhotoFullScreenShow = true;
 
 								const res = await fetch(url);
@@ -186,18 +179,16 @@
 								const blob = await res.blob();
 								selectedPhotoMeta = await exifr.parse(blob);
 								console.log($state.snapshot(selectedPhotoMeta));
-							}}
-						>
+							}}>
 							<button
 								title=""
 								class="badge bg-light bg-opacity-25 text-light position-absolute border-0 p-1"
 								style="right: .3em; top: .3em"
-								onclick={(e) => {
+								onclick={e => {
 									e.stopPropagation();
-									selectedPhoto = photos.find((pf) => pf.url == url);
+									selectedPhoto = photos.find(pf => pf.url == url);
 									isDeletePhotoShow = true;
-								}}
-							>
+								}}>
 								<i class="fa-solid fa-trash text-danger"></i>
 							</button>
 						</div>
@@ -226,24 +217,33 @@
 					folder: newFolder
 				})
 			});
-		}}
-	>
-		<input class="form-control" placeholder="Название папки" type="text" bind:value={newFolder} />
+		}}>
+		<input
+			class="form-control"
+			placeholder="Название папки"
+			type="text"
+			bind:value={newFolder} />
 	</Modal>
 
-	<ModalPhoto bind:isShow={isPhotoFullScreenShow} _class="">
-		<img class="rounded" style="max-height: 98vh;" src={selectedPhoto?.url} alt="" />
+	<ModalPhoto
+		bind:isShow={isPhotoFullScreenShow}
+		_class="">
+		<img
+			class="rounded"
+			style="max-height: 98vh;"
+			src={selectedPhoto?.url}
+			alt="" />
 		<div
 			class="bg-light text-dark bg-opacity-50 p-2 rounded position-absolute"
-			style="bottom: .7em; right:.7em; max-width: 40%;"
-		>
+			style="bottom: .7em; right:.7em; max-width: 40%;">
 			<div class="d-flex flex-column justify-content-end overflow-hidden">
 				<small><b>Hазвание:</b> {selectedPhoto?.name}</small>
 				<small
 					><b>Url:</b>
-					<a href={selectedPhoto?.url} target="_blank">{selectedPhoto?.url.slice(0, 45)}...</a
-					></small
-				>
+					<a
+						href={selectedPhoto?.url}
+						target="_blank">{selectedPhoto?.url.slice(0, 45)}...</a
+					></small>
 				<small
 					><b>Дата:</b>
 					{new Date(selectedPhotoMeta?.CreateDate || '').toLocaleDateString('ru-Ru', {
@@ -282,8 +282,7 @@
 				},
 				body: JSON.stringify({ folder: folders[selectedFolder] })
 			});
-		}}
-	>
+		}}>
 		<div class="text-center">
 			Вы действительно хотите удалить папку <b>"{folders[selectedFolder]}"</b>?
 		</div>
@@ -300,14 +299,13 @@
 					'content-type': 'application/json'
 				},
 				body: JSON.stringify({ name: selectedPhoto?.name })
-			}).then((r) => {
+			}).then(r => {
 				invalidateAll();
 			});
-		}}
-	>
+		}}>
 		<div
 			class="rounded text-center"
-			style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:16em;"
-		></div>
+			style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:16em;">
+		</div>
 	</Modal>
 </Column>

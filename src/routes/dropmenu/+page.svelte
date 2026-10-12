@@ -4,7 +4,10 @@
 <div class="dropdown">
 	<div class="d-inline">
 		<button class="btn btn-sm btn-light dropbtn rounded-1">Выпадающее меню</button>
-		<button class="btn btn-sm btn-light px-1 rounded-end-1" data-bs-toggle="dropdown" aria-label="">
+		<button
+			class="btn btn-sm btn-light px-1 rounded-end-1"
+			data-bs-toggle="dropdown"
+			aria-label="">
 			<i class="fa-solid fa-angles-down"></i>
 		</button>
 	</div>
@@ -15,8 +18,7 @@
 				[...new Array(5)].length - 1
 					? 'rounded-bottom'
 					: ''}"
-				href="#">Ссылка {i + 1}</a
-			>
+				href="#">Ссылка {i + 1}</a>
 		{/each}
 	</div>
 </div>

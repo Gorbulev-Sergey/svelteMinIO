@@ -27,9 +27,10 @@
 
 <div
 	class="modal {isShow ? 'show' : 'fade'} bg-dark bg-opacity-10"
-	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.06em);"
->
-	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" tabindex="-1">
+	style="display: {isShow ? 'block' : 'none'}; backdrop-filter: blur(.06em);">
+	<div
+		class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+		tabindex="-1">
 		<div class="modal-content rounded shadow-sm border-0 w-100 bg-white {_class}">
 			<div class="d-flex flex-column gap-2 p-2">
 				<div class="d-flex align-self-center justify-content-between w-100">
@@ -40,8 +41,7 @@
 						onclick={() => {
 							isShow = false;
 							onCancel();
-						}}
-					></button>
+						}}></button>
 				</div>
 				<div class="d-flex flex-column gap-2 p-1">
 					{@render children?.()}
@@ -52,8 +52,7 @@
 						onclick={() => {
 							isShow = false;
 							onCancel();
-						}}>{buttonCancelTitle}</button
-					>
+						}}>{buttonCancelTitle}</button>
 					<button
 						class="btn btn-sm btn-dark text-light"
 						onclick={() => {
@@ -62,8 +61,7 @@
 								isShow = false;
 								onCancel();
 							}
-						}}>{buttonOkTitle}</button
-					>
+						}}>{buttonOkTitle}</button>
 				</div>
 			</div>
 		</div>
