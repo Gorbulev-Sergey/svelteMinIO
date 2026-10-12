@@ -13,7 +13,6 @@
 		deletePhoto,
 		getBuckets,
 		getFolders,
-		getPhotoEXIF,
 		getPhotos
 	} from '$lib/minIO.remote';
 	import { store } from '$lib/store.svelte';
@@ -23,8 +22,7 @@
 	let folders = $derived((await getFolders(selectedBucket?.name)) || []);
 	let selectedFolder = $derived(folders ? folders[0] : '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
-	let selectedPhoto = $derived(photos ? photos[0] : { url: '', name: '' });
-	let selectedPhotoEXIF = $derived(await getPhotoEXIF(selectedPhoto.url));
+	let selectedPhoto = $derived(photos && photos.length > 0 ? photos[0] : { url: '', name: '' });
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();

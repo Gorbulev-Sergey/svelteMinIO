@@ -154,8 +154,7 @@ export const deletePhoto = command(
 export const getPhotoEXIF = query(v.string(), async (photo) => {
 	const res = await fetch(photo);
 	const arrayBuffer = await res.arrayBuffer();
-
 	const tags = ExifReader.load(arrayBuffer, { expanded: true });
-	const exif = tags?.exif;
-	return exif;
+
+	return tags?.exif;
 });

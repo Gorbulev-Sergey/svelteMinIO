@@ -3,14 +3,14 @@
 	import { onMount, type Snippet } from 'svelte';
 
 	interface IProps {
-		url: string;
+		url?: string;
 		isShow?: boolean;
 		onCancel?: () => void;
 		children?: Snippet<[]>;
 	}
-	let { url = '', isShow = $bindable(false), onCancel = () => {}, children }: IProps = $props();
+	let { url, isShow = $bindable(false), onCancel = () => {}, children }: IProps = $props();
 
-	let exif = $derived(await getPhotoEXIF(url));
+	let exif = $derived(url && url.trim() !== '' ? await getPhotoEXIF(url) : undefined);
 
 	function hideScroll(isHide: boolean) {
 		document.body.style.overflow = isHide ? 'hidden' : '';
