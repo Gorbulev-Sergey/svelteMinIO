@@ -81,7 +81,9 @@
 					{/each}
 				</section>
 				<div class="d-flex align-items-center gap-2">
-					<small class="bg-light text-dark rounded-1 px-1">в папке: <b>{photos?.length} фото</b></small>
+					<small class="bg-light text-dark rounded-1 px-1">
+						в папке: <b class="text-dark">{photos?.length} фото</b>
+					</small>
 
 					<div class="dropdown">
 						<button

@@ -8,18 +8,22 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link
+		rel="icon"
+		href={favicon} />
 </svelte:head>
 
 <div class="sticky-top w-100 bg-light px-3 py-2">
 	<div class="d-flex align-items-center">
 		<div class="d-flex align-items-center gap-2">
-			<a class="btn btn-sm btn-light bg-white text-dark border-0 text-nowrap" href="/"
-				>Svelte <b>MinIO</b></a
-			>
+			<a
+				class="btn btn-sm btn-light bg-white text-dark border-0 text-nowrap"
+				href="/">Svelte <b>MinIO</b></a>
 			<div class="d-flex align-items-center gap-2">
 				<div class="d-flex align-items-end">
-					<i style="font-size: .8em;" class="fa-solid fa-angle-right"></i>
+					<i
+						style="font-size: .8em;"
+						class="fa-solid fa-angle-right"></i>
 				</div>
 				<div class="my-0 text-nowrap text-uppercase">
 					<RenderTitle>
@@ -33,27 +37,17 @@
 
 		<div class="d-flex align-items-center justify-content-end gap-0 w-100">
 			<a
-				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/dropmenu'
-					? 'fw-bold'
-					: ''}"
-				href="/dropmenu">Dropmenu</a
-			>
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/dropmenu' ? 'fw-bold' : ''}"
+				href="/dropmenu">Dropmenu</a>
 			<a
-				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/main'
-					? 'fw-bold'
-					: ''}"
-				href="/main">Load</a
-			>
-			<a
-				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/third'
-					? 'fw-bold'
-					: ''}"
-				href="/third">New maket</a
-			>
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/main' ? 'fw-bold' : ''}"
+				href="/main">Load</a>
 			<a
 				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/' ? 'fw-bold' : ''}"
-				href="/">Remote functions</a
-			>
+				href="/">New maket</a>
+			<a
+				class="btn btn-sm btn-light text-dark border-0 {page.url.pathname == '/second' ? 'fw-bold' : ''}"
+				href="/second">Remote functions</a>
 		</div>
 	</div>
 </div>
