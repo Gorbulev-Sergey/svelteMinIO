@@ -204,7 +204,7 @@
 									class="d-flex flex-column {selectedPhoto.url === photo.url
 										? 'bg-dark'
 										: 'bg-secondary bg-opacity-10'} rounded"
-									style="padding: .1em;">
+									style="padding: 0;">
 									<!-- svelte-ignore a11y_click_events_have_key_events -->
 									<div
 										class="h-100 rounded-1 position-relative w-100 d-flex align-items-start justify-content-end"
@@ -309,7 +309,7 @@
 	autoCloseOnOk={false}>
 	<small>
 		<b class="bg-light text-dark px-1 rounded-1">{selectedBucket.name}:</b>
-		{selectedFolder}/<b>{newObject.folder}</b>
+		<b>{newObject.folder}</b>
 	</small>
 	<input
 		class="form-control"
