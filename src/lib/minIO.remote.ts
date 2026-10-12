@@ -1,6 +1,7 @@
 import { command, query } from '$app/server';
 import { minioClient } from '$lib/minIO';
 import { json } from '@sveltejs/kit';
+import exifr from 'exifr';
 import ExifReader from 'exifreader';
 import * as v from 'valibot';
 
@@ -153,8 +154,15 @@ export const deletePhoto = command(
 
 export const getPhotoEXIF = query(v.string(), async (photo) => {
 	const res = await fetch(photo);
-	const arrayBuffer = await res.arrayBuffer();
-	const tags = ExifReader.load(arrayBuffer, { expanded: true });
+	// const arrayBuffer = await res.arrayBuffer();
+	// const tags = ExifReader.load(arrayBuffer, { expanded: true });
 
-	return tags?.exif;
+	const tags = await exifr.parse(photo, {
+		// Можно указать только нужные теги, чтобы еще больше ускорить процесс
+		// pick: ['Make', 'Model', 'ISO', 'FNumber']
+	});
+
+	console.log(tags);
+
+	return tags;
 });

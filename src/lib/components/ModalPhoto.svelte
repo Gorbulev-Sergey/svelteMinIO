@@ -45,20 +45,37 @@
 		{#if exif}
 			<div class="position-fixed bottom-0 w-100 start-0 d-flex justify-content-center p-2">
 				<div
-					class="d-flex flex-column gap-0 bg-dark bg-opacity-25 rounded-1 p-2 flex-wrap"
+					class="d-flex flex-column gap-0 bg-dark bg-opacity-25 rounded-1 mb-1 p-2 flex-wrap"
 					style="max-height: 20em;">
-					<div class="text-light">Model: <b>{JSON.stringify(exif.Model?.description)}</b></div>
+					<div class="text-light">Камера: <b>{exif.Model}</b></div>
 					<div class="text-light">
-						Lens Model: <b>{exif.LensModel?.description}</b>
+						Объектив: <b>{exif.LensModel}</b>
 					</div>
 					<div class="text-light">
-						Экспозиция: <b>{exif.ExposureMode?.description}</b>
+						Фокусное расстояние: <b>{exif.FocalLength} мм</b>
 					</div>
 					<div class="text-light">
-						Автор: <b>{exif.Artist?.description}</b>
+						Диафрагма: <b>{exif.FNumber}</b>
 					</div>
 					<div class="text-light">
-						Дата: <b>{exif.DateTime?.description}</b>
+						ISO: <b>{exif.ISO}</b>
+					</div>
+
+					<div class="text-light">
+						Экспозиция: <b>{exif.ExposureMode}</b>
+					</div>
+
+					<div class="text-light">
+						Баланс белого: <b>{exif.WhiteBalance}</b>
+					</div>
+					<div class="text-light">
+						Разрешение: <b>{exif.ExifImageWidth}*{exif.ExifImageHeight} пикселей</b>
+					</div>
+					<div class="text-light">
+						Автор: <b>{exif.Artist}</b>
+					</div>
+					<div class="text-light">
+						Дата: <b>{exif.DateTime}</b>
 					</div>
 				</div>
 			</div>
