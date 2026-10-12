@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { getPhotoEXIF } from '$lib/minIO.remote';
+	import type { IPhoto } from '$lib/models/IPhoto';
 	import { onMount, type Snippet } from 'svelte';
 
 	interface IProps {
-		url?: string;
+		photo?: IPhoto;
+		photos?: IPhoto[];
 		isShow?: boolean;
 		onCancel?: () => void;
 		children?: Snippet<[]>;
 	}
-	let { url, isShow = $bindable(false), onCancel = () => {}, children }: IProps = $props();
+	let { photo, photos, isShow = $bindable(false), onCancel = () => {}, children }: IProps = $props();
 
-	let exif = $derived(url && url.trim() !== '' ? await getPhotoEXIF(url) : undefined);
+	let exif = $derived(photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined);
 
 	function hideScroll(isHide: boolean) {
 		document.body.style.overflow = isHide ? 'hidden' : '';
@@ -20,6 +22,18 @@
 		document.addEventListener('keydown', e => {
 			if (e.key !== 'Escape') return;
 			isShow = false;
+		});
+		document.addEventListener('wheel', e => {
+			if (photo && photos && photos.length > 0) {
+				let index = photos.indexOf(photo);
+				if (e.deltaY > 0) {
+					index = photos.indexOf(photo) < photos.length - 1 ? photos.indexOf(photo) + 1 : 0;
+				}
+				if (e.deltaY < 0) {
+					index = photos.indexOf(photo) > 0 ? photos.indexOf(photo) - 1 : photos.length - 1;
+				}
+				photo = photos[index];
+			}
 		});
 	});
 
@@ -35,7 +49,7 @@
 		<div class="d-flex justify-content-center align-items-center w-100 h-100">
 			<img
 				class="img-fluid h-100 rounded-1"
-				src={url}
+				src={photo?.url}
 				style="background-position: center; background-size: contain;"
 				alt="" />
 			{#if children}

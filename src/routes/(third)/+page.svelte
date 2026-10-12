@@ -377,4 +377,5 @@
 
 <ModalPhoto
 	bind:isShow={isModalShow.photo.fullScreen}
-	url={selectedPhoto.url}></ModalPhoto>
+	photo={selectedPhoto}
+	{photos}></ModalPhoto>
