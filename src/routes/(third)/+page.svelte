@@ -11,6 +11,7 @@
 		deleteBucket,
 		deleteFolder,
 		deletePhoto,
+		downloadBucket,
 		getBuckets,
 		getFolders,
 		getPhotos
@@ -78,10 +79,15 @@
 							}}>{item}</button>
 					{/each}
 				</section>
-				<div class="d-flex align-items-center gap-2">
+				<div class="d-flex align-items-center gap-1">
 					<small class="bg-light text-dark rounded-1 px-1">
 						в папке: <b class="text-dark">{photos?.length} фото</b>
 					</small>
+
+					<button
+						class="btn btn-sm bg-dark text-light"
+						onclick={async () => await downloadBucket(selectedBucket.name)}
+						>Скачать бакет <b>{selectedBucket.name}</b></button>
 
 					<div class="dropdown">
 						<button
