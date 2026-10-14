@@ -55,18 +55,18 @@
 					{#each selectedFolder?.split('/') as item, i}
 						{#if i == 0}
 							<button
-								class="btn btn-sm btn-light text-dark px-1 py-0 border-0"
+								class="badge rounded-3"
 								onclick={async () => (selectedFolder = folders ? folders[0] : '')}>
 								<b>{selectedBucket.name}:</b>
 							</button>
 						{/if}
-						<div class="d-flex align-items-end">
-							<i
-								style="font-size: .8em; padding-top:.2em"
-								class="fa-solid fa-angle-right"></i>
+
+						<div class="badge bg-transparent rounded-3 p-1">
+							<i class="bi bi-chevron-right"></i>
 						</div>
+
 						<button
-							class="btn btn-sm btn-light text-dark px-1 py-0"
+							class="badge rounded-3"
 							onclick={async () => {
 								selectedFolder = selectedFolder
 									?.split('/')
@@ -80,63 +80,61 @@
 					{/each}
 				</section>
 				<div class="d-flex align-items-center gap-1">
-					<small class="bg-light text-dark rounded-1 px-1">
+					<small class="badge rounded-3">
 						в папке: <b class="text-dark">{photos?.length} фото</b>
 					</small>
 
 					<button
-						class="btn btn-sm bg-dark text-light"
+						class="btn btn-sm rounded-3"
 						onclick={async () => await downloadBucket(selectedBucket.name)}
 						>Скачать бакет <b>{selectedBucket.name}</b></button>
 
-					<div class="dropdown">
+					<button
+						class="btn btn-sm btn-solid theme-inverse rounded-3"
+						type="button"
+						data-bs-toggle="menu"
+						data-bs-placement="bottom-end"
+						aria-expanded="false">
+						<div>Добавить</div>
+						<i class="bi bi-chevron-expand"></i>
+					</button>
+					<div class="menu rounded-3 border-0">
 						<button
-							class="btn btn-sm btn-dark"
-							id="dropdownMenuButton1"
-							data-bs-toggle="dropdown">
-							Добавить
+							class="menu-item rounded-3"
+							onclick={() => (isModalShow.bucket.add = true)}>Бакет</button>
+
+						<button
+							class="menu-item rounded-3"
+							onclick={() => (isModalShow.folder.add = true)}>
+							Папка
 						</button>
-						<ul
-							class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-1"
-							aria-labelledby="dropdownMenuButton1">
-							<button
-								class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
-								onclick={() => (isModalShow.bucket.add = true)}>Бакет</button>
-
-							<button
-								class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
-								onclick={() => (isModalShow.folder.add = true)}>
-								Папка
-							</button>
-
-							<input
-								hidden
-								class="form-control"
-								type="file"
-								name="files"
-								multiple
-								bind:this={inputFiles}
-								onchange={async (e: Event) => {
-									const t = e.target as HTMLInputElement;
-									if (t.files && t.files.length > 0) {
-										const blobs = Array.from(t.files as FileList).map(f => f as Blob);
-										isModalShow.photo.add = true;
-										await addPhotos({
-											bucket: selectedBucket.name,
-											folder: selectedFolder,
-											photos: blobs
-										});
-										isModalShow.photo.add = false;
-										await getPhotos({
-											bucket: selectedBucket.name,
-											folder: selectedFolder
-										}).refresh();
-									}
-								}} />
-							<button
-								class="btn btn-sm btn-light text-dark w-100 rounded-0 text-end"
-								onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button>
-						</ul>
+						<button
+							class="menu-item rounded-3"
+							onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button>
+						<input
+							hidden
+							class="form-control"
+							type="file"
+							name="files"
+							multiple
+							bind:this={inputFiles}
+							onchange={async (e: Event) => {
+								const t = e.target as HTMLInputElement;
+								if (t.files && t.files.length > 0) {
+									const blobs = Array.from(t.files as FileList).map(f => f as Blob);
+									isModalShow.photo.add = true;
+									await addPhotos({
+										bucket: selectedBucket.name,
+										folder: selectedFolder,
+										photos: blobs
+									});
+									isModalShow.photo.add = false;
+									await getPhotos({
+										bucket: selectedBucket.name,
+										folder: selectedFolder
+									}).refresh();
+								}
+							}} />
 					</div>
 				</div>
 			</div>
@@ -146,11 +144,11 @@
 					<section class="d-flex flex-column align-items-stretch gap-1">
 						<Subtitle title="Бакеты:"></Subtitle>
 						{#each buckets as bucket}
-							<div class="d-flex align-items-center">
+							<div class="btn-group">
 								<button
-									class="btn btn-sm {selectedBucket.name === bucket.name
-										? 'btn-dark text-light'
-										: 'btn-light text-dark'} text-nowrap rounded-end-0 w-100 text-start"
+									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name === bucket.name
+										? 'btn-solid theme-inverse'
+										: ''}"
 									onclick={() => {
 										selectedBucket = bucket;
 									}}>
@@ -158,14 +156,12 @@
 								</button>
 								<button
 									title="Удалить бакет"
-									class="btn btn-sm {selectedBucket.name === bucket.name
-										? 'btn-dark'
-										: 'btn-light'} text-danger text-nowrap rounded-start-0 p-1"
+									class="btn btn-sm rounded-end-3 fg-danger p-1"
 									onclick={() => {
 										selectedBucket = bucket;
 										isModalShow.bucket.delete = true;
 									}}>
-									<i class="fa-solid fa-xmark"></i>
+									<i class="bi bi-x-lg"></i>
 								</button>
 							</div>
 						{/each}
@@ -174,11 +170,11 @@
 					<div class="d-flex flex-column align-items-stretch gap-1">
 						<Subtitle title="Папки:"></Subtitle>
 						{#each folders as folder}
-							<div class="d-flex align-items-center">
+							<div class="btn-group">
 								<button
-									class="btn btn-sm {selectedFolder === folder
-										? 'btn-dark text-light'
-										: 'btn-light text-dark'} text-nowrap rounded-end-0 w-100 text-start"
+									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder === folder
+										? 'btn-solid theme-inverse'
+										: ''}"
 									onclick={() => {
 										selectedFolder = folder;
 									}}>
@@ -186,14 +182,12 @@
 								</button>
 								<button
 									title="Удалить бакет"
-									class="btn btn-sm {selectedFolder === folder
-										? 'btn-dark'
-										: 'btn-light'} text-danger text-nowrap rounded-start-0 p-1"
+									class="btn btn-sm rounded-end-3 fg-danger p-1"
 									onclick={() => {
 										selectedFolder = folder;
 										isModalShow.folder.delete = true;
 									}}>
-									<i class="fa-solid fa-xmark"></i>
+									<i class="bi bi-x-lg"></i>
 								</button>
 							</div>
 						{/each}
@@ -201,19 +195,15 @@
 				</section>
 
 				<div class="flex-grow-1 w-100">
-					<div class="row row-cols-1 row-cols-md-4 g-2 w-100 m-auto">
+					<div class="row row-cols-1 md:row-cols-4 g-2 w-100 m-auto">
 						{#each photos as photo}
 							<div class="col">
 								<!-- svelte-ignore a11y_no_static_element_interactions -->
 								<!-- svelte-ignore a11y_mouse_events_have_key_events -->
-								<div
-									class="d-flex flex-column {selectedPhoto.url === photo.url
-										? 'bg-dark'
-										: 'bg-secondary bg-opacity-10'} rounded"
-									style="padding: 0;">
+								<div class="d-flex flex-column rounded-3">
 									<!-- svelte-ignore a11y_click_events_have_key_events -->
 									<div
-										class="h-100 rounded-1 position-relative w-100 d-flex align-items-start justify-content-end"
+										class="h-100 rounded-3 position-relative w-100 d-flex align-items-start justify-content-end"
 										style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:10em; cursor:pointer"
 										onclick={() => {
 											selectedPhoto = photo;
@@ -221,12 +211,12 @@
 										}}>
 										<button
 											title="Удалить фото"
-											class="btn btn-sm btn-danger bg-light m-1 p-1 bg-opacity-10 border-0"
+											class="btn btn-sm bg-20"
 											onclick={async e => {
 												e.stopPropagation();
 												isModalShow.photo.delete = true;
 											}}>
-											<i class="fa-solid fa-xmark text-danger"></i>
+											<i class="bi bi-x-lg"></i>
 										</button>
 									</div>
 								</div>
