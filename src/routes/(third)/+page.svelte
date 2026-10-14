@@ -148,7 +148,7 @@
 							<div class="btn-group">
 								<button
 									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name === bucket.name
-										? 'btn-solid theme-inverse'
+										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
 									onclick={() => {
 										selectedBucket = bucket;
@@ -157,7 +157,9 @@
 								</button>
 								<button
 									title="Удалить бакет"
-									class="btn btn-sm rounded-end-3 fg-danger p-1"
+									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedBucket.name === bucket.name
+										? 'btn-subtle theme-inverse fw-bold'
+										: ''}"
 									onclick={() => {
 										selectedBucket = bucket;
 										isModalShow.bucket.delete = true;
@@ -174,7 +176,7 @@
 							<div class="btn-group">
 								<button
 									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder === folder
-										? 'btn-solid theme-inverse'
+										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
 									onclick={() => {
 										selectedFolder = folder;
@@ -183,7 +185,9 @@
 								</button>
 								<button
 									title="Удалить бакет"
-									class="btn btn-sm rounded-end-3 fg-danger p-1"
+									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedFolder === folder
+										? 'btn-subtle theme-inverse fw-bold'
+										: ''}"
 									onclick={() => {
 										selectedFolder = folder;
 										isModalShow.folder.delete = true;
@@ -205,7 +209,7 @@
 									class="img-fluid object-fit-cover w-100 h-100 rounded-3"
 									style="height: 11.5em; cursor: pointer;"
 									src={photo.url}
-									alt=""
+									alt={photo.name}
 									onclick={() => {
 										selectedPhoto = photo;
 										isModalShow.photo.fullScreen = true;
