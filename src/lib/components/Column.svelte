@@ -1,7 +1,7 @@
 <script lang="ts">
-	let { children } = $props();
+	let { children, gap = '3' } = $props();
 </script>
 
-<div class="d-flex flex-column gap-3 w-100">
+<div class="d-flex flex-column gap-{gap} w-100">
 	{@render children?.()}
 </div>

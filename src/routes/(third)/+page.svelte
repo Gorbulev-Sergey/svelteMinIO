@@ -49,7 +49,7 @@
 
 <Column>
 	<Block>
-		<Column>
+		<Column gap="2">
 			<div class="d-flex align-items-center justify-content-between gap-2 w-100">
 				<section class="d-flex align-items-center gap-0">
 					{#each selectedFolder?.split('/') as item, i}
@@ -204,25 +204,24 @@
 						{#each photos as photo}
 							<div class="col position-relative">
 								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-								<img
-									class="img-fluid object-fit-cover w-100 h-100 rounded-3"
-									style="height: 11.5em; cursor: pointer;"
-									src={photo.url}
-									alt={photo.name}
+								<!-- svelte-ignore a11y_no_static_element_interactions -->
+								<div
+									class="h-100 rounded-3 w-100 d-flex align-items-start justify-content-end"
+									style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
 									onclick={() => {
 										selectedPhoto = photo;
 										isModalShow.photo.fullScreen = true;
-									}} />
-								<button
-									title="Удалить фото"
-									class="btn btn-sm bg-20 position-absolute end-0"
-									onclick={async e => {
-										e.stopPropagation();
-										isModalShow.photo.delete = true;
 									}}>
-									<i class="bi bi-x-lg"></i>
-								</button>
+									<button
+										title="Удалить фото"
+										class="btn btn-sm bg-20 position-absolute end-0"
+										onclick={async e => {
+											e.stopPropagation();
+											isModalShow.photo.delete = true;
+										}}>
+										<i class="bi bi-x-lg"></i>
+									</button>
+								</div>
 							</div>
 						{/each}
 					</div>
