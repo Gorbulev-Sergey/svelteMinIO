@@ -51,7 +51,7 @@
 	<Block>
 		<Column>
 			<div class="d-flex align-items-center justify-content-between gap-2 w-100">
-				<section class="d-flex align-items-center gap-1">
+				<section class="d-flex align-items-center gap-0">
 					{#each selectedFolder?.split('/') as item, i}
 						{#if i == 0}
 							<button
@@ -79,62 +79,63 @@
 							}}>{item}</button>
 					{/each}
 				</section>
-				<div class="d-flex align-items-center gap-1">
-					<small class="badge rounded-3">
+				<div class="d-flex align-items-center gap-3">
+					<small class="badge bg-10 rounded-3">
 						в папке: <b class="text-dark">{photos?.length} фото</b>
 					</small>
-
-					<button
-						class="btn btn-sm rounded-3"
-						onclick={async () => await downloadBucket(selectedBucket.name)}
-						>Скачать бакет <b>{selectedBucket.name}</b></button>
-
-					<button
-						class="btn btn-sm btn-solid theme-inverse rounded-3"
-						type="button"
-						data-bs-toggle="menu"
-						data-bs-placement="bottom-end"
-						aria-expanded="false">
-						<div>Добавить</div>
-						<i class="bi bi-chevron-expand"></i>
-					</button>
-					<div class="menu rounded-3 border-0">
+					<div class="d-flex align-items-center gap-1">
 						<button
-							class="menu-item rounded-3"
-							onclick={() => (isModalShow.bucket.add = true)}>Бакет</button>
+							class="btn btn-sm rounded-3"
+							onclick={async () => await downloadBucket(selectedBucket.name)}
+							>Скачать бакет <b>{selectedBucket.name}</b></button>
 
 						<button
-							class="menu-item rounded-3"
-							onclick={() => (isModalShow.folder.add = true)}>
-							Папка
+							class="btn btn-sm btn-solid theme-inverse rounded-3"
+							type="button"
+							data-bs-toggle="menu"
+							data-bs-placement="bottom-end"
+							aria-expanded="false">
+							<div>Добавить</div>
+							<i class="bi bi-chevron-expand"></i>
 						</button>
-						<button
-							class="menu-item rounded-3"
-							onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button>
-						<input
-							hidden
-							class="form-control"
-							type="file"
-							name="files"
-							multiple
-							bind:this={inputFiles}
-							onchange={async (e: Event) => {
-								const t = e.target as HTMLInputElement;
-								if (t.files && t.files.length > 0) {
-									const blobs = Array.from(t.files as FileList).map(f => f as Blob);
-									isModalShow.photo.add = true;
-									await addPhotos({
-										bucket: selectedBucket.name,
-										folder: selectedFolder,
-										photos: blobs
-									});
-									isModalShow.photo.add = false;
-									await getPhotos({
-										bucket: selectedBucket.name,
-										folder: selectedFolder
-									}).refresh();
-								}
-							}} />
+						<div class="menu rounded-3 border-0">
+							<button
+								class="menu-item rounded-3"
+								onclick={() => (isModalShow.bucket.add = true)}>Бакет</button>
+
+							<button
+								class="menu-item rounded-3"
+								onclick={() => (isModalShow.folder.add = true)}>
+								Папка
+							</button>
+							<button
+								class="menu-item rounded-3"
+								onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button>
+							<input
+								hidden
+								class="form-control"
+								type="file"
+								name="files"
+								multiple
+								bind:this={inputFiles}
+								onchange={async (e: Event) => {
+									const t = e.target as HTMLInputElement;
+									if (t.files && t.files.length > 0) {
+										const blobs = Array.from(t.files as FileList).map(f => f as Blob);
+										isModalShow.photo.add = true;
+										await addPhotos({
+											bucket: selectedBucket.name,
+											folder: selectedFolder,
+											photos: blobs
+										});
+										isModalShow.photo.add = false;
+										await getPhotos({
+											bucket: selectedBucket.name,
+											folder: selectedFolder
+										}).refresh();
+									}
+								}} />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -197,29 +198,27 @@
 				<div class="flex-grow-1 w-100">
 					<div class="row row-cols-1 md:row-cols-4 g-2 w-100 m-auto">
 						{#each photos as photo}
-							<div class="col">
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
-								<!-- svelte-ignore a11y_mouse_events_have_key_events -->
-								<div class="d-flex flex-column rounded-3">
-									<!-- svelte-ignore a11y_click_events_have_key_events -->
-									<div
-										class="h-100 rounded-3 position-relative w-100 d-flex align-items-start justify-content-end"
-										style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:10em; cursor:pointer"
-										onclick={() => {
-											selectedPhoto = photo;
-											isModalShow.photo.fullScreen = true;
-										}}>
-										<button
-											title="Удалить фото"
-											class="btn btn-sm bg-20"
-											onclick={async e => {
-												e.stopPropagation();
-												isModalShow.photo.delete = true;
-											}}>
-											<i class="bi bi-x-lg"></i>
-										</button>
-									</div>
-								</div>
+							<div class="col position-relative">
+								<!-- svelte-ignore a11y_click_events_have_key_events -->
+								<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+								<img
+									class="img-fluid object-fit-cover w-100 h-100 rounded-3"
+									style="height: 11.5em; cursor: pointer;"
+									src={photo.url}
+									alt=""
+									onclick={() => {
+										selectedPhoto = photo;
+										isModalShow.photo.fullScreen = true;
+									}} />
+								<button
+									title="Удалить фото"
+									class="btn btn-sm bg-20 position-absolute end-0"
+									onclick={async e => {
+										e.stopPropagation();
+										isModalShow.photo.delete = true;
+									}}>
+									<i class="bi bi-x-lg"></i>
+								</button>
 							</div>
 						{/each}
 					</div>
