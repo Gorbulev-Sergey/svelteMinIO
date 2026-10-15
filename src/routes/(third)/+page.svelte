@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
+	import Dialog from '$lib/components/Dialog.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Subtitle from '$lib/components/Subtitle.svelte';
@@ -231,7 +232,7 @@
 	</Block>
 </Column>
 
-<Modal
+<Dialog
 	title="Добавить <b>{newObject.bucket}</b> бакет?"
 	bind:isShow={isModalShow.bucket.add}
 	buttonOkTitle="Добавить"
@@ -247,16 +248,16 @@
 		newObject.bucket = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="bg-info text-dark bg-opacity-10 rounded-1 px-3 py-2">
+	<div class="alert theme-info border-0 rounded-3 px-3 py-2">
 		Название бакета должно содержать только латинские буквы!
 	</div>
 	<input
-		class="form-control"
+		class="form-control rounded-3"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Удалить бакет {selectedBucket.name}?"
 	bind:isShow={isModalShow.bucket.delete}
 	buttonOkTitle="Удалить"
@@ -287,9 +288,9 @@
 		class="form-control"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Добавить папку"
 	bind:isShow={isModalShow.folder.add}
 	buttonOkTitle="Добавить"
@@ -313,9 +314,9 @@
 		class="form-control"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Удалить папку {selectedFolder}?"
 	bind:isShow={isModalShow.folder.delete}
 	buttonOkTitle="Удалить"
@@ -345,9 +346,9 @@
 		class="form-control"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Удалить фото?"
 	bind:isShow={isModalShow.photo.delete}
 	buttonOkTitle="Удалить"
@@ -371,7 +372,7 @@
 		class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
 		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer">
 	</div>
-</Modal>
+</Dialog>
 
 <ModalPhoto
 	bind:isShow={isModalShow.photo.fullScreen}

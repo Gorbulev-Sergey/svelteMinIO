@@ -35,15 +35,15 @@
 
 <dialog
 	{id}
-	class="my-dialog border-0 rounded-3 p-4 shadow-sm"
+	class="my-dialog border-0 p-0 bg-transparent shadow-sm"
 	style="min-width: 25%;">
-	<div class=" d-flex flex-column align-items-start gap-2 m-0 {_class}">
-		<div class="d-flex align-self-center justify-content-between w-100">
-			<b class="ps-1 mb-0">{@html title}</b>
+	<div class="rounded-4 p-0 bg-body w-100">
+		<div
+			class="d-flex align-items-center justify-content-between text-uppercase rounded-top-4 bg-1 ps-4 pe-2 py-2 w-100">
+			<b>{@html title}</b>
 			<button
 				title="Закрыть"
-				class="btn btn-icon position-absolute"
-				style="top:.5em; right:.5em;"
+				class="btn btn-sm px-2 rounded-3"
 				onclick={() => {
 					isShow = false;
 					onCancel();
@@ -51,32 +51,34 @@
 				<i class="bi bi-x-lg"></i>
 			</button>
 		</div>
-		<div class="d-flex flex-column gap-2 p-1">
-			{@render children?.()}
-		</div>
-		<div class="d-flex align-items-center justify-content-between w-100">
-			<button
-				class="btn btn-sm rounded-3"
-				onclick={() => {
-					isShow = false;
-					onCancel();
-				}}>{buttonCancelTitle}</button>
-			<button
-				class="btn btn-sm btn-solid theme-inverse rounded-3"
-				onclick={() => {
-					onOk();
-					if (autoCloseOnOk) {
+		<div class="d-flex flex-column align-items-start p-4 pt-5 gap-5 {_class}">
+			<div class="d-flex flex-column gap-4 w-100">
+				{@render children?.()}
+			</div>
+			<div class="d-flex align-items-center justify-content-between w-100">
+				<button
+					class="btn btn-sm rounded-3"
+					onclick={() => {
 						isShow = false;
 						onCancel();
-					}
-				}}>{buttonOkTitle}</button>
+					}}>{buttonCancelTitle}</button>
+				<button
+					class="btn btn-sm btn-solid theme-inverse rounded-3"
+					onclick={() => {
+						onOk();
+						if (autoCloseOnOk) {
+							isShow = false;
+							onCancel();
+						}
+					}}>{buttonOkTitle}</button>
+			</div>
 		</div>
 	</div>
 </dialog>
 
 <style>
 	.my-dialog::backdrop {
-		background: rgba(0, 0, 0, 0.2);
-		backdrop-filter: blur(0.07em);
+		background: rgba(0, 0, 0, 0.07);
+		backdrop-filter: blur(0.7em);
 	}
 </style>
