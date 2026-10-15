@@ -273,19 +273,18 @@
 		newObject.bucket = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 px-3 py-2">
+	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3">
 		{#if folders.length > 0}
 			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
 		{/if}
 		<div>Вы точно хотите удалить этот бакет?</div>
 		<div>
-			Для удаления бакета <b class="bg-danger text-light px-1 rounded-1 text-nowrap">{selectedBucket.name}</b> введите его
-			название!
+			Для удаления бакета <b class="bg-danger bg-50 rounded-3 px-1 text-nowrap">{selectedBucket.name}</b> введите его название!
 		</div>
 	</div>
 
 	<input
-		class="form-control"
+		class="form-control rounded-3"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
 </Dialog>
@@ -307,11 +306,11 @@
 	}}
 	autoCloseOnOk={false}>
 	<small>
-		<b class="bg-light text-dark px-1 rounded-1">{selectedBucket.name}:</b>
+		<b class="bg-light text-dark rounded-1">{selectedBucket.name}:</b>
 		<b>{newObject.folder}</b>
 	</small>
 	<input
-		class="form-control"
+		class="form-control rounded-3"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
 </Dialog>
@@ -332,18 +331,18 @@
 		newObject.folder = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3">
+	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3 p-3">
 		{#if photos && photos.length > 0}
 			<div>Папка <b>{selectedFolder}</b> не пустая!</div>
 		{/if}
 		<div>Вы точно хотите удалить эту папку?</div>
 		<div>
-			Для удаления паки <b class="bg-danger text-light px-1 rounded-1 text-nowrap">{selectedFolder}</b> введите её название!
+			Для удаления паки <b class="bg-danger bg-50 px-1 rounded-3 text-nowrap">{selectedFolder}</b> введите её название!
 		</div>
 	</div>
 
 	<input
-		class="form-control"
+		class="form-control rounded-3"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
 </Dialog>
@@ -365,11 +364,11 @@
 		newObject.folder = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3">
+	<div class="alert theme-danger border-0 rounded-3">
 		<div>Вы точно хотите удалить это фото?</div>
 	</div>
 	<div
-		class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
+		class="w-100 h-100 rounded-3 position-relative d-flex align-items-start justify-content-end"
 		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer">
 	</div>
 </Dialog>
