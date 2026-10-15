@@ -10,7 +10,7 @@
 	let { title, children, _class }: IProps = $props();
 </script>
 
-<div class={`bg-white p-3 rounded d-flex flex-column align-items-start gap-2 ${_class}`}>
+<div class={`bg-1 p-3 rounded-3 d-flex flex-column align-items-start gap-2 ${_class}`}>
 	{#if title}
 		<h5 class="my-0">{title}</h5>
 	{/if}
