@@ -2,6 +2,7 @@
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
+	import DialogPhoto from '$lib/components/DialogPhoto.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Subtitle from '$lib/components/Subtitle.svelte';
@@ -373,7 +374,7 @@
 	</div>
 </Dialog>
 
-<ModalPhoto
+<DialogPhoto
 	bind:isShow={isModalShow.photo.fullScreen}
 	photo={selectedPhoto}
-	{photos}></ModalPhoto>
+	{photos}></DialogPhoto>

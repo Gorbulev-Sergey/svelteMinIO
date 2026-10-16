@@ -39,7 +39,7 @@
 	style="min-width: 25%;">
 	<div class="rounded-4 p-0 bg-body w-100">
 		<div
-			class="d-flex align-items-center justify-content-between text-uppercase rounded-top-4 bg-1 ps-4 pe-2 py-2 w-100">
+			class="d-flex align-items-center justify-content-between text-uppercase rounded-top-4 bg-1 ps-4 pe-1 py-1 w-100">
 			<b>{@html title}</b>
 			<button
 				title="Закрыть"
