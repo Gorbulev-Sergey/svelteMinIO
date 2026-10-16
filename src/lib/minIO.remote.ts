@@ -12,10 +12,15 @@ export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
 });
 
-export const addBucket = command(v.string(), async bucket => {
+export const addBucket = query(v.string(), async bucket => {
 	if (await minioClient.bucketExists(bucket)) return;
 
-	await minioClient.makeBucket(bucket);
+	try {
+		await minioClient.makeBucket(bucket);
+		return { result: 'ok' };
+	} catch (error) {
+		return { result: error };
+	}
 });
 
 export const deleteBucket = command(v.string(), async bucket => {

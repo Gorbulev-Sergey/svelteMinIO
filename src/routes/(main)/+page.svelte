@@ -17,6 +17,7 @@
 		getPhotos
 	} from '$lib/minIO.remote';
 	import { store } from '$lib/store.svelte';
+	import { toast } from '@gorbulevsv/toasts';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[0]);
@@ -239,8 +240,16 @@
 	buttonOkTitle="Добавить"
 	onOk={async () => {
 		if (newObject.bucket.trim() != '') {
-			await addBucket(newObject.bucket);
-			await getBuckets().refresh();
+			await addBucket(newObject.bucket).then(async r => {
+				if (r?.result === 'ok') {
+					toast({
+						title: 'Бакет добавлен',
+						content: `Бакет ${newObject.bucket} успешно добавлен!`,
+						_class: 'bg-success bg-10'
+					});
+					await getBuckets().refresh();
+				} else toast({ title: 'Ошибка', content: 'Не удалось добавить бакет!', _class: 'bg-danger bg-10' });
+			});
 			isModalShow.bucket.add = false;
 			newObject.bucket = '';
 		}
