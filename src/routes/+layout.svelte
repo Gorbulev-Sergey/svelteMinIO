@@ -7,6 +7,12 @@
 	import { store } from '$lib/store.svelte';
 
 	let { children } = $props();
+
+	function toggleTheme() {
+		let theme = document.querySelector('[data-bs-theme]');
+		theme?.setAttribute('data-bs-theme', theme.getAttribute('data-bs-theme') == 'light' ? 'dark' : 'light');
+		cookieStore.set('theme', theme?.getAttribute('data-bs-theme') || 'light');
+	}
 </script>
 
 <svelte:head>
@@ -19,7 +25,7 @@
 	<div class="d-flex align-items-center">
 		<div class="d-flex align-items-center gap-1">
 			<a
-				class="btn btn-sm bg-1 rounded-3 text-nowrap"
+				class="btn btn-sm bg-1 rounded-4 text-nowrap"
 				href="/">
 				Svelte <b>MinIO</b>
 			</a>
@@ -30,7 +36,7 @@
 				<div class="text-nowrap text-uppercase">
 					<RenderTitle>
 						{#if store.title}
-							<div class="btn btn-sm bg-1 rounded-3">
+							<div class="btn btn-sm bg-1 rounded-4">
 								{@render store.title?.()}
 							</div>
 						{/if}
@@ -40,15 +46,28 @@
 		</div>
 
 		<div class="d-flex align-items-center justify-content-end gap-1 w-100">
+			<button
+				title="Тема"
+				class="btn btn-sm rounded-4"
+				onclick={toggleTheme}>
+				<i class="bi bi-sun"></i>
+			</button>
 			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/' ? 'fw-bold' : ''}"
+				class="btn btn-sm rounded-4 {page.url.pathname == '/' ? 'fw-bold' : ''}"
 				href="/">New maket</a>
 			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/second' ? 'fw-bold' : ''}"
+				class="btn btn-sm rounded-4 {page.url.pathname == '/second' ? 'fw-bold' : ''}"
 				href="/second">Remote functions</a>
 		</div>
 	</div>
 </div>
-<div class="container my-4">
+<div class="container my-5">
 	{@render children()}
 </div>
+
+<style>
+	/* Настройка цветов фона для светлой и темной темы */
+	:global(:root) {
+		--bs-bg-body: light-dark(var(--bs-white), var(--bs-gray-900));
+	}
+</style>

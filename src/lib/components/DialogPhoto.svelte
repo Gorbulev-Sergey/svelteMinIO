@@ -52,7 +52,7 @@
 		{#if exif}
 			<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
 				<div
-					class="d-flex flex-column gap-0 bg-body bg-50 rounded-4 mb-3 p-5 flex-wrap"
+					class="d-flex flex-column gap-0 theme-inverse bg-body bg-50 rounded-4 mb-3 p-5 flex-wrap"
 					style="max-height: 20em;">
 					{#if exif.Model}
 						<div class="text-light">Камера: <b>{exif.Model}</b></div>
@@ -108,7 +108,7 @@
 
 		<button
 			aria-label="Закрыть"
-			class="btn bg-body bg-20 px-1 py-0 position-absolute rounded-3"
+			class="btn btn-sm bg-body bg-20 p-1 position-absolute rounded-4"
 			style="top:.375rem; right:.375rem;"
 			onclick={e => {
 				e.stopPropagation();

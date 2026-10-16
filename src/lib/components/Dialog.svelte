@@ -43,7 +43,7 @@
 			<b>{@html title}</b>
 			<button
 				title="Закрыть"
-				class="btn btn-sm px-2 rounded-3"
+				class="btn btn-sm px-2 rounded-4"
 				onclick={() => {
 					isShow = false;
 					onCancel();
@@ -57,13 +57,13 @@
 			</div>
 			<div class="d-flex align-items-center justify-content-between w-100">
 				<button
-					class="btn btn-sm rounded-3"
+					class="btn btn-sm rounded-4"
 					onclick={() => {
 						isShow = false;
 						onCancel();
 					}}>{buttonCancelTitle}</button>
 				<button
-					class="btn btn-sm btn-solid theme-inverse rounded-3"
+					class="btn btn-sm btn-solid theme-inverse rounded-4"
 					onclick={() => {
 						onOk();
 						if (autoCloseOnOk) {
