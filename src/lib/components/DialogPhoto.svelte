@@ -14,10 +14,14 @@
 	let id = crypto.randomUUID();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
 	let exif = $derived(photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined);
+	function hideScroll(isHide: boolean) {
+		document.body.style.overflow = isHide ? 'hidden' : '';
+	}
 
 	$effect(() => {
 		if (isShow) dialog.showModal();
 		else dialog.close();
+		hideScroll(isShow);
 	});
 
 	onMount(async () => {
@@ -41,15 +45,93 @@
 
 <dialog
 	{id}
+	class="my-dialog dialog-fullscreen position-relative border-0 p-0 bg-transparent">
+	<div class="d-flex justify-content-center align-items-center w-100 h-100 p-3">
+		<img
+			src={photo?.url}
+			class="fitt-object-contain h-100 rounded-3"
+			alt="" />
+	</div>
+	<button
+		aria-label="Закрыть"
+		class="position-absolute btn bg-body bg-20 px-1 py-0 rounded-3"
+		style="top:.5rem; right:.5rem;"
+		onclick={e => {
+			e.stopPropagation();
+			isShow = false;
+			onCancel();
+		}}>
+		<i class="bi bi-x-lg"></i>
+	</button>
+	{#if exif}
+		<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
+			<div
+				class="d-flex flex-column gap-0 bg-body bg-50 rounded-top-3 mb-3 p-5 flex-wrap"
+				style="max-height: 20em;">
+				{#if exif.Model}
+					<div class="text-light">Камера: <b>{exif.Model}</b></div>
+				{/if}
+				{#if exif.LensModel}
+					<div class="text-light">
+						Объектив: <b>{exif.LensModel}</b>
+					</div>
+				{/if}
+				{#if exif.FocalLength}
+					<div class="text-light">
+						Фокусное расстояние: <b>{exif.FocalLength} мм</b>
+					</div>
+				{/if}
+				{#if exif.FNumber}
+					<div class="text-light">
+						Диафрагма: <b>{exif.FNumber}</b>
+					</div>
+				{/if}
+				{#if exif.ISO}
+					<div class="text-light">
+						ISO: <b>{exif.ISO}</b>
+					</div>
+				{/if}
+				{#if exif.ExposureMode}
+					<div class="text-light">
+						Экспозиция: <b>{exif.ExposureMode}</b>
+					</div>
+				{/if}
+				{#if exif.WhiteBalance}
+					<div class="text-light">
+						Баланс белого: <b>{exif.WhiteBalance}</b>
+					</div>
+				{/if}
+				{#if exif.ExifImageHeight}
+					<div class="text-light">
+						Разрешение: <b>{exif.ExifImageWidth}*{exif.ExifImageHeight} пикселей</b>
+					</div>
+				{/if}
+				{#if exif.Artist}
+					<div class="text-light">
+						Автор: <b>{exif.Artist}</b>
+					</div>
+				{/if}
+				{#if exif.DateTime}
+					<div class="text-light">
+						Дата: <b>{exif.DateTime}</b>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/if}
+</dialog>
+
+<!-- <dialog
+	{id}
 	class="my-dialog dialog-fullscreen border-0 p-0 bg-transparent">
 	<div class="w-100 h-100 p-3">
 		<div
-			class="position-relative img-fluid w-100 h-100 rounded-3"
+			class="position-relative img-fluid h-100 rounded-3"
 			style="background-image: url({photo?.url}); background-repeat: no-repeat; background-position: center; background-size: contain;">
 			{#if exif}
 				<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
 					<div
-						class="d-flex flex-column gap-0 bg-body bg-50 rounded-3 mb-3 p-5 flex-wrap"
+						class="d-flex flex-column gap-0 bg-body bg-50 rounded-top-3 mb-0 p-5 flex-wrap"
 						style="max-height: 20em;">
 						{#if exif.Model}
 							<div class="text-light">Камера: <b>{exif.Model}</b></div>
@@ -105,7 +187,7 @@
 
 			<button
 				aria-label="Закрыть"
-				class="btn btn-icon btn-solid btn-theme-subtle position-absolute top-0 end-0 rounded-3"
+				class="btn bg-body bg-20 px-1 py-0 position-absolute top-0 end-0 rounded-3"
 				onclick={e => {
 					e.stopPropagation();
 					isShow = false;
@@ -115,7 +197,7 @@
 			</button>
 		</div>
 	</div>
-</dialog>
+</dialog> -->
 
 <style>
 	.my-dialog::backdrop {
