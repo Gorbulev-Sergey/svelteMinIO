@@ -3,8 +3,6 @@
 	import Column from '$lib/components/Column.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import DialogPhoto from '$lib/components/DialogPhoto.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
 	import Subtitle from '$lib/components/Subtitle.svelte';
 	import {
 		addBucket,

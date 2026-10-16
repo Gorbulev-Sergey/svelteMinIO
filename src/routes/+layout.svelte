@@ -41,15 +41,6 @@
 
 		<div class="d-flex align-items-center justify-content-end gap-1 w-100">
 			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/dropmenu' ? 'fw-bold' : ''}"
-				href="/dialog">Диалог</a>
-			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/dropmenu' ? 'fw-bold' : ''}"
-				href="/dropmenu">Dropmenu</a>
-			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/main' ? 'fw-bold' : ''}"
-				href="/main">Load</a>
-			<a
 				class="btn btn-sm rounded-3 {page.url.pathname == '/' ? 'fw-bold' : ''}"
 				href="/">New maket</a>
 			<a

@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { getPhotoEXIF } from '$lib/minIO.remote';
 	import type { IPhoto } from '$lib/models/IPhoto';
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 
 	interface IProps {
 		photo?: IPhoto;
 		photos?: IPhoto[];
+		children?: Snippet<[]>;
 		isShow?: boolean;
 		onCancel?: () => void;
 	}
-	let { photo, photos, isShow = $bindable(false), onCancel = () => {} }: IProps = $props();
+	let { photo, photos, children, isShow = $bindable(false), onCancel = () => {} }: IProps = $props();
 
 	let id = crypto.randomUUID();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
@@ -45,6 +46,9 @@
 	<div
 		class="position-relative img-fluid h-100"
 		style="background-image: url({photo?.url}); background-repeat: no-repeat; background-position: center; background-size: contain;">
+		{#if children}
+			{@render children?.()}
+		{/if}
 		{#if exif}
 			<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
 				<div

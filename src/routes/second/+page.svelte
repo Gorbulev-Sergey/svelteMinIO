@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
+	import Dialog from '$lib/components/Dialog.svelte';
+	import DialogPhoto from '$lib/components/DialogPhoto.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import {
 		addBucket,
@@ -202,7 +202,7 @@
 	</Block>
 </Column>
 
-<Modal
+<Dialog
 	title="Добавить <b>{newObject.bucket}</b> бакет?"
 	bind:isShow={isModalShow.bucket.add}
 	buttonOkTitle="Добавить"
@@ -225,9 +225,9 @@
 		class="form-control"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Удалить бакет {selectedBucket.name}?"
 	bind:isShow={isModalShow.bucket.delete}
 	buttonOkTitle="Удалить"
@@ -258,9 +258,9 @@
 		class="form-control"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Добавить <b>{newObject.folder}</b> папку?"
 	bind:isShow={isModalShow.folder.add}
 	buttonOkTitle="Добавить"
@@ -280,9 +280,9 @@
 		class="form-control"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Удалить папку {selectedFolder}?"
 	bind:isShow={isModalShow.folder.delete}
 	buttonOkTitle="Удалить"
@@ -312,9 +312,9 @@
 		class="form-control"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
-</Modal>
+</Dialog>
 
-<Modal
+<Dialog
 	title="Удалить фото?"
 	bind:isShow={isModalShow.photo.delete}
 	buttonOkTitle="Удалить"
@@ -338,8 +338,8 @@
 		class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
 		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer">
 	</div>
-</Modal>
+</Dialog>
 
-<ModalPhoto
+<DialogPhoto
 	bind:isShow={isModalShow.photo.fullScreen}
-	url={selectedPhoto.url}></ModalPhoto>
+	photo={selectedPhoto}></DialogPhoto>
