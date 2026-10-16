@@ -12,13 +12,13 @@ export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
 });
 
-export const addBucket = command(v.string(), async (bucket) => {
+export const addBucket = command(v.string(), async bucket => {
 	if (await minioClient.bucketExists(bucket)) return;
 
 	await minioClient.makeBucket(bucket);
 });
 
-export const deleteBucket = command(v.string(), async (bucket) => {
+export const deleteBucket = command(v.string(), async bucket => {
 	// Удаляем содержимое бакета
 	const objectsStream = minioClient.listObjects(bucket, '', true);
 	for await (const obj of objectsStream) {
@@ -30,7 +30,7 @@ export const deleteBucket = command(v.string(), async (bucket) => {
 	await minioClient.removeBucket(bucket);
 });
 
-export const downloadBucket = command(v.string(), async (bucket) => {
+export const downloadBucket = command(v.string(), async bucket => {
 	let baseDir = `C:/Users/gorbu/Desktop/${bucket}`;
 
 	// Собираем все имена объектов из потока listObjects
@@ -38,15 +38,15 @@ export const downloadBucket = command(v.string(), async (bucket) => {
 		const names = [];
 		const stream = minioClient.listObjects(bucket, '', true);
 
-		stream.on('data', (obj) => {
+		stream.on('data', obj => {
 			if (obj.name) names.push(obj.name);
 		});
 
-		stream.on('error', (err) => reject(err));
+		stream.on('error', err => reject(err));
 		stream.on('end', () => resolve(names));
 	});
 
-	let files = (objects as [])?.filter((o) => o?.at(-1) != '/');
+	let files = (objects as [])?.filter(o => o?.at(-1) != '/');
 	console.log(`Найдено файлов: ${files.length}`);
 
 	const downloadPromises = files.map(async (name, i) => {
@@ -62,7 +62,7 @@ export const downloadBucket = command(v.string(), async (bucket) => {
 	await Promise.all(downloadPromises);
 });
 
-export const getFolders = query(v.optional(v.string()), async (bucket) => {
+export const getFolders = query(v.optional(v.string()), async bucket => {
 	if (bucket) {
 		const objects = await minioClient.listObjects(bucket, '', true);
 		const folders = new Set<string>();
@@ -86,7 +86,7 @@ export const addFolder = command(
 		bucket: v.string(),
 		folder: v.string()
 	}),
-	async (data) => {
+	async data => {
 		if (data.bucket.trim() === '' && data.folder.trim() === '') return;
 
 		// folder должен быть без начального слэша, например 'images/2024'
@@ -106,7 +106,7 @@ export const deleteFolder = command(
 		bucket: v.string(),
 		folder: v.string()
 	}),
-	async (data) => {
+	async data => {
 		const objects = minioClient.listObjects(data.bucket, data.folder, true);
 		const removeObjects = [];
 
@@ -123,7 +123,7 @@ export const getPhotos = query(
 		bucket: v.optional(v.string()),
 		folder: v.optional(v.string())
 	}),
-	async (data) => {
+	async data => {
 		if (data.bucket && data.folder) {
 			const objects = await minioClient.listObjects(data.bucket, data.folder, true);
 
@@ -137,11 +137,7 @@ export const getPhotos = query(
 				}
 
 				// генерируем presigned URL — он будет работать даже без публичного бакета
-				const presignedUrl = await minioClient.presignedGetObject(
-					data.bucket,
-					objInfo.name,
-					24 * 60 * 60
-				);
+				const presignedUrl = await minioClient.presignedGetObject(data.bucket, objInfo.name, 24 * 60 * 60);
 
 				if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
 					images.push({
@@ -162,7 +158,7 @@ export const addPhotos = command(
 		folder: v.string(),
 		photos: v.array(v.blob())
 	}),
-	async (data) => {
+	async data => {
 		if (!data.photos || !(data.photos[0] instanceof Blob)) return;
 
 		for (const f of data.photos) {
@@ -182,18 +178,18 @@ export const deletePhoto = command(
 		bucket: v.string(),
 		photo: v.string()
 	}),
-	async (data) => {
+	async data => {
 		await minioClient.removeObject(data.bucket, data.photo);
 	}
 );
 
-export const getPhotoEXIF = query(v.string(), async (photo) => {
+export const getPhotoEXIF = query(v.string(), async photo => {
 	const res = await fetch(photo);
 	const tags = await exifr.parse(photo, {
 		// Можно указать только нужные теги, чтобы еще больше ускорить процесс
 		// pick: ['Make', 'Model', 'ISO', 'FNumber']
 	});
-	console.log(tags);
+	// console.log(tags);
 	return tags;
 });
 
@@ -235,7 +231,7 @@ async function downloadObject(
 				readStream.pipe(writeStream);
 
 				// Ждём окончания записи
-				await once(writeStream, 'finish').then((_) => {
+				await once(writeStream, 'finish').then(_ => {
 					console.log(`${index ? index + '. ' : ''}Файл сохранён: ${localPath}`);
 				});
 			} catch (err) {

@@ -37,13 +37,13 @@
 	{id}
 	class="my-dialog border-0 p-0 bg-transparent shadow-sm"
 	style="min-width: 25%;">
-	<div class="rounded-4 p-0 bg-body w-100">
+	<div class="rounded-3 p-0 bg-body w-100">
 		<div
 			class="d-flex align-items-center justify-content-between text-uppercase rounded-top-4 bg-1 ps-4 pe-1 py-1 w-100">
 			<b>{@html title}</b>
 			<button
 				title="Закрыть"
-				class="btn btn-sm px-2 rounded-4"
+				class="btn btn-sm px-2 rounded-3"
 				onclick={() => {
 					isShow = false;
 					onCancel();
@@ -57,13 +57,13 @@
 			</div>
 			<div class="d-flex align-items-center justify-content-between w-100">
 				<button
-					class="btn btn-sm rounded-4"
+					class="btn btn-sm rounded-3"
 					onclick={() => {
 						isShow = false;
 						onCancel();
 					}}>{buttonCancelTitle}</button>
 				<button
-					class="btn btn-sm btn-solid theme-inverse rounded-4"
+					class="btn btn-sm btn-solid theme-inverse rounded-3"
 					onclick={() => {
 						onOk();
 						if (autoCloseOnOk) {

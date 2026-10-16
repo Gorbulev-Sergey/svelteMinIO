@@ -55,18 +55,18 @@
 					{#each selectedFolder?.split('/') as item, i}
 						{#if i == 0}
 							<button
-								class="badge rounded-4"
+								class="badge rounded-3"
 								onclick={async () => (selectedFolder = folders ? folders[0] : '')}>
 								<b>{selectedBucket.name}:</b>
 							</button>
 						{/if}
 
-						<div class="badge bg-transparent rounded-4 p-1">
+						<div class="badge bg-transparent rounded-3 p-1">
 							<i class="bi bi-chevron-right"></i>
 						</div>
 
 						<button
-							class="badge rounded-4"
+							class="badge rounded-3"
 							onclick={async () => {
 								selectedFolder = selectedFolder
 									?.split('/')
@@ -80,17 +80,17 @@
 					{/each}
 				</section>
 				<div class="d-flex align-items-center gap-3">
-					<small class="badge bg-10 rounded-4">
+					<small class="badge bg-10 rounded-3">
 						в папке: <b class="text-dark">{photos?.length} фото</b>
 					</small>
 					<div class="d-flex align-items-center gap-1">
 						<button
-							class="btn btn-sm rounded-4"
+							class="btn btn-sm rounded-3"
 							onclick={async () => await downloadBucket(selectedBucket.name)}
 							>Скачать бакет <b>{selectedBucket.name}</b></button>
 
 						<button
-							class="btn btn-sm btn-solid theme-inverse rounded-4"
+							class="btn btn-sm btn-solid theme-inverse rounded-3"
 							type="button"
 							data-bs-toggle="menu"
 							data-bs-placement="bottom-end"
@@ -98,18 +98,20 @@
 							<div>Добавить</div>
 							<i class="bi bi-chevron-expand"></i>
 						</button>
-						<div class="menu rounded-4 border-0">
+						<div class="menu rounded-3 border-0">
 							<button
-								class="menu-item rounded-4"
+								class="menu-item rounded-3"
 								onclick={() => (isModalShow.bucket.add = true)}>Бакет</button>
 
 							<button
-								class="menu-item rounded-4"
-								onclick={() => (isModalShow.folder.add = true)}>
+								class="menu-item rounded-3"
+								onclick={() => {
+									isModalShow.folder.add = true;
+								}}>
 								Папка
 							</button>
 							<button
-								class="menu-item rounded-4"
+								class="menu-item rounded-3"
 								onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button>
 							<input
 								hidden
@@ -206,7 +208,7 @@
 								<!-- svelte-ignore a11y_click_events_have_key_events -->
 								<!-- svelte-ignore a11y_no_static_element_interactions -->
 								<div
-									class="h-100 rounded-4 w-100 d-flex align-items-start justify-content-end"
+									class="h-100 rounded-3 w-100 d-flex align-items-start justify-content-end hover-lift"
 									style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
 									onclick={() => {
 										selectedPhoto = photo;
@@ -247,11 +249,11 @@
 		newObject.bucket = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="alert theme-info border-0 rounded-4 px-3 py-2">
+	<div class="alert theme-info border-0 rounded-3 px-3 py-2">
 		Название бакета должно содержать только латинские буквы!
 	</div>
 	<input
-		class="form-control rounded-4"
+		class="form-control rounded-3"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
 </Dialog>
@@ -272,18 +274,18 @@
 		newObject.bucket = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-4">
+	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3">
 		{#if folders.length > 0}
 			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
 		{/if}
 		<div>Вы точно хотите удалить этот бакет?</div>
 		<div>
-			Для удаления бакета <b class="bg-danger bg-50 rounded-4 px-1 text-nowrap">{selectedBucket.name}</b> введите его название!
+			Для удаления бакета <b class="bg-danger bg-50 rounded-3 px-1 text-nowrap">{selectedBucket.name}</b> введите его название!
 		</div>
 	</div>
 
 	<input
-		class="form-control rounded-4"
+		class="form-control rounded-3"
 		placeholder="Название бакета"
 		bind:value={newObject.bucket} />
 </Dialog>
@@ -309,7 +311,7 @@
 		<b>{newObject.folder}</b>
 	</small>
 	<input
-		class="form-control rounded-4"
+		class="form-control rounded-3"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
 </Dialog>
@@ -330,18 +332,18 @@
 		newObject.folder = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-4 p-3">
+	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3 p-3">
 		{#if photos && photos.length > 0}
 			<div>Папка <b>{selectedFolder}</b> не пустая!</div>
 		{/if}
 		<div>Вы точно хотите удалить эту папку?</div>
 		<div>
-			Для удаления паки <b class="bg-danger bg-50 px-1 rounded-4 text-nowrap">{selectedFolder}</b> введите её название!
+			Для удаления паки <b class="bg-danger bg-50 px-1 rounded-3 text-nowrap">{selectedFolder}</b> введите её название!
 		</div>
 	</div>
 
 	<input
-		class="form-control rounded-4"
+		class="form-control rounded-3"
 		placeholder="Название папки"
 		bind:value={newObject.folder} />
 </Dialog>
@@ -363,11 +365,11 @@
 		newObject.folder = '';
 	}}
 	autoCloseOnOk={false}>
-	<div class="alert theme-danger border-0 rounded-4">
+	<div class="alert theme-danger border-0 rounded-3">
 		<div>Вы точно хотите удалить это фото?</div>
 	</div>
 	<div
-		class="w-100 h-100 rounded-4 position-relative d-flex align-items-start justify-content-end"
+		class="w-100 h-100 rounded-3 position-relative d-flex align-items-start justify-content-end"
 		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer">
 	</div>
 </Dialog>
