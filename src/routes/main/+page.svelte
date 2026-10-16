@@ -3,8 +3,8 @@
 	import { page } from '$app/state';
 	import Block from '$lib/components/Block.svelte';
 	import Column from '$lib/components/Column.svelte';
-	import Modal from '$lib/components/Modal.svelte';
-	import ModalPhoto from '$lib/components/ModalPhoto.svelte';
+	import Dialog from '$lib/components/Dialog.svelte';
+	import DialogPhoto from '$lib/components/DialogPhoto.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import type { IEXIF, IPhoto } from '$lib/models/IPhoto.js';
 	import { store } from '$lib/store.svelte.js';
@@ -203,7 +203,7 @@
 		</div>
 	</Block>
 
-	<Modal
+	<Dialog
 		title="Добавить папку?"
 		bind:isShow={isFolderCreateShow}
 		buttonOkTitle="Добавить"
@@ -223,11 +223,9 @@
 			placeholder="Название папки"
 			type="text"
 			bind:value={newFolder} />
-	</Modal>
+	</Dialog>
 
-	<ModalPhoto
-		bind:isShow={isPhotoFullScreenShow}
-		_class="">
+	<DialogPhoto bind:isShow={isPhotoFullScreenShow}>
 		<img
 			class="rounded"
 			style="max-height: 98vh;"
@@ -268,9 +266,9 @@
 				<small><b>Баланс белого:</b> {selectedPhotoMeta?.WhiteBalance}</small>
 			</div>
 		</div>
-	</ModalPhoto>
+	</DialogPhoto>
 
-	<Modal
+	<Dialog
 		title="Удалить папку?"
 		bind:isShow={isDeleteFolderShow}
 		buttonOkTitle="Удалить"
@@ -286,9 +284,9 @@
 		<div class="text-center">
 			Вы действительно хотите удалить папку <b>"{folders[selectedFolder]}"</b>?
 		</div>
-	</Modal>
+	</Dialog>
 
-	<Modal
+	<Dialog
 		title="Удалить этот файл?"
 		bind:isShow={isDeletePhotoShow}
 		buttonOkTitle="Удалить"
@@ -307,5 +305,5 @@
 			class="rounded text-center"
 			style="background-image: url({selectedPhoto?.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:16em;">
 		</div>
-	</Modal>
+	</Dialog>
 </Column>
