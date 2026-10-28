@@ -1,0 +1,18 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface IProps {
+		title?: string;
+		children?: Snippet<[]>;
+		_class?: string;
+	}
+
+	let { title, children, _class }: IProps = $props();
+</script>
+
+<div class={`bg-1 p-4 rounded-3 d-flex flex-column align-items-start gap-2 ${_class}`}>
+	{#if title}
+		<h5 class="my-0">{title}</h5>
+	{/if}
+	{@render children?.()}
+</div>
