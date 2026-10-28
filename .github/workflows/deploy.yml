@@ -1,0 +1,69 @@
+name: Deploy to Ubuntu
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # Важно: увеличить таймаут, установка+build могут идти долго
+          command_timeout: 20m
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            # 1. Подключаем nvm / Node (если Node ставился через nvm)
+            export NVM_DIR="$HOME/.nvm"
+            if [ -s "$NVM_DIR/nvm.sh" ]; then
+              . "$NVM_DIR/nvm.sh"
+            fi
+            # Если Node ставился через apt/nodesource — эта строка не нужна,
+            # но PATH на всякий случай дополняем:
+            export PATH="$HOME/.nvm/versions/node/$(nvm current 2>/dev/null || echo '')/bin:/usr/local/bin:/usr/bin:$PATH"
+
+            # 2. Проверяем, что npm и node доступны (иначе — падаем сразу с понятной ошибкой)
+            echo "node: $(node -v)"
+            echo "npm:  $(npm -v)"
+
+            # 3. Переходим в проект
+            cd /projects/svelteMinIO
+
+            # 4. Обновляем код (ветка должна совпадать с триггером!)
+            git fetch --all --prune
+            git reset --hard origin/main
+
+            # 5. ВАЖНО: снимаем NODE_ENV=production на время установки,
+            #    иначе npm ci не поставит devDependencies (vite, svelte-kit и т.д.)
+            unset NODE_ENV || true
+
+            # 6. Чистая установка зависимостей
+            #    --include=dev гарантирует установку devDependencies даже если NODE_ENV=production
+            npm ci --include=dev
+
+            # 7. Проверяем, что vite реально установлен
+            if [ ! -x "node_modules/.bin/vite" ]; then
+              echo "❌ vite не найден в node_modules/.bin — установка зависимостей неполная"
+              ls -la node_modules/.bin | head -20 || true
+              exit 1
+            fi
+
+            # 8. Сборка (NODE_ENV=production нужен именно здесь)
+            NODE_ENV=production npm run build
+
+            # 9. Перезапуск PM2
+            pm2 restart svelteMinIO \
+              || pm2 start build/index.js --name svelteMinIO
+
+            # 10. Сохраняем список процессов PM2 (чтобы пережить ребут)
+            pm2 save
