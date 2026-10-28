@@ -11,13 +11,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # Важно: увеличить таймаут, установка+build могут идти долго
           command_timeout: 20m
           script_stop: true
           script: |
@@ -32,7 +36,7 @@ jobs:
             # но PATH на всякий случай дополняем:
             export PATH="$HOME/.nvm/versions/node/$(nvm current 2>/dev/null || echo '')/bin:/usr/local/bin:/usr/bin:$PATH"
 
-            # 2. Проверяем, что npm и node доступны (иначе — падаем сразу с понятной ошибкой)
+            # 2. Проверяем, что npm и node доступны
             echo "node: $(node -v)"
             echo "npm:  $(npm -v)"
 
@@ -48,7 +52,6 @@ jobs:
             unset NODE_ENV || true
 
             # 6. Чистая установка зависимостей
-            #    --include=dev гарантирует установку devDependencies даже если NODE_ENV=production
             npm ci --include=dev
 
             # 7. Проверяем, что vite реально установлен
@@ -59,6 +62,9 @@ jobs:
             fi
 
             # 8. Сборка (NODE_ENV=production нужен именно здесь)
+            # Передаём переменные окружения для SvelteKit, чтобы избежать env_invalid
+            MINIO_LOGIN="${{ secrets.MINIO_LOGIN }}" \
+            MINIO_PASSWORD="${{ secrets.MINIO_PASSWORD }}" \
             NODE_ENV=production npm run build
 
             # 9. Перезапуск PM2
