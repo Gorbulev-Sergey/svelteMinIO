@@ -4,30 +4,39 @@
 	import { page } from '$app/state';
 	import favicon from '#lib/assets/favicon.svg';
 	import RenderTitle from '#lib/components/RenderTitle.svelte';
-	import { store } from '#lib/store.svelte';
 	import { toast, Toaster } from '@gorbulevsv/toasts';
+	import { onMount } from 'svelte';
+	import { store } from '#lib/store.svelte.ts';
 
 	let { children } = $props();
 
 	function toggleTheme() {
 		let theme = document.querySelector('[data-bs-theme]');
-		theme?.setAttribute('data-bs-theme', theme.getAttribute('data-bs-theme') == 'light' ? 'dark' : 'light');
+		theme?.setAttribute(
+			'data-bs-theme',
+			theme.getAttribute('data-bs-theme') == 'light' ? 'dark' : 'light'
+		);
 		cookieStore.set('theme', theme?.getAttribute('data-bs-theme') || 'light');
 	}
+
+	onMount(async () => {
+		const defaultTheme = 'light';
+		let theme = (await cookieStore.get('theme'))?.value;
+		if (!theme) {
+			cookieStore.set('theme', defaultTheme);
+		}
+		document.querySelector('[data-bs-theme]')?.setAttribute('data-bs-theme', theme || defaultTheme);
+	});
 </script>
 
 <svelte:head>
-	<link
-		rel="icon"
-		href={favicon} />
+	<link rel="icon" href={favicon} />
 </svelte:head>
 
 <div class="sticky-top bg-1 px-3 py-2">
 	<div class="d-flex align-items-center">
 		<div class="d-flex align-items-center gap-1">
-			<a
-				class="btn btn-sm bg-1 rounded-3 text-nowrap"
-				href="/">
+			<a class="btn btn-sm bg-1 rounded-3 text-nowrap" href="/">
 				Svelte <b>MinIO</b>
 			</a>
 			<div class="d-flex align-items-center gap-0">
@@ -51,20 +60,19 @@
 				class="btn btn-sm rounded-3"
 				onclick={() => {
 					toast({ title: 'Привет', content: 'Как дела, друг?', _class: 'bg-body bg-50 shadow-sm' });
-				}}>Toast</button>
-			<button
-				title="Тема"
-				class="btn btn-sm rounded-3"
-				onclick={toggleTheme}>
+				}}>Toast</button
+			>
+			<button title="Тема" class="btn btn-sm rounded-3" onclick={toggleTheme}>
 				<i class="bi bi-sun"></i>
 			</button>
 			<div class="vr mx-3"></div>
-			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/' ? 'fw-bold' : ''}"
-				href="/">New maket</a>
+			<a class="btn btn-sm rounded-3 {page.url.pathname == '/' ? 'fw-bold' : ''}" href="/"
+				>New maket</a
+			>
 			<a
 				class="btn btn-sm rounded-3 {page.url.pathname == '/second' ? 'fw-bold' : ''}"
-				href="/second">Remote functions</a>
+				href="/second">Remote functions</a
+			>
 		</div>
 	</div>
 </div>

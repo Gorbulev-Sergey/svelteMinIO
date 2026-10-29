@@ -15,8 +15,8 @@
 		getBuckets,
 		getFolders,
 		getPhotos
-	} from '#lib/minio.remote';
-	import { store } from '#lib/store.svelte';
+	} from '#lib/minio.remote.ts';
+	import { store } from '#lib/store.svelte.ts';
 	import { toast } from '@gorbulevsv/toasts';
 
 	let buckets = $derived(await getBuckets());
@@ -57,7 +57,8 @@
 						{#if i == 0}
 							<button
 								class="badge rounded-3"
-								onclick={async () => (selectedFolder = folders ? folders[0] : '')}>
+								onclick={async () => (selectedFolder = folders ? folders[0] : '')}
+							>
 								<b>{selectedBucket.name}:</b>
 							</button>
 						{/if}
@@ -77,7 +78,8 @@
 									bucket: selectedBucket?.name,
 									folder: selectedFolder
 								}).refresh();
-							}}>{item}</button>
+							}}>{item}</button
+						>
 					{/each}
 				</section>
 				<div class="d-flex align-items-center gap-3">
@@ -88,32 +90,35 @@
 						<button
 							class="btn btn-sm rounded-3"
 							onclick={async () => await downloadBucket(selectedBucket.name)}
-							>Скачать бакет <b>{selectedBucket.name}</b></button>
+							>Скачать бакет <b>{selectedBucket.name}</b></button
+						>
 
 						<button
 							class="btn btn-sm btn-solid theme-inverse rounded-3"
 							type="button"
 							data-bs-toggle="menu"
 							data-bs-placement="bottom-end"
-							aria-expanded="false">
+							aria-expanded="false"
+						>
 							<div>Добавить</div>
 							<i class="bi bi-chevron-expand"></i>
 						</button>
 						<div class="menu rounded-3 border-0">
-							<button
-								class="menu-item rounded-3"
-								onclick={() => (isModalShow.bucket.add = true)}>Бакет</button>
+							<button class="menu-item rounded-3" onclick={() => (isModalShow.bucket.add = true)}
+								>Бакет</button
+							>
 
 							<button
 								class="menu-item rounded-3"
 								onclick={() => {
 									isModalShow.folder.add = true;
-								}}>
+								}}
+							>
 								Папка
 							</button>
-							<button
-								class="menu-item rounded-3"
-								onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button>
+							<button class="menu-item rounded-3" onclick={() => inputFiles?.click()}
+								>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button
+							>
 							<input
 								hidden
 								class="form-control"
@@ -124,7 +129,7 @@
 								onchange={async (e: Event) => {
 									const t = e.target as HTMLInputElement;
 									if (t.files && t.files.length > 0) {
-										const blobs = Array.from(t.files as FileList).map(f => f as Blob);
+										const blobs = Array.from(t.files as FileList).map((f) => f as Blob);
 										isModalShow.photo.add = true;
 										await addPhotos({
 											bucket: selectedBucket.name,
@@ -137,7 +142,8 @@
 											folder: selectedFolder
 										}).refresh();
 									}
-								}} />
+								}}
+							/>
 						</div>
 					</div>
 				</div>
@@ -150,12 +156,14 @@
 						{#each buckets as bucket}
 							<div class="btn-group">
 								<button
-									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name === bucket.name
+									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name ===
+									bucket.name
 										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
 									onclick={() => {
 										selectedBucket = bucket;
-									}}>
+									}}
+								>
 									{bucket.name}
 								</button>
 								<button
@@ -166,7 +174,8 @@
 									onclick={() => {
 										selectedBucket = bucket;
 										isModalShow.bucket.delete = true;
-									}}>
+									}}
+								>
 									<i class="bi bi-x-lg"></i>
 								</button>
 							</div>
@@ -178,12 +187,14 @@
 						{#each folders as folder}
 							<div class="btn-group">
 								<button
-									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder === folder
+									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder ===
+									folder
 										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
 									onclick={() => {
 										selectedFolder = folder;
-									}}>
+									}}
+								>
 									{folder}
 								</button>
 								<button
@@ -194,7 +205,8 @@
 									onclick={() => {
 										selectedFolder = folder;
 										isModalShow.folder.delete = true;
-									}}>
+									}}
+								>
 									<i class="bi bi-x-lg"></i>
 								</button>
 							</div>
@@ -214,14 +226,16 @@
 									onclick={() => {
 										selectedPhoto = photo;
 										isModalShow.photo.fullScreen = true;
-									}}>
+									}}
+								>
 									<button
 										title="Удалить фото"
 										class="btn btn-sm bg-20 position-absolute end-0"
-										onclick={async e => {
+										onclick={async (e) => {
 											e.stopPropagation();
 											isModalShow.photo.delete = true;
-										}}>
+										}}
+									>
 										<i class="bi bi-x-lg"></i>
 									</button>
 								</div>
@@ -240,7 +254,7 @@
 	buttonOkTitle="Добавить"
 	onOk={async () => {
 		if (newObject.bucket.trim() != '') {
-			await addBucket(newObject.bucket).then(async r => {
+			await addBucket(newObject.bucket).then(async (r) => {
 				if (r?.result === 'ok') {
 					toast({
 						title: 'Бакет добавлен',
@@ -248,7 +262,12 @@
 						_class: 'bg-success bg-10'
 					});
 					await getBuckets().refresh();
-				} else toast({ title: 'Ошибка', content: 'Не удалось добавить бакет!', _class: 'bg-danger bg-10' });
+				} else
+					toast({
+						title: 'Ошибка',
+						content: 'Не удалось добавить бакет!',
+						_class: 'bg-danger bg-10'
+					});
 			});
 			isModalShow.bucket.add = false;
 			newObject.bucket = '';
@@ -257,14 +276,16 @@
 	onCancel={() => {
 		newObject.bucket = '';
 	}}
-	autoCloseOnOk={false}>
+	autoCloseOnOk={false}
+>
 	<div class="alert theme-info border-0 rounded-3 px-3 py-2">
 		Название бакета должно содержать только латинские буквы!
 	</div>
 	<input
 		class="form-control rounded-3"
 		placeholder="Название бакета"
-		bind:value={newObject.bucket} />
+		bind:value={newObject.bucket}
+	/>
 </Dialog>
 
 <Dialog
@@ -273,7 +294,7 @@
 	buttonOkTitle="Удалить"
 	onOk={async () => {
 		if (selectedBucket.name === newObject.bucket) {
-			await deleteBucket(newObject.bucket).then(async r => {
+			await deleteBucket(newObject.bucket).then(async (r) => {
 				if (r.result === 'ok') {
 					toast({
 						title: 'Бакет удалён',
@@ -292,21 +313,27 @@
 	onCancel={() => {
 		newObject.bucket = '';
 	}}
-	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3">
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3"
+	>
 		{#if folders.length > 0}
 			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
 		{/if}
 		<div>Вы точно хотите удалить этот бакет?</div>
 		<div>
-			Для удаления бакета <b class="bg-danger bg-50 rounded-3 px-1 text-nowrap">{selectedBucket.name}</b> введите его название!
+			Для удаления бакета <b class="bg-danger bg-50 rounded-3 px-1 text-nowrap"
+				>{selectedBucket.name}</b
+			> введите его название!
 		</div>
 	</div>
 
 	<input
 		class="form-control rounded-3"
 		placeholder="Название бакета"
-		bind:value={newObject.bucket} />
+		bind:value={newObject.bucket}
+	/>
 </Dialog>
 
 <Dialog
@@ -324,7 +351,8 @@
 	onCancel={() => {
 		newObject.folder = '';
 	}}
-	autoCloseOnOk={false}>
+	autoCloseOnOk={false}
+>
 	<small>
 		<b class="bg-light text-dark rounded-1">{selectedBucket.name}:</b>
 		<b>{newObject.folder}</b>
@@ -332,7 +360,8 @@
 	<input
 		class="form-control rounded-3"
 		placeholder="Название папки"
-		bind:value={newObject.folder} />
+		bind:value={newObject.folder}
+	/>
 </Dialog>
 
 <Dialog
@@ -350,21 +379,26 @@
 	onCancel={() => {
 		newObject.folder = '';
 	}}
-	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3 p-3">
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3 p-3"
+	>
 		{#if photos && photos.length > 0}
 			<div>Папка <b>{selectedFolder}</b> не пустая!</div>
 		{/if}
 		<div>Вы точно хотите удалить эту папку?</div>
 		<div>
-			Для удаления паки <b class="bg-danger bg-50 px-1 rounded-3 text-nowrap">{selectedFolder}</b> введите её название!
+			Для удаления паки <b class="bg-danger bg-50 px-1 rounded-3 text-nowrap">{selectedFolder}</b> введите
+			её название!
 		</div>
 	</div>
 
 	<input
 		class="form-control rounded-3"
 		placeholder="Название папки"
-		bind:value={newObject.folder} />
+		bind:value={newObject.folder}
+	/>
 </Dialog>
 
 <Dialog
@@ -383,17 +417,16 @@
 	onCancel={() => {
 		newObject.folder = '';
 	}}
-	autoCloseOnOk={false}>
+	autoCloseOnOk={false}
+>
 	<div class="alert theme-danger border-0 rounded-3">
 		<div>Вы точно хотите удалить это фото?</div>
 	</div>
 	<div
 		class="w-100 h-100 rounded-3 position-relative d-flex align-items-start justify-content-end"
-		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer">
-	</div>
+		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
+	></div>
 </Dialog>
 
-<DialogPhoto
-	bind:isShow={isModalShow.photo.fullScreen}
-	photo={selectedPhoto}
-	{photos}></DialogPhoto>
+<DialogPhoto bind:isShow={isModalShow.photo.fullScreen} photo={selectedPhoto} {photos}
+></DialogPhoto>

@@ -14,8 +14,8 @@
 		getBuckets,
 		getFolders,
 		getPhotos
-	} from '#lib/minio.remote';
-	import { store } from '#lib/store.svelte';
+	} from '#lib/minio.remote.ts';
+	import { store } from '#lib/store.svelte.ts';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[0]);
@@ -54,12 +54,12 @@
 					{#if i == 0}
 						<button
 							class="btn btn-sm btn-light bg-white text-dark border-0"
-							onclick={async () => (selectedFolder = folders ? folders[0] : '')}><b>{selectedBucket.name}:</b></button>
+							onclick={async () => (selectedFolder = folders ? folders[0] : '')}
+							><b>{selectedBucket.name}:</b></button
+						>
 					{/if}
 					<div class="d-flex align-items-end">
-						<i
-							style="font-size: .8em; padding-top:.2em"
-							class="fa-solid fa-angle-right"></i>
+						<i style="font-size: .8em; padding-top:.2em" class="fa-solid fa-angle-right"></i>
 					</div>
 					<button
 						class="btn btn-sm btn-light text-dark px-1 py-0"
@@ -72,7 +72,8 @@
 								bucket: selectedBucket?.name,
 								folder: selectedFolder
 							}).refresh();
-						}}>{item}</button>
+						}}>{item}</button
+					>
 				{/each}
 			</div>
 		</div>
@@ -80,9 +81,9 @@
 
 	<Block>
 		<Title title="Баккеты">
-			<button
-				class="btn btn-sm btn-dark text-light"
-				onclick={() => (isModalShow.bucket.add = true)}>Добавить</button>
+			<button class="btn btn-sm btn-dark text-light" onclick={() => (isModalShow.bucket.add = true)}
+				>Добавить</button
+			>
 		</Title>
 		<div class="d-flex align-items-center gap-2">
 			{#each buckets as bucket}
@@ -93,7 +94,8 @@
 							: 'btn-light text-dark'} text-nowrap rounded-end-0"
 						onclick={() => {
 							selectedBucket = bucket;
-						}}>
+						}}
+					>
 						{bucket.name}
 					</button>
 					<button
@@ -104,7 +106,8 @@
 						onclick={() => {
 							selectedBucket = bucket;
 							isModalShow.bucket.delete = true;
-						}}>
+						}}
+					>
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
@@ -114,9 +117,9 @@
 
 	<Block>
 		<Title title="Папки">
-			<button
-				class="btn btn-sm btn-dark text-light"
-				onclick={() => (isModalShow.folder.add = true)}>Добавить</button>
+			<button class="btn btn-sm btn-dark text-light" onclick={() => (isModalShow.folder.add = true)}
+				>Добавить</button
+			>
 		</Title>
 		<div class="d-flex align-items-center gap-2 flex-wrap">
 			{#each folders as folder}
@@ -127,7 +130,8 @@
 							: 'btn-light text-dark'} text-nowrap rounded-end-0"
 						onclick={() => {
 							selectedFolder = folder;
-						}}>
+						}}
+					>
 						{folder}
 					</button>
 					<button
@@ -138,7 +142,8 @@
 						onclick={() => {
 							selectedFolder = folder;
 							isModalShow.folder.delete = true;
-						}}>
+						}}
+					>
 						<i class="fa-solid fa-xmark"></i>
 					</button>
 				</div>
@@ -158,16 +163,17 @@
 				onchange={async (e: Event) => {
 					const t = e.target as HTMLInputElement;
 					if (t.files && t.files.length > 0) {
-						const blobs = Array.from(t.files as FileList).map(f => f as Blob);
+						const blobs = Array.from(t.files as FileList).map((f) => f as Blob);
 						isModalShow.photo.add = true;
 						await addPhotos({ bucket: selectedBucket.name, folder: selectedFolder, photos: blobs });
 						isModalShow.photo.add = false;
 						await getPhotos({ bucket: selectedBucket.name, folder: selectedFolder }).refresh();
 					}
-				}} />
-			<button
-				class="btn btn-sm btn-dark text-light"
-				onclick={() => inputFiles?.click()}>{isModalShow.photo.add ? 'Загрузка...' : 'Добавить'}</button>
+				}}
+			/>
+			<button class="btn btn-sm btn-dark text-light" onclick={() => inputFiles?.click()}
+				>{isModalShow.photo.add ? 'Загрузка...' : 'Добавить'}</button
+			>
 		</Title>
 		<div class="row row-cols-1 row-cols-md-4 g-2 w-100 mx-auto">
 			{#each photos as photo}
@@ -179,19 +185,22 @@
 							? 'bg-dark'
 							: 'bg-secondary bg-opacity-10'} rounded"
 						style="padding: .1em;"
-						onmouseover={() => (selectedPhoto = photo)}>
+						onmouseover={() => (selectedPhoto = photo)}
+					>
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<div
 							class="h-100 rounded-1 position-relative w-100 d-flex align-items-start justify-content-end"
 							style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
-							onclick={() => (isModalShow.photo.fullScreen = true)}>
+							onclick={() => (isModalShow.photo.fullScreen = true)}
+						>
 							<button
 								title="Удалить фото"
 								class="btn btn-sm btn-danger bg-light m-1 p-1 bg-opacity-10 border-0"
-								onclick={async e => {
+								onclick={async (e) => {
 									e.stopPropagation();
 									isModalShow.photo.delete = true;
-								}}>
+								}}
+							>
 								<i class="fa-solid fa-xmark text-danger"></i>
 							</button>
 						</div>
@@ -217,14 +226,12 @@
 	onCancel={() => {
 		newObject.bucket = '';
 	}}
-	autoCloseOnOk={false}>
+	autoCloseOnOk={false}
+>
 	<div class="bg-info text-dark bg-opacity-10 rounded-1 px-3 py-2">
 		Название бакета должно содержать только латинские буквы!
 	</div>
-	<input
-		class="form-control"
-		placeholder="Название бакета"
-		bind:value={newObject.bucket} />
+	<input class="form-control" placeholder="Название бакета" bind:value={newObject.bucket} />
 </Dialog>
 
 <Dialog
@@ -242,22 +249,23 @@
 	onCancel={() => {
 		newObject.bucket = '';
 	}}
-	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 px-3 py-2">
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 px-3 py-2"
+	>
 		{#if folders.length > 0}
 			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
 		{/if}
 		<div>Вы точно хотите удалить этот бакет?</div>
 		<div>
-			Для удаления бакета <b class="bg-danger text-light px-1 rounded-1 text-nowrap">{selectedBucket.name}</b> введите его
-			название!
+			Для удаления бакета <b class="bg-danger text-light px-1 rounded-1 text-nowrap"
+				>{selectedBucket.name}</b
+			> введите его название!
 		</div>
 	</div>
 
-	<input
-		class="form-control"
-		placeholder="Название бакета"
-		bind:value={newObject.bucket} />
+	<input class="form-control" placeholder="Название бакета" bind:value={newObject.bucket} />
 </Dialog>
 
 <Dialog
@@ -275,11 +283,9 @@
 	onCancel={() => {
 		newObject.folder = '';
 	}}
-	autoCloseOnOk={false}>
-	<input
-		class="form-control"
-		placeholder="Название папки"
-		bind:value={newObject.folder} />
+	autoCloseOnOk={false}
+>
+	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
 </Dialog>
 
 <Dialog
@@ -297,21 +303,23 @@
 	onCancel={() => {
 		newObject.folder = '';
 	}}
-	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3">
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3"
+	>
 		{#if photos && photos.length > 0}
 			<div>Папка <b>{selectedFolder}</b> не пустая!</div>
 		{/if}
 		<div>Вы точно хотите удалить эту папку?</div>
 		<div>
-			Для удаления паки <b class="bg-danger text-light px-1 rounded-1 text-nowrap">{selectedFolder}</b> введите её название!
+			Для удаления паки <b class="bg-danger text-light px-1 rounded-1 text-nowrap"
+				>{selectedFolder}</b
+			> введите её название!
 		</div>
 	</div>
 
-	<input
-		class="form-control"
-		placeholder="Название папки"
-		bind:value={newObject.folder} />
+	<input class="form-control" placeholder="Название папки" bind:value={newObject.folder} />
 </Dialog>
 
 <Dialog
@@ -330,16 +338,17 @@
 	onCancel={() => {
 		newObject.folder = '';
 	}}
-	autoCloseOnOk={false}>
-	<div class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3">
+	autoCloseOnOk={false}
+>
+	<div
+		class="d-flex flex-column justify-content-center gap-1 bg-danger text-danger bg-opacity-10 rounded-1 p-3"
+	>
 		<div>Вы точно хотите удалить это фото?</div>
 	</div>
 	<div
 		class="h-100 rounded position-relative w-100 d-flex align-items-start justify-content-end"
-		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer">
-	</div>
+		style="background-image: url({selectedPhoto.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:13em; cursor:pointer"
+	></div>
 </Dialog>
 
-<DialogPhoto
-	bind:isShow={isModalShow.photo.fullScreen}
-	photo={selectedPhoto}></DialogPhoto>
+<DialogPhoto bind:isShow={isModalShow.photo.fullScreen} photo={selectedPhoto}></DialogPhoto>
