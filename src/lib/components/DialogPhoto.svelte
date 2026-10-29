@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getPhotoEXIF } from '#lib/minio.remote';
-	import type { IPhoto } from '#lib/models/IPhoto';
+	import { getPhotoEXIF } from '#lib/minio.remote.ts';
+	import type { IPhoto } from '#lib/models/IPhoto.ts';
 	import { onMount, type Snippet } from 'svelte';
 
 	interface IProps {
@@ -10,11 +10,20 @@
 		isShow?: boolean;
 		onCancel?: () => void;
 	}
-	let { photo, photos, children, isShow = $bindable(false), onCancel = () => {} }: IProps = $props();
+	let {
+		photo,
+		photos,
+		children,
+		isShow = $bindable(false),
+		onCancel = () => {}
+	}: IProps = $props();
 
-	let id = crypto.randomUUID();
+	// let id = crypto.randomUUID();
+	let id = Date.now().toString();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
-	let exif = $derived(photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined);
+	let exif = $derived(
+		photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined
+	);
 
 	$effect(() => {
 		if (isShow) dialog.showModal();
@@ -22,11 +31,11 @@
 	});
 
 	onMount(async () => {
-		document.addEventListener('keydown', e => {
+		document.addEventListener('keydown', (e) => {
 			if (e.key !== 'Escape') return;
 			isShow = false;
 		});
-		document.addEventListener('wheel', e => {
+		document.addEventListener('wheel', (e) => {
 			if (photo && photos && photos.length > 0) {
 				let index = photos.indexOf(photo);
 				if (e.deltaY > 0) {
@@ -40,12 +49,11 @@
 	});
 </script>
 
-<dialog
-	{id}
-	class="my-dialog dialog-fullscreen border-0 p-0 bg-transparent">
+<dialog {id} class="my-dialog dialog-fullscreen border-0 p-0 bg-transparent">
 	<div
 		class="position-relative img-fluid h-100"
-		style="background-image: url({photo?.url}); background-repeat: no-repeat; background-position: center; background-size: contain;">
+		style="background-image: url({photo?.url}); background-repeat: no-repeat; background-position: center; background-size: contain;"
+	>
 		{#if children}
 			{@render children?.()}
 		{/if}
@@ -53,7 +61,8 @@
 			<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
 				<div
 					class="d-flex flex-column gap-0 theme-inverse bg-body bg-50 rounded-3 mb-3 p-5 flex-wrap"
-					style="max-height: 20em;">
+					style="max-height: 20em;"
+				>
 					{#if exif.Model}
 						<div class="text-light">Камера: <b>{exif.Model}</b></div>
 					{/if}
@@ -110,11 +119,12 @@
 			aria-label="Закрыть"
 			class="btn btn-sm bg-body bg-20 p-1 position-absolute rounded-3"
 			style="top:.375rem; right:.375rem;"
-			onclick={e => {
+			onclick={(e) => {
 				e.stopPropagation();
 				isShow = false;
 				onCancel();
-			}}>
+			}}
+		>
 			<i class="bi bi-x-lg"></i>
 		</button>
 	</div>

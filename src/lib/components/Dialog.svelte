@@ -13,7 +13,8 @@
 		onCancel?: () => void;
 	}
 
-	let id = crypto.randomUUID();
+	// let id = crypto.randomUUID();
+	let id = Date.now().toString();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
 	$effect(() => {
 		if (isShow) dialog.showModal();
@@ -33,13 +34,11 @@
 	}: IProps = $props();
 </script>
 
-<dialog
-	{id}
-	class="my-dialog border-0 p-0 bg-transparent shadow-sm"
-	style="min-width: 25%;">
+<dialog {id} class="my-dialog border-0 p-0 bg-transparent shadow-sm" style="min-width: 25%;">
 	<div class="rounded-3 p-0 bg-body w-100">
 		<div
-			class="d-flex align-items-center justify-content-between text-uppercase rounded-top-4 bg-1 ps-4 pe-1 py-1 w-100">
+			class="d-flex align-items-center justify-content-between text-uppercase rounded-top-4 bg-1 ps-4 pe-1 py-1 w-100"
+		>
 			<b>{@html title}</b>
 			<button
 				title="Закрыть"
@@ -47,7 +46,8 @@
 				onclick={() => {
 					isShow = false;
 					onCancel();
-				}}>
+				}}
+			>
 				<i class="bi bi-x-lg"></i>
 			</button>
 		</div>
@@ -61,7 +61,8 @@
 					onclick={() => {
 						isShow = false;
 						onCancel();
-					}}>{buttonCancelTitle}</button>
+					}}>{buttonCancelTitle}</button
+				>
 				<button
 					class="btn btn-sm btn-solid theme-inverse rounded-3"
 					onclick={() => {
@@ -70,7 +71,8 @@
 							isShow = false;
 							onCancel();
 						}
-					}}>{buttonOkTitle}</button>
+					}}>{buttonOkTitle}</button
+				>
 			</div>
 		</div>
 	</div>
