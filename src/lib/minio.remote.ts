@@ -146,23 +146,12 @@ export const getPhotos = query(
 				}
 
 				// генерируем presigned URL — он будет работать даже без публичного бакета
-				// const presignedUrl = await minioClient.presignedGetObject(
-				// 	data.bucket,
-				// 	objInfo.name,
-				// 	24 * 60 * 60
-				// );
-
-				// https://4dfbff24fa1f8ceedd3e90006e05cccd.bckt.ru/
-				// https://423e6601553efdbcde70cf57dbe1782c.bckt.ru/
-
-				// const presignedUrl = await createPresignedUrl(data.bucket, objInfo.name, 86400);
 				const presignedUrl = await getCachedPresignedUrl(data.bucket, objInfo.name);
 
 				if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
 					images.push({
 						name: objInfo.name,
 						url: presignedUrl
-						// url: `https://4dfbff24fa1f8ceedd3e90006e05cccd.bckt.ru/${encodeURI(objInfo.name)}`
 					});
 				}
 			}
