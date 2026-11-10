@@ -10,6 +10,29 @@ export const minioClient = new MinIOClient({
 	secretKey: MINIO_PASSWORD
 });
 
+export async function createPresignedUrl(
+	bucket: string,
+	objectKey: string,
+	expires: number = 3600
+) {
+	return await minioClient.presignedGetObject(bucket, objectKey, expires);
+}
+
+const cache = new Map<string, { url: string; expiresAt: number }>();
+export async function getCachedPresignedUrl(bucket: string, key: string, ttlSec = 86400) {
+	const cached = cache.get(key);
+	// отдаём кэшированный URL, пока до истечения осталось больше минуты
+	if (cached && cached.expiresAt - Date.now() > 60_000) {
+		return cached.url;
+	}
+
+	const url = await minioClient.presignedGetObject(bucket, key, ttlSec);
+	cache.set(key, { url, expiresAt: Date.now() + ttlSec * 1000 });
+	return url;
+}
+
+export const CACHE_CONTROL = 'public, max-age=31536000, immutable';
+
 // export const minioClient = new MinIOClient({
 // 	// endPoint: '109.205.56.30', // для vps
 // 	//endPoint: '192.168.0.107', // для виртуальной машины

@@ -20,8 +20,8 @@
 	import { toast } from '@gorbulevsv/toasts';
 
 	let buckets = $derived(await getBuckets());
-	let selectedBucket = $derived(buckets[0]);
-	let folders = $derived((await getFolders(selectedBucket?.name)) || []);
+	let selectedBucket = $derived(buckets[0] || undefined);
+	let folders = $derived(await getFolders(selectedBucket?.name));
 	let selectedFolder = $derived(folders ? folders[0] : '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
 	let selectedPhoto = $derived(photos && photos.length > 0 ? photos[0] : { url: '', name: '' });
@@ -90,7 +90,7 @@
 						<button
 							class="btn btn-sm rounded-3"
 							onclick={async () => await downloadBucket(selectedBucket.name)}
-							>Скачать бакет <b>{selectedBucket.name}</b></button
+							>Скачать бакет <b>{selectedBucket?.name}</b></button
 						>
 
 						<button
@@ -318,7 +318,7 @@
 	<div
 		class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3"
 	>
-		{#if folders.length > 0}
+		{#if folders && folders.length > 0}
 			<div>Бакет <b>{selectedBucket.name}</b> не пустой!</div>
 		{/if}
 		<div>Вы точно хотите удалить этот бакет?</div>

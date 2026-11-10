@@ -6,13 +6,13 @@ import { access, constants } from 'fs/promises';
 import type { Client } from 'minio';
 import { dirname } from 'path';
 import * as v from 'valibot';
-import { minioClient } from './minio';
+import { CACHE_CONTROL, createPresignedUrl, getCachedPresignedUrl, minioClient } from './minio';
 
 export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
 });
 
-export const addBucket = query(v.string(), async bucket => {
+export const addBucket = query(v.string(), async (bucket) => {
 	if (await minioClient.bucketExists(bucket)) return;
 
 	try {
@@ -23,7 +23,7 @@ export const addBucket = query(v.string(), async bucket => {
 	}
 });
 
-export const deleteBucket = query(v.string(), async bucket => {
+export const deleteBucket = query(v.string(), async (bucket) => {
 	try {
 		// Удаляем содержимое бакета
 		const objectsStream = minioClient.listObjects(bucket, '', true);
@@ -39,7 +39,7 @@ export const deleteBucket = query(v.string(), async bucket => {
 	}
 });
 
-export const downloadBucket = command(v.string(), async bucket => {
+export const downloadBucket = command(v.string(), async (bucket) => {
 	let baseDir = `C:/Users/gorbu/Desktop/${bucket}`;
 
 	// Собираем все имена объектов из потока listObjects
@@ -47,15 +47,15 @@ export const downloadBucket = command(v.string(), async bucket => {
 		const names = [];
 		const stream = minioClient.listObjects(bucket, '', true);
 
-		stream.on('data', obj => {
+		stream.on('data', (obj) => {
 			if (obj.name) names.push(obj.name);
 		});
 
-		stream.on('error', err => reject(err));
+		stream.on('error', (err) => reject(err));
 		stream.on('end', () => resolve(names));
 	});
 
-	let files = (objects as [])?.filter(o => o?.at(-1) != '/');
+	let files = (objects as [])?.filter((o) => o?.at(-1) != '/');
 	console.log(`Найдено файлов: ${files.length}`);
 
 	const downloadPromises = files.map(async (name, i) => {
@@ -71,7 +71,7 @@ export const downloadBucket = command(v.string(), async bucket => {
 	await Promise.all(downloadPromises);
 });
 
-export const getFolders = query(v.optional(v.string()), async bucket => {
+export const getFolders = query(v.optional(v.string()), async (bucket) => {
 	if (bucket) {
 		const objects = await minioClient.listObjects(bucket, '', true);
 		const folders = new Set<string>();
@@ -95,7 +95,7 @@ export const addFolder = command(
 		bucket: v.string(),
 		folder: v.string()
 	}),
-	async data => {
+	async (data) => {
 		if (data.bucket.trim() === '' && data.folder.trim() === '') return;
 
 		// folder должен быть без начального слэша, например 'images/2024'
@@ -115,7 +115,7 @@ export const deleteFolder = command(
 		bucket: v.string(),
 		folder: v.string()
 	}),
-	async data => {
+	async (data) => {
 		const objects = minioClient.listObjects(data.bucket, data.folder, true);
 		const removeObjects = [];
 
@@ -132,7 +132,7 @@ export const getPhotos = query(
 		bucket: v.optional(v.string()),
 		folder: v.optional(v.string())
 	}),
-	async data => {
+	async (data) => {
 		if (data.bucket && data.folder) {
 			const objects = await minioClient.listObjects(data.bucket, data.folder, true);
 
@@ -146,12 +146,23 @@ export const getPhotos = query(
 				}
 
 				// генерируем presigned URL — он будет работать даже без публичного бакета
-				const presignedUrl = await minioClient.presignedGetObject(data.bucket, objInfo.name, 24 * 60 * 60);
+				// const presignedUrl = await minioClient.presignedGetObject(
+				// 	data.bucket,
+				// 	objInfo.name,
+				// 	24 * 60 * 60
+				// );
+
+				// https://4dfbff24fa1f8ceedd3e90006e05cccd.bckt.ru/
+				// https://423e6601553efdbcde70cf57dbe1782c.bckt.ru/
+
+				// const presignedUrl = await createPresignedUrl(data.bucket, objInfo.name, 86400);
+				const presignedUrl = await getCachedPresignedUrl(data.bucket, objInfo.name);
 
 				if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
 					images.push({
 						name: objInfo.name,
 						url: presignedUrl
+						// url: `https://4dfbff24fa1f8ceedd3e90006e05cccd.bckt.ru/${encodeURI(objInfo.name)}`
 					});
 				}
 			}
@@ -167,16 +178,18 @@ export const addPhotos = command(
 		folder: v.string(),
 		photos: v.array(v.blob())
 	}),
-	async data => {
+	async (data) => {
 		if (!data.photos || !(data.photos[0] instanceof Blob)) return;
 
 		for (const f of data.photos) {
 			const file = f as Blob & { name: string; type: string };
-			console.log(file.name);
+			const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
+			const key = `${crypto.randomUUID()}.${ext}`;
 
 			let buffer = Buffer.from(await file.arrayBuffer());
-			await minioClient.putObject(data.bucket, `${data.folder}/${file.name}`, buffer, file.size, {
-				'Content-Type': file.type
+			await minioClient.putObject(data.bucket, `${data.folder}/${key}`, buffer, file.size, {
+				'Content-Type': file.type,
+				'Cache-Control': CACHE_CONTROL
 			});
 		}
 	}
@@ -187,12 +200,12 @@ export const deletePhoto = command(
 		bucket: v.string(),
 		photo: v.string()
 	}),
-	async data => {
+	async (data) => {
 		await minioClient.removeObject(data.bucket, data.photo);
 	}
 );
 
-export const getPhotoEXIF = query(v.string(), async photo => {
+export const getPhotoEXIF = query(v.string(), async (photo) => {
 	const res = await fetch(photo);
 	const tags = await exifr.parse(photo, {
 		// Можно указать только нужные теги, чтобы еще больше ускорить процесс
@@ -240,7 +253,7 @@ async function downloadObject(
 				readStream.pipe(writeStream);
 
 				// Ждём окончания записи
-				await once(writeStream, 'finish').then(_ => {
+				await once(writeStream, 'finish').then((_) => {
 					console.log(`${index ? index + '. ' : ''}Файл сохранён: ${localPath}`);
 				});
 			} catch (err) {
@@ -252,3 +265,12 @@ async function downloadObject(
 		}
 	});
 }
+
+// export async function uploadPhoto(bucket: string, key: string, buffer: Buffer, contentType: string) {
+//   const size = buffer.length;
+//   await minioClient.putObject(bucket, key, buffer, size, {
+//     'Content-Type': contentType,
+//     'Cache-Control': CACHE_CONTROL,
+//   });
+//   return `https://${env.MINIO_ENDPOINT}:${env.MINIO_PORT}/${bucket}/${key}`;
+// }
