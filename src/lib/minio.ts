@@ -1,13 +1,13 @@
-import { MINIO_LOGIN, MINIO_PASSWORD } from '$app/env/private';
+import { ID, key, region, endpoint, ID_tenanta } from '$app/env/private';
 import { Client as MinIOClient } from 'minio';
 
 export const minioClient = new MinIOClient({
-	region: 'ru-1',
-	endPoint: 's3.buckets.ru',
+	region: region,
+	endPoint: endpoint,
 	port: 443,
 	useSSL: true,
-	accessKey: MINIO_LOGIN,
-	secretKey: MINIO_PASSWORD
+	accessKey: `${ID_tenanta}.${ID}`,
+	secretKey: key
 });
 
 const cache = new Map<string, { url: string; expiresAt: number }>();
