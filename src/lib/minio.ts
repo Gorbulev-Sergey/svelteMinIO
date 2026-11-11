@@ -2,12 +2,12 @@ import { ID, key, region, endpoint, ID_tenanta } from '$app/env/private';
 import { Client as MinIOClient } from 'minio';
 
 export const minioClient = new MinIOClient({
-	region: region,
-	endPoint: endpoint,
 	port: 443,
 	useSSL: true,
 	accessKey: `${ID_tenanta}.${ID}`,
-	secretKey: key
+	secretKey: key,
+	endPoint: endpoint,
+	region: region
 });
 
 export const CACHE_CONTROL = 'public, max-age=31536000, immutable' as const;
