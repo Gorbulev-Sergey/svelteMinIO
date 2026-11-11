@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import favicon from '#lib/assets/favicon.svg';
 	import RenderTitle from '#lib/components/RenderTitle.svelte';
-	import { toast, Toaster } from '@gorbulevsv/toasts';
+	import { toast, Toaster } from '@gorbulevsv/toaster';
 	import { onMount } from 'svelte';
 	import { store } from '#lib/store.svelte.ts';
 

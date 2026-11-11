@@ -17,7 +17,7 @@
 		getPhotos
 	} from '#lib/minio.remote.ts';
 	import { store } from '#lib/store.svelte.ts';
-	import { toast } from '@gorbulevsv/toasts';
+	import { toast } from '@gorbulevsv/toaster';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets[0] || undefined);

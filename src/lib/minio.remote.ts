@@ -253,12 +253,3 @@ async function downloadObject(
 		}
 	});
 }
-
-// export async function uploadPhoto(bucket: string, key: string, buffer: Buffer, contentType: string) {
-//   const size = buffer.length;
-//   await minioClient.putObject(bucket, key, buffer, size, {
-//     'Content-Type': contentType,
-//     'Cache-Control': CACHE_CONTROL,
-//   });
-//   return `https://${env.MINIO_ENDPOINT}:${env.MINIO_PORT}/${bucket}/${key}`;
-// }
