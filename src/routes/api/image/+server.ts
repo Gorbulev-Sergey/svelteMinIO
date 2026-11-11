@@ -11,14 +11,9 @@ const MIME: Record<string, string> = {
 	avif: 'image/avif'
 };
 
+// Отдаёт готовый кэшированный файл
 export const GET = async ({ request, setHeaders, url }) => {
 	const bucket = url.searchParams.get('bucket') || '';
-	// const key = decodeURIComponent(url.searchParams.get('name') || '')
-	// 	.replace(/\\/g, '/')
-	// 	.split('/')
-	// 	.filter((seg) => seg && seg !== '.' && seg !== '..')
-	// 	.join('/');
-
 	const key = url.searchParams.get('name') || '';
 
 	if (!key) throw error(400, 'Missing key');

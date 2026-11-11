@@ -132,36 +132,31 @@ export const getPhotos = query(
 		bucket: v.optional(v.string()),
 		folder: v.optional(v.string())
 	}),
-	async (data) => {
-		if (data.bucket && data.folder) {
-			const objects = await minioClient.listObjects(data.bucket, data.folder, true);
+	async ({ bucket, folder }) => {
+		if (!bucket || !folder) return [];
 
-			const images: Array<{ name: string; url: string }> = [];
+		const event = getRequestEvent(); // объявляем один раз, до цикла
+		const prefix = folder.endsWith('/') ? folder : `${folder}/`;
 
-			for await (const objInfo of objects) {
-				// берём только файлы с расширениями картинок
-				const ext = objInfo.name.split('.').pop()?.toLowerCase();
-				if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'].includes(ext ?? '')) {
-					continue;
-				}
-				const event = getRequestEvent();
-				// генерируем presigned URL — он будет работать даже без публичного бакета
-				const presignedUrl = await getCachedPresignedUrl(data.bucket, objInfo.name);
+		const images: { name: string; url: string }[] = [];
 
-				if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
-					console.log('бакет:', data.bucket);
-					console.log('имя:', objInfo.name);
-
-					images.push({
-						name: objInfo.name,
-						url: presignedUrl
-						// url: `${event.request.url}api/image?bucket=${data.bucket}&name=${objInfo.name}`
-					});
-				}
+		for await (const obj of minioClient.listObjects(bucket, prefix, true)) {
+			const ext = obj.name.split('.').pop()?.toLowerCase() ?? '';
+			if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'].includes(ext)) {
+				continue;
 			}
 
-			return images;
+			// только файлы непосредственно в папке, без подпапок
+			if (obj.name.replace(prefix, '').includes('/')) continue;
+
+			const url = new URL('/api/image', event.request.url);
+			url.searchParams.set('bucket', bucket);
+			url.searchParams.set('name', obj.name);
+
+			images.push({ name: obj.name, url: url.toString() });
 		}
+
+		return images; // возвращаем сам массив, а не функцию
 	}
 );
 
