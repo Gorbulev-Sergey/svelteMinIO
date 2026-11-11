@@ -9,5 +9,4 @@ if (window !== undefined) {
 	// 	cookieStore.set('theme', defaultTheme);
 	// }
 	// document.querySelector('[data-bs-theme]')?.setAttribute('data-bs-theme', theme || defaultTheme);
-	// import('bootstrap');
 }

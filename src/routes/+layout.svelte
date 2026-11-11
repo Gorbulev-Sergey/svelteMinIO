@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import favicon from '#lib/assets/favicon.svg';
 	import RenderTitle from '#lib/components/RenderTitle.svelte';
-	import { toast, Toaster } from '@gorbulevsv/toasts';
+	import { toast, Toaster } from '@gorbulevsv/toaster';
 	import { onMount } from 'svelte';
 	import { store } from '#lib/store.svelte.ts';
 
@@ -56,27 +56,16 @@
 		</div>
 
 		<div class="d-flex align-items-center justify-content-end gap-1 w-100">
-			<button
-				class="btn btn-sm rounded-3"
-				onclick={() => {
-					toast({ title: 'Привет', content: 'Как дела, друг?', _class: 'bg-body bg-50 shadow-sm' });
-				}}>Toast</button
-			>
 			<button title="Тема" class="btn btn-sm rounded-3" onclick={toggleTheme}>
 				<i class="bi bi-sun"></i>
 			</button>
-			<div class="vr mx-3"></div>
 			<a class="btn btn-sm rounded-3 {page.url.pathname == '/' ? 'fw-bold' : ''}" href="/"
-				>New maket</a
-			>
-			<a
-				class="btn btn-sm rounded-3 {page.url.pathname == '/second' ? 'fw-bold' : ''}"
-				href="/second">Remote functions</a
+				>Главная</a
 			>
 		</div>
 	</div>
 </div>
-<div class="container my-5">
+<div class="container my-8">
 	{@render children()}
 </div>
 
@@ -85,6 +74,6 @@
 <style>
 	/* Настройка цветов фона для светлой и темной темы */
 	:global(:root) {
-		--bs-bg-body: light-dark(var(--bs-white), var(--bs-gray-900));
+		--bs-bg-body: light-dark(var(--bs-white), var(--bs-gray-800));
 	}
 </style>

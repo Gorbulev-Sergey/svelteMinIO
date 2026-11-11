@@ -17,14 +17,15 @@
 		getPhotos
 	} from '#lib/minio.remote.ts';
 	import { store } from '#lib/store.svelte.ts';
-	import { toast } from '@gorbulevsv/toasts';
+	import { toast } from '@gorbulevsv/toaster';
+	import { onDestroy, onMount } from 'svelte';
 
 	let buckets = $derived(await getBuckets());
-	let selectedBucket = $derived(buckets[0] || undefined);
+	let selectedBucket = $derived(buckets?.[0] || '');
 	let folders = $derived(await getFolders(selectedBucket?.name));
-	let selectedFolder = $derived(folders ? folders[0] : '');
+	let selectedFolder = $derived(folders?.[0] || '');
 	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
-	let selectedPhoto = $derived(photos && photos.length > 0 ? photos[0] : { url: '', name: '' });
+	let selectedPhoto = $derived(photos?.[0] || {});
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -41,7 +42,12 @@
 		photo: ''
 	});
 
-	store.title = title;
+	onMount(() => {
+		store.title = title;
+	});
+	onDestroy(() => {
+		store.title = null;
+	});
 </script>
 
 {#snippet title()}
@@ -198,7 +204,7 @@
 									{folder}
 								</button>
 								<button
-									title="Удалить бакет"
+									title="Удалить папку"
 									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedFolder === folder
 										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
@@ -240,6 +246,8 @@
 									</button>
 								</div>
 							</div>
+						{:else}
+							<div>Загрузка</div>
 						{/each}
 					</div>
 				</div>
@@ -261,7 +269,6 @@
 						content: `Бакет ${newObject.bucket} успешно добавлен!`,
 						_class: 'bg-success bg-10'
 					});
-					await getBuckets().refresh();
 				} else
 					toast({
 						title: 'Ошибка',
@@ -269,6 +276,7 @@
 						_class: 'bg-danger bg-10'
 					});
 			});
+			await getBuckets().refresh();
 			isModalShow.bucket.add = false;
 			newObject.bucket = '';
 		}
@@ -301,11 +309,11 @@
 						content: `Бакет <b>${newObject.bucket}</b> удалён!`,
 						_class: 'bg-success bg-10'
 					});
-					await getBuckets().refresh();
 				} else {
 					toast({ title: 'Ошибка', content: `Ошибка удаления бакета!`, _class: 'bg-danger bg-10' });
 				}
 			});
+			await getBuckets().refresh();
 			isModalShow.bucket.delete = false;
 			newObject.bucket = '';
 		}
@@ -343,7 +351,7 @@
 	onOk={async () => {
 		if (newObject.folder.trim() !== '') {
 			await addFolder({ bucket: selectedBucket.name, folder: newObject.folder });
-			await getFolders(selectedBucket.name).refresh();
+			await getFolders(selectedBucket?.name).refresh();
 			isModalShow.folder.add = false;
 			newObject.folder = '';
 		}
@@ -371,7 +379,7 @@
 	onOk={async () => {
 		if (selectedFolder === newObject.folder) {
 			await deleteFolder({ bucket: selectedBucket.name, folder: newObject.folder });
-			await getFolders(selectedBucket.name).refresh();
+			await getFolders(selectedBucket?.name).refresh();
 			isModalShow.folder.delete = false;
 			newObject.folder = '';
 		}
@@ -428,5 +436,4 @@
 	></div>
 </Dialog>
 
-<DialogPhoto bind:isShow={isModalShow.photo.fullScreen} photo={selectedPhoto} {photos}
-></DialogPhoto>
+<DialogPhoto bind:isShow={isModalShow.photo.fullScreen} photo={selectedPhoto} {photos} />

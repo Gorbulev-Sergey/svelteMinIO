@@ -9,7 +9,11 @@ import * as v from 'valibot';
 import { CACHE_CONTROL, minioClient } from './minio';
 
 export const getBuckets = query(async () => {
-	return minioClient.listBuckets();
+	try {
+		return minioClient.listBuckets();
+	} catch (error) {
+		return [];
+	}
 });
 
 export const addBucket = query(v.string(), async (bucket) => {
@@ -72,21 +76,25 @@ export const downloadBucket = command(v.string(), async (bucket) => {
 });
 
 export const getFolders = query(v.optional(v.string()), async (bucket) => {
-	if (bucket) {
-		const objects = await minioClient.listObjects(bucket, '', true);
-		const folders = new Set<string>();
+	try {
+		if (bucket) {
+			const objects = await minioClient.listObjects(bucket, '', true);
+			const folders = new Set<string>();
 
-		for await (const objInfo of objects) {
-			const name = objInfo.name;
-			const lastSlash = name.lastIndexOf('/');
+			for await (const objInfo of objects) {
+				const name = objInfo.name;
+				const lastSlash = name.lastIndexOf('/');
 
-			if (lastSlash > 0) {
-				const prefix = name.substring(0, lastSlash);
-				folders.add(prefix);
+				if (lastSlash > 0) {
+					const prefix = name.substring(0, lastSlash);
+					folders.add(prefix);
+				}
 			}
-		}
 
-		return Array.from(folders).sort((a: string, b: string) => a.localeCompare(b, 'ru'));
+			return Array.from(folders).sort((a: string, b: string) => a.localeCompare(b, 'ru'));
+		}
+	} catch (error) {
+		return [];
 	}
 });
 
