@@ -1,4 +1,4 @@
-import { command, query } from '$app/server';
+import { command, getRequestEvent, query } from '$app/server';
 import exifr from 'exifr';
 import { createWriteStream, mkdir } from 'fs';
 import { once } from 'events';
@@ -6,7 +6,7 @@ import { access, constants } from 'fs/promises';
 import type { Client } from 'minio';
 import { dirname } from 'path';
 import * as v from 'valibot';
-import { CACHE_CONTROL, createPresignedUrl, getCachedPresignedUrl, minioClient } from './minio';
+import { CACHE_CONTROL, getCachedPresignedUrl, minioClient } from './minio';
 
 export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
@@ -144,14 +144,18 @@ export const getPhotos = query(
 				if (!['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'heic'].includes(ext ?? '')) {
 					continue;
 				}
-
+				const event = getRequestEvent();
 				// генерируем presigned URL — он будет работать даже без публичного бакета
 				const presignedUrl = await getCachedPresignedUrl(data.bucket, objInfo.name);
 
 				if (!objInfo.name.replace(data.folder + '/', '').includes('/')) {
+					console.log('бакет:', data.bucket);
+					console.log('имя:', objInfo.name);
+
 					images.push({
 						name: objInfo.name,
 						url: presignedUrl
+						// url: `${event.request.url}api/image?bucket=${data.bucket}&name=${objInfo.name}`
 					});
 				}
 			}
