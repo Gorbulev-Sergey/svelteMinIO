@@ -262,11 +262,27 @@ async function downloadObject(
 	});
 }
 
-// export async function uploadPhoto(bucket: string, key: string, buffer: Buffer, contentType: string) {
-//   const size = buffer.length;
-//   await minioClient.putObject(bucket, key, buffer, size, {
-//     'Content-Type': contentType,
-//     'Cache-Control': CACHE_CONTROL,
-//   });
-//   return `https://${env.MINIO_ENDPOINT}:${env.MINIO_PORT}/${bucket}/${key}`;
-// }
+export const uploadFile = command(
+	v.object({ bucket: v.string(), folder: v.string(), photo: v.file() }),
+	async (data) => {
+		const ext = data.photo.name.split('.').pop()?.toLowerCase() || 'bin';
+		const key =
+			`${data.folder.replace(/^\/+/, '').replace(/\/+$/, '')}/${crypto.randomUUID()}`.replace(
+				/\/+/g,
+				'/'
+			) + `.${ext}`;
+
+		const buffer = Buffer.from(await data.photo.arrayBuffer());
+
+		await minioClient.putObject(
+			data.bucket,
+			key,
+			buffer,
+			buffer.length, // размер буфера, совпадает с photo.size
+			{
+				'Content-Type': data.photo.type || `application/${ext}`,
+				'Cache-Control': CACHE_CONTROL
+			}
+		);
+	}
+);

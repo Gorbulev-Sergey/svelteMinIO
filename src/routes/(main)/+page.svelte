@@ -14,7 +14,8 @@
 		downloadBucket,
 		getBuckets,
 		getFolders,
-		getPhotos
+		getPhotos,
+		uploadFile
 	} from '#lib/minio.remote.ts';
 	import { store } from '#lib/store.svelte.ts';
 	import { toast } from '@gorbulevsv/toaster';
@@ -134,14 +135,47 @@
 								bind:this={inputFiles}
 								onchange={async (e: Event) => {
 									const t = e.target as HTMLInputElement;
-									if (t.files && t.files.length > 0) {
-										const blobs = Array.from(t.files as FileList).map((f) => f as Blob);
-										isModalShow.photo.add = true;
-										await addPhotos({
-											bucket: selectedBucket.name,
-											folder: selectedFolder,
-											photos: blobs
-										});
+									if (!t.files || t.files.length === 0) return;
+
+									// снимаем снапшот и сразу сбрасываем input,
+									// чтобы повторный выбор тех же файлов сработал
+									const files = Array.from(t.files);
+									t.value = '';
+
+									isModalShow.photo.add = true;
+									try {
+										// пул с ограниченной параллельностью, например по 5
+										const CONCURRENCY = 5;
+										let done = 0;
+										const errors: { file: File; error: unknown }[] = [];
+
+										const queue = [...files];
+										const worker = async () => {
+											while (queue.length) {
+												const file = queue.shift()!;
+												try {
+													await uploadFile({
+														bucket: selectedBucket.name,
+														folder: selectedFolder,
+														photo: file
+													});
+												} catch (err) {
+													errors.push({ file, error: err });
+												}
+												done++;
+												// progress = Math.round((done / files.length) * 100);
+											}
+										};
+										await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+
+										if (errors.length) {
+											// показать пользователю, какие файлы не залились
+											console.warn(
+												'Не загружены:',
+												errors.map((e) => e.file.name)
+											);
+										}
+									} finally {
 										isModalShow.photo.add = false;
 										await getPhotos({
 											bucket: selectedBucket.name,
@@ -238,6 +272,7 @@
 										title="Удалить фото"
 										class="btn btn-sm bg-20 position-absolute end-0"
 										onclick={async (e) => {
+											selectedPhoto = photo;
 											e.stopPropagation();
 											isModalShow.photo.delete = true;
 										}}
@@ -246,8 +281,6 @@
 									</button>
 								</div>
 							</div>
-						{:else}
-							<div>Загрузка</div>
 						{/each}
 					</div>
 				</div>
