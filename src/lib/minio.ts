@@ -10,6 +10,9 @@ export const minioClient = new MinIOClient({
 	secretKey: key
 });
 
+export const CACHE_CONTROL = 'public, max-age=31536000, immutable' as const;
+
+// Не используется, но работает
 const cache = new Map<string, { url: string; expiresAt: number }>();
 export async function getCachedPresignedUrl(bucket: string, key: string, ttlSec = 86400) {
 	const cached = cache.get(key);

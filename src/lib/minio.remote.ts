@@ -6,7 +6,7 @@ import { access, constants } from 'fs/promises';
 import type { Client } from 'minio';
 import { dirname } from 'path';
 import * as v from 'valibot';
-import { CACHE_CONTROL, getCachedPresignedUrl, minioClient } from './minio';
+import { CACHE_CONTROL, minioClient } from './minio';
 
 export const getBuckets = query(async () => {
 	return minioClient.listBuckets();
@@ -156,7 +156,7 @@ export const getPhotos = query(
 			images.push({ name: obj.name, url: url.toString() });
 		}
 
-		return images; // возвращаем сам массив, а не функцию
+		return images; // возвращаем сам массив
 	}
 );
 

@@ -1,4 +1,4 @@
-import { minioClient } from '#lib/minio.ts';
+import { CACHE_CONTROL, minioClient } from '#lib/minio.ts';
 import { error } from '@sveltejs/kit';
 
 const MIME: Record<string, string> = {
@@ -24,7 +24,7 @@ export const GET = async ({ request, setHeaders, url }) => {
 		// Если версия объекта не изменилась (тот же ETag), экономим трафик: 304 без тела
 		if (request.headers.get('if-none-match') === `"${stat.etag}"`) {
 			setHeaders({
-				'Cache-Control': 'public, max-age=31536000, immutable',
+				'Cache-Control': CACHE_CONTROL,
 				ETag: `"${stat.etag}"`
 			});
 			return new Response(null, { status: 304 });
@@ -35,7 +35,7 @@ export const GET = async ({ request, setHeaders, url }) => {
 
 		return new Response(stream as unknown as ReadableStream, {
 			headers: {
-				'Cache-Control': 'public, max-age=31536000, immutable',
+				'Cache-Control': CACHE_CONTROL,
 				'Content-Type': MIME[ext] ?? 'application/octet-stream',
 				'Content-Length': String(stat.size),
 				ETag: `"${stat.etag}"`
