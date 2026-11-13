@@ -22,7 +22,7 @@ export async function POST({ request }) {
 		await minioClient.makeBucket(bucket.toLowerCase());
 		return new Response(JSON.stringify({ status: 'ok' }));
 	} catch (error) {
-		return new Response(JSON.stringify({ status: 'error', message: 'Ошибка создания бакета!' }));
+		return new Response(JSON.stringify({ status: 'error' }));
 	}
 }
 
@@ -39,6 +39,6 @@ export async function DELETE({ request }) {
 		await minioClient.removeBucket(bucket);
 		return new Response(JSON.stringify({ status: 'ok' }));
 	} catch (error) {
-		return new Response(JSON.stringify({ status: 'error', message: 'Ошибка удаления бакета!' }));
+		return new Response(JSON.stringify({ status: 'error' }));
 	}
 }

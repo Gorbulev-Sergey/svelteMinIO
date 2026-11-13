@@ -39,7 +39,7 @@ export async function POST({ request }) {
 		});
 
 		await Promise.all(downloadPromises);
-		return new Response(JSON.stringify({ status: 'ok', message: 'Бакет успешно скачен!' }));
+		return new Response(JSON.stringify({ status: 'ok' }));
 	} catch (error) {
 		return new Response(JSON.stringify({ status: 'error' }));
 	}
