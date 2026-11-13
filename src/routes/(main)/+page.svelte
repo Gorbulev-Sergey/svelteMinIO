@@ -7,7 +7,6 @@
 	import {
 		addBucket,
 		addFolder,
-		addPhotos,
 		deleteBucket,
 		deleteFolder,
 		deletePhoto,
@@ -25,8 +24,8 @@
 	let selectedBucket = $derived(buckets?.[0] || '');
 	let folders = $derived(await getFolders(selectedBucket?.name));
 	let selectedFolder = $derived(folders?.[0] || '');
-	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
-	let selectedPhoto = $derived(photos?.[0] || {});
+	let photos = $derived(getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
+	let selectedPhoto = $derived((await photos)?.[0] || {});
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -91,7 +90,7 @@
 				</section>
 				<div class="d-flex align-items-center gap-3">
 					<small class="badge bg-10 rounded-3">
-						в папке: <b class="text-dark">{photos?.length} фото</b>
+						в папке: <b class="text-dark">{(await photos)?.length} фото</b>
 					</small>
 					<div class="d-flex align-items-center gap-1">
 						<button
@@ -200,7 +199,7 @@
 									bucket.name
 										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
-									onclick={() => {
+									onclick={async () => {
 										selectedBucket = bucket;
 									}}
 								>
@@ -211,7 +210,7 @@
 									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedBucket.name === bucket.name
 										? 'btn-subtle theme-inverse fw-bold'
 										: ''}"
-									onclick={() => {
+									onclick={async () => {
 										selectedBucket = bucket;
 										isModalShow.bucket.delete = true;
 									}}
@@ -256,32 +255,34 @@
 
 				<div class="flex-grow-1 w-100">
 					<div class="row row-cols-1 md:row-cols-4 g-2 w-100 m-auto">
-						{#each photos as photo}
-							<div class="col position-relative">
-								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
-								<div
-									class="h-100 rounded-3 w-100 d-flex align-items-start justify-content-end hover-lift"
-									style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
-									onclick={() => {
-										selectedPhoto = photo;
-										isModalShow.photo.fullScreen = true;
-									}}
-								>
-									<button
-										title="Удалить фото"
-										class="btn btn-sm bg-20 position-absolute end-0"
-										onclick={async (e) => {
+						{#await photos then photos1}
+							{#each photos1 as photo}
+								<div class="col position-relative">
+									<!-- svelte-ignore a11y_click_events_have_key_events -->
+									<!-- svelte-ignore a11y_no_static_element_interactions -->
+									<div
+										class="h-100 rounded-3 w-100 d-flex align-items-start justify-content-end hover-lift"
+										style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
+										onclick={() => {
 											selectedPhoto = photo;
-											e.stopPropagation();
-											isModalShow.photo.delete = true;
+											isModalShow.photo.fullScreen = true;
 										}}
 									>
-										<i class="bi bi-x-lg"></i>
-									</button>
+										<button
+											title="Удалить фото"
+											class="btn btn-sm bg-20 position-absolute end-0"
+											onclick={async (e) => {
+												selectedPhoto = photo;
+												e.stopPropagation();
+												isModalShow.photo.delete = true;
+											}}
+										>
+											<i class="bi bi-x-lg"></i>
+										</button>
+									</div>
 								</div>
-							</div>
-						{/each}
+							{/each}
+						{/await}
 					</div>
 				</div>
 			</div>
@@ -469,4 +470,8 @@
 	></div>
 </Dialog>
 
-<DialogPhoto bind:isShow={isModalShow.photo.fullScreen} photo={selectedPhoto} {photos} />
+<DialogPhoto
+	bind:isShow={isModalShow.photo.fullScreen}
+	photo={selectedPhoto}
+	photos={await photos}
+/>

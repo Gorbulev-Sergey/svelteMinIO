@@ -18,12 +18,11 @@
 		onCancel = () => {}
 	}: IProps = $props();
 
-	// let id = crypto.randomUUID();
-	let id = Date.now().toString();
+	let id = crypto.randomUUID();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
-	let exif = $derived(
-		photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined
-	);
+	// let exif = $derived(
+	// 	photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined
+	// );
 
 	$effect(() => {
 		if (isShow) dialog.showModal();
@@ -57,62 +56,67 @@
 		{#if children}
 			{@render children?.()}
 		{/if}
-		{#if exif}
-			<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
-				<div
-					class="d-flex flex-column gap-0 theme-inverse bg-body bg-50 rounded-3 mb-3 p-5 flex-wrap"
-					style="max-height: 20em;"
-				>
-					{#if exif.Model}
-						<div class="text-light">Камера: <b>{exif.Model}</b></div>
-					{/if}
-					{#if exif.LensModel}
-						<div class="text-light">
-							Объектив: <b>{exif.LensModel}</b>
+
+		{#if photo?.url && photo.url.trim() !== ''}
+			{#await getPhotoEXIF(photo.url) then exif}
+				{#if exif}
+					<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
+						<div
+							class="d-flex flex-column gap-0 theme-inverse bg-body bg-50 rounded-3 mb-3 p-5 flex-wrap"
+							style="max-height: 20em;"
+						>
+							{#if exif.Model}
+								<div class="text-light">Камера: <b>{exif.Model}</b></div>
+							{/if}
+							{#if exif.LensModel}
+								<div class="text-light">
+									Объектив: <b>{exif.LensModel}</b>
+								</div>
+							{/if}
+							{#if exif.FocalLength}
+								<div class="text-light">
+									Фокусное расстояние: <b>{exif.FocalLength} мм</b>
+								</div>
+							{/if}
+							{#if exif.FNumber}
+								<div class="text-light">
+									Диафрагма: <b>{exif.FNumber}</b>
+								</div>
+							{/if}
+							{#if exif.ISO}
+								<div class="text-light">
+									ISO: <b>{exif.ISO}</b>
+								</div>
+							{/if}
+							{#if exif.ExposureMode}
+								<div class="text-light">
+									Экспозиция: <b>{exif.ExposureMode}</b>
+								</div>
+							{/if}
+							{#if exif.WhiteBalance}
+								<div class="text-light">
+									Баланс белого: <b>{exif.WhiteBalance}</b>
+								</div>
+							{/if}
+							{#if exif.ExifImageHeight}
+								<div class="text-light">
+									Разрешение: <b>{exif.ExifImageWidth}*{exif.ExifImageHeight} пикселей</b>
+								</div>
+							{/if}
+							{#if exif.Artist}
+								<div class="text-light">
+									Автор: <b>{exif.Artist}</b>
+								</div>
+							{/if}
+							{#if exif.DateTime}
+								<div class="text-light">
+									Дата: <b>{exif.DateTime}</b>
+								</div>
+							{/if}
 						</div>
-					{/if}
-					{#if exif.FocalLength}
-						<div class="text-light">
-							Фокусное расстояние: <b>{exif.FocalLength} мм</b>
-						</div>
-					{/if}
-					{#if exif.FNumber}
-						<div class="text-light">
-							Диафрагма: <b>{exif.FNumber}</b>
-						</div>
-					{/if}
-					{#if exif.ISO}
-						<div class="text-light">
-							ISO: <b>{exif.ISO}</b>
-						</div>
-					{/if}
-					{#if exif.ExposureMode}
-						<div class="text-light">
-							Экспозиция: <b>{exif.ExposureMode}</b>
-						</div>
-					{/if}
-					{#if exif.WhiteBalance}
-						<div class="text-light">
-							Баланс белого: <b>{exif.WhiteBalance}</b>
-						</div>
-					{/if}
-					{#if exif.ExifImageHeight}
-						<div class="text-light">
-							Разрешение: <b>{exif.ExifImageWidth}*{exif.ExifImageHeight} пикселей</b>
-						</div>
-					{/if}
-					{#if exif.Artist}
-						<div class="text-light">
-							Автор: <b>{exif.Artist}</b>
-						</div>
-					{/if}
-					{#if exif.DateTime}
-						<div class="text-light">
-							Дата: <b>{exif.DateTime}</b>
-						</div>
-					{/if}
-				</div>
-			</div>
+					</div>
+				{/if}
+			{/await}
 		{/if}
 
 		<button

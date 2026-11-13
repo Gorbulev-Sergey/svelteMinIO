@@ -14,7 +14,6 @@
 	}
 
 	let id = crypto.randomUUID();
-	// let id = Date.now().toString();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
 	$effect(() => {
 		if (isShow) dialog.showModal();
