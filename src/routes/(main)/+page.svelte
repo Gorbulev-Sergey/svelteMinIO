@@ -51,7 +51,7 @@
 </script>
 
 {#snippet title()}
-	<div><b>Новый макет</b></div>
+	<div><b>Хранилище</b></div>
 {/snippet}
 
 <Column>
