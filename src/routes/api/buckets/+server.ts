@@ -1,5 +1,4 @@
 import { minioClient } from '#lib/minio.ts';
-import { message } from 'valibot';
 
 export async function GET() {
 	try {
@@ -24,5 +23,22 @@ export async function POST({ request }) {
 		return new Response(JSON.stringify({ status: 'ok' }));
 	} catch (error) {
 		return new Response(JSON.stringify({ status: 'error', message: 'Ошибка создания бакета!' }));
+	}
+}
+
+export async function DELETE({ request }) {
+	let { bucket } = await request.json();
+	try {
+		// Удаляем содержимое бакета
+		const objectsStream = minioClient.listObjects(bucket, '', true);
+		for await (const obj of objectsStream) {
+			if (obj.isDir) continue;
+			await minioClient.removeObject(bucket, obj.name);
+		}
+		// Удаляем сам бакет
+		await minioClient.removeBucket(bucket);
+		return new Response(JSON.stringify({ status: 'ok' }));
+	} catch (error) {
+		return new Response(JSON.stringify({ status: 'error', message: 'Ошибка удаления бакета!' }));
 	}
 }
