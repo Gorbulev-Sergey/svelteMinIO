@@ -11,15 +11,15 @@
 		onCancel?: () => void;
 	}
 	let {
-		photo,
-		photos,
+		photo = $bindable(),
+		photos = $bindable([]),
 		children,
 		isShow = $bindable(false),
 		onCancel = () => {}
 	}: IProps = $props();
 
-	// let id = crypto.randomUUID();
-	let id = Date.now().toString();
+	let id = crypto.randomUUID();
+	// let id = Date.now().toString();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
 	let exif = $derived(
 		photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined

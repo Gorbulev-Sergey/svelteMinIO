@@ -21,12 +21,12 @@
 	import { toast } from '@gorbulevsv/toaster';
 	import { onDestroy, onMount } from 'svelte';
 
-	let buckets = $derived(await getBuckets());
-	let selectedBucket = $derived(buckets?.[0] || '');
-	let folders = $derived(await getFolders(selectedBucket?.name));
-	let selectedFolder = $derived(folders?.[0] || '');
-	let photos = $derived(await getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
-	let selectedPhoto = $derived(photos?.[0] || {});
+	let buckets = $derived(getBuckets());
+	let selectedBucket = $derived((await buckets)?.[0] || '');
+	let folders = $derived(getFolders(selectedBucket?.name));
+	let selectedFolder = $derived((await folders)?.[0] || '');
+	let photos = $derived(getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
+	let selectedPhoto = $derived((await photos)?.[0] || {});
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -193,95 +193,102 @@
 				<section class="d-flex flex-column gap-3">
 					<section class="d-flex flex-column align-items-stretch gap-1">
 						<Subtitle title="Бакеты:"></Subtitle>
-						{#each buckets as bucket}
-							<div class="btn-group">
-								<button
-									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name ===
-									bucket.name
-										? 'btn-subtle theme-inverse fw-bold'
-										: ''}"
-									onclick={() => {
-										selectedBucket = bucket;
-									}}
-								>
-									{bucket.name}
-								</button>
-								<button
-									title="Удалить бакет"
-									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedBucket.name === bucket.name
-										? 'btn-subtle theme-inverse fw-bold'
-										: ''}"
-									onclick={() => {
-										selectedBucket = bucket;
-										isModalShow.bucket.delete = true;
-									}}
-								>
-									<i class="bi bi-x-lg"></i>
-								</button>
-							</div>
-						{/each}
-					</section>
-
-					<div class="d-flex flex-column align-items-stretch gap-1">
-						<Subtitle title="Папки:"></Subtitle>
-						{#each folders as folder}
-							<div class="btn-group">
-								<button
-									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder ===
-									folder
-										? 'btn-subtle theme-inverse fw-bold'
-										: ''}"
-									onclick={() => {
-										selectedFolder = folder;
-									}}
-								>
-									{folder}
-								</button>
-								<button
-									title="Удалить папку"
-									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedFolder === folder
-										? 'btn-subtle theme-inverse fw-bold'
-										: ''}"
-									onclick={() => {
-										selectedFolder = folder;
-										isModalShow.folder.delete = true;
-									}}
-								>
-									<i class="bi bi-x-lg"></i>
-								</button>
-							</div>
-						{/each}
-					</div>
-				</section>
-
-				<div class="flex-grow-1 w-100">
-					<div class="row row-cols-1 md:row-cols-4 g-2 w-100 m-auto">
-						{#each photos as photo}
-							<div class="col position-relative">
-								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
-								<div
-									class="h-100 rounded-3 w-100 d-flex align-items-start justify-content-end hover-lift"
-									style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
-									onclick={() => {
-										selectedPhoto = photo;
-										isModalShow.photo.fullScreen = true;
-									}}
-								>
+						{#await buckets then buckets1}
+							{#each buckets1 as bucket}
+								<div class="btn-group">
 									<button
-										title="Удалить фото"
-										class="btn btn-sm bg-20 position-absolute end-0"
-										onclick={async (e) => {
-											selectedPhoto = photo;
-											e.stopPropagation();
-											isModalShow.photo.delete = true;
+										class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name ===
+										bucket.name
+											? 'btn-subtle theme-inverse fw-bold'
+											: ''}"
+										onclick={() => {
+											selectedBucket = bucket;
+										}}
+									>
+										{bucket.name}
+									</button>
+									<button
+										title="Удалить бакет"
+										class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedBucket.name ===
+										bucket.name
+											? 'btn-subtle theme-inverse fw-bold'
+											: ''}"
+										onclick={() => {
+											selectedBucket = bucket;
+											isModalShow.bucket.delete = true;
 										}}
 									>
 										<i class="bi bi-x-lg"></i>
 									</button>
 								</div>
-							</div>
-						{/each}
+							{/each}
+						{/await}
+					</section>
+
+					<div class="d-flex flex-column align-items-stretch gap-1">
+						<Subtitle title="Папки:"></Subtitle>
+						{#await folders then folders1}
+							{#each folders1 as folder}
+								<div class="btn-group">
+									<button
+										class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder ===
+										folder
+											? 'btn-subtle theme-inverse fw-bold'
+											: ''}"
+										onclick={() => {
+											selectedFolder = folder;
+										}}
+									>
+										{folder}
+									</button>
+									<button
+										title="Удалить папку"
+										class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedFolder === folder
+											? 'btn-subtle theme-inverse fw-bold'
+											: ''}"
+										onclick={() => {
+											selectedFolder = folder;
+											isModalShow.folder.delete = true;
+										}}
+									>
+										<i class="bi bi-x-lg"></i>
+									</button>
+								</div>
+							{/each}
+						{/await}
+					</div>
+				</section>
+
+				<div class="flex-grow-1 w-100">
+					<div class="row row-cols-1 md:row-cols-4 g-2 w-100 m-auto">
+						{#await photos then photos1}
+							{#each photos1 as photo}
+								<div class="col position-relative">
+									<!-- svelte-ignore a11y_click_events_have_key_events -->
+									<!-- svelte-ignore a11y_no_static_element_interactions -->
+									<div
+										class="h-100 rounded-3 w-100 d-flex align-items-start justify-content-end hover-lift"
+										style="background-image: url({photo.url}); background-repeat: no-repeat; background-position: center; background-size: cover; min-height:11.5em; cursor:pointer"
+										onclick={() => {
+											selectedPhoto = photo;
+											isModalShow.photo.fullScreen = true;
+										}}
+									>
+										<button
+											title="Удалить фото"
+											class="btn btn-sm bg-20 position-absolute end-0"
+											onclick={async (e) => {
+												selectedPhoto = photo;
+												e.stopPropagation();
+												isModalShow.photo.delete = true;
+											}}
+										>
+											<i class="bi bi-x-lg"></i>
+										</button>
+									</div>
+								</div>
+							{/each}
+						{/await}
 					</div>
 				</div>
 			</div>
@@ -425,7 +432,7 @@
 	<div
 		class="d-flex flex-column justify-content-center gap-1 alert theme-danger border-0 rounded-3 p-3"
 	>
-		{#if photos && photos.length > 0}
+		{#if (await photos) && (await photos).length > 0}
 			<div>Папка <b>{selectedFolder}</b> не пустая!</div>
 		{/if}
 		<div>Вы точно хотите удалить эту папку?</div>
@@ -469,4 +476,8 @@
 	></div>
 </Dialog>
 
-<DialogPhoto bind:isShow={isModalShow.photo.fullScreen} photo={selectedPhoto} {photos} />
+<DialogPhoto
+	bind:isShow={isModalShow.photo.fullScreen}
+	bind:photo={selectedPhoto}
+	photos={await photos}
+/>

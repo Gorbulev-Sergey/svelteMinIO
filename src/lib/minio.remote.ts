@@ -10,7 +10,7 @@ import { CACHE_CONTROL, minioClient } from './minio';
 
 export const getBuckets = query(async () => {
 	try {
-		return minioClient.listBuckets();
+		return await minioClient.listBuckets();
 	} catch (error) {
 		return [];
 	}
@@ -202,12 +202,10 @@ export const deletePhoto = command(
 );
 
 export const getPhotoEXIF = query(v.string(), async (photo) => {
-	const res = await fetch(photo);
 	const tags = await exifr.parse(photo, {
 		// Можно указать только нужные теги, чтобы еще больше ускорить процесс
 		// pick: ['Make', 'Model', 'ISO', 'FNumber']
 	});
-	// console.log(tags);
 	return tags;
 });
 
