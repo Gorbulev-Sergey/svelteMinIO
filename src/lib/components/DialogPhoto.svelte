@@ -2,6 +2,7 @@
 	import { getPhotoEXIF } from '#lib/minio.remote.ts';
 	import type { IPhoto } from '#lib/models/IPhoto.ts';
 	import { onMount, type Snippet } from 'svelte';
+	import exifr from 'exifr';
 
 	interface IProps {
 		photo?: IPhoto;
@@ -20,9 +21,6 @@
 
 	let id = crypto.randomUUID();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
-	// let exif = $derived(
-	// 	photo?.url && photo.url.trim() !== '' ? await getPhotoEXIF(photo.url) : undefined
-	// );
 
 	$effect(() => {
 		if (isShow) dialog.showModal();
@@ -58,7 +56,7 @@
 		{/if}
 
 		{#if photo?.url && photo.url.trim() !== ''}
-			{#await getPhotoEXIF(photo.url) then exif}
+			{#await exifr.parse(photo.url, {}) then exif}
 				{#if exif}
 					<div class="position-absolute d-flex justify-content-center w-100 bottom-0">
 						<div
