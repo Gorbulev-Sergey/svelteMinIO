@@ -18,15 +18,19 @@
 		uploadFile
 	} from '#lib/minio.remote.ts';
 	import { store } from '#lib/store.svelte.ts';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { toast } from '@gorbulevsv/toaster';
 	import { onDestroy, onMount } from 'svelte';
 
-	let buckets = $derived(getBuckets());
-	let selectedBucket = $derived((await buckets)?.[0] || '');
-	let folders = $derived(getFolders(selectedBucket?.name));
-	let selectedFolder = $derived((await folders)?.[0] || '');
-	let photos = $derived(getPhotos({ bucket: selectedBucket?.name, folder: selectedFolder }));
-	let selectedPhoto = $derived((await photos)?.[0] || {});
+	let { data } = $props();
+
+	let buckets = $derived(data.buckets);
+	let selectedBucket = $derived(data.bucket);
+	let folders = $derived(data.folders);
+	let selectedFolder = $derived(data.folder);
+	let photos = $derived(data.photos);
+	let selectedPhoto = $derived(photos?.[0] || {});
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
@@ -66,7 +70,7 @@
 								class="badge rounded-3"
 								onclick={async () => (selectedFolder = folders ? folders[0] : '')}
 							>
-								<b>{selectedBucket.name}:</b>
+								<b>{selectedBucket}:</b>
 							</button>
 						{/if}
 
@@ -81,10 +85,8 @@
 									?.split('/')
 									?.slice(0, i + 1)
 									?.join('/');
-								await getPhotos({
-									bucket: selectedBucket?.name,
-									folder: selectedFolder
-								}).refresh();
+								// console.log(selectedFolder);
+								// goto(`/?bucket=${selectedBucket}&folder=${selectedFolder}`);
 							}}>{item}</button
 						>
 					{/each}
@@ -193,75 +195,74 @@
 				<section class="d-flex flex-column gap-3">
 					<section class="d-flex flex-column align-items-stretch gap-1">
 						<Subtitle title="Бакеты:"></Subtitle>
-						{#await buckets then buckets1}
-							{#each buckets1 as bucket}
-								<div class="btn-group">
-									<button
-										class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name ===
-										bucket.name
-											? 'btn-subtle theme-inverse fw-bold'
-											: ''}"
-										onclick={() => {
-											selectedBucket = bucket;
-										}}
-									>
-										{bucket.name}
-									</button>
-									<button
-										title="Удалить бакет"
-										class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedBucket.name ===
-										bucket.name
-											? 'btn-subtle theme-inverse fw-bold'
-											: ''}"
-										onclick={() => {
-											selectedBucket = bucket;
-											isModalShow.bucket.delete = true;
-										}}
-									>
-										<i class="bi bi-x-lg"></i>
-									</button>
-								</div>
-							{/each}
-						{/await}
+
+						{#each buckets as bucket}
+							<div class="btn-group">
+								<button
+									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedBucket.name ===
+									bucket.name
+										? 'btn-subtle theme-inverse fw-bold'
+										: ''}"
+									onclick={() => {
+										selectedBucket = bucket;
+									}}
+								>
+									{bucket.name}
+								</button>
+								<button
+									title="Удалить бакет"
+									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedBucket.name === bucket.name
+										? 'btn-subtle theme-inverse fw-bold'
+										: ''}"
+									onclick={() => {
+										selectedBucket = bucket;
+										isModalShow.bucket.delete = true;
+									}}
+								>
+									<i class="bi bi-x-lg"></i>
+								</button>
+							</div>
+						{/each}
 					</section>
 
 					<div class="d-flex flex-column align-items-stretch gap-1">
 						<Subtitle title="Папки:"></Subtitle>
-						{#await folders then folders1}
-							{#each folders1 as folder}
-								<div class="btn-group">
-									<button
-										class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder ===
-										folder
-											? 'btn-subtle theme-inverse fw-bold'
-											: ''}"
-										onclick={() => {
-											selectedFolder = folder;
-										}}
-									>
-										{folder}
-									</button>
-									<button
-										title="Удалить папку"
-										class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedFolder === folder
-											? 'btn-subtle theme-inverse fw-bold'
-											: ''}"
-										onclick={() => {
-											selectedFolder = folder;
-											isModalShow.folder.delete = true;
-										}}
-									>
-										<i class="bi bi-x-lg"></i>
-									</button>
-								</div>
-							{/each}
-						{/await}
+
+						{#each folders as folder}
+							<div class="btn-group">
+								<button
+									class="btn btn-sm w-100 justify-content-start rounded-start-3 {selectedFolder ===
+									folder
+										? 'btn-subtle theme-inverse fw-bold'
+										: ''}"
+									onclick={() => {
+										selectedFolder = folder;
+										console.log(selectedFolder);
+										goto(`/?bucket=${selectedBucket}&folder=${selectedFolder}`);
+									}}
+								>
+									{folder}
+								</button>
+								<button
+									title="Удалить папку"
+									class="btn btn-sm rounded-end-3 fg-danger p-1 {selectedFolder === folder
+										? 'btn-subtle theme-inverse fw-bold'
+										: ''}"
+									onclick={() => {
+										selectedFolder = folder;
+										isModalShow.folder.delete = true;
+									}}
+								>
+									<i class="bi bi-x-lg"></i>
+								</button>
+							</div>
+						{/each}
 					</div>
 				</section>
 
 				<div class="flex-grow-1 w-100">
 					<div class="row row-cols-1 md:row-cols-4 g-2 w-100 m-auto">
-						{#await photos then photos1}
+						{#await data.photos then photos1}
 							{#each photos1 as photo}
 								<div class="col position-relative">
 									<!-- svelte-ignore a11y_click_events_have_key_events -->
