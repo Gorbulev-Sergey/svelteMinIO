@@ -22,8 +22,13 @@
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
 
 	$effect(() => {
-		if (isShow) dialog.showModal();
-		else dialog.close();
+		if (isShow) {
+			dialog.showModal();
+			document.body.style.overflow = 'hidden';
+		} else {
+			dialog.close();
+			document.body.style.overflow = 'auto';
+		}
 	});
 
 	onMount(async () => {
@@ -135,5 +140,8 @@
 	.my-dialog::backdrop {
 		background: #212529f0;
 		backdrop-filter: blur(1em);
+	}
+	:global(body) {
+		scrollbar-gutter: none;
 	}
 </style>

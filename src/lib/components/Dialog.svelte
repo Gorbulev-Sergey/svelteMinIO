@@ -16,8 +16,13 @@
 	let id = crypto.randomUUID();
 	let dialog = $derived(document.getElementById(id) as HTMLDialogElement);
 	$effect(() => {
-		if (isShow) dialog.showModal();
-		else dialog.close();
+		if (isShow) {
+			dialog.showModal();
+			document.body.style.overflow = 'hidden';
+		} else {
+			dialog.close();
+			document.body.style.overflow = 'auto';
+		}
 	});
 
 	let {
