@@ -10,16 +10,16 @@
 		deleteBucket,
 		deleteFolder,
 		deletePhoto,
-		downloadBucket,
-		downloadBucket1,
 		getBuckets,
 		getFolders,
 		getPhotos,
+		rrr,
 		uploadFile
 	} from '#lib/minio.remote.ts';
 	import { store } from '#lib/store.svelte.ts';
 	import { toast } from '@gorbulevsv/toaster';
 	import { onDestroy, onMount } from 'svelte';
+	import { downloadBucket3 } from '../../lib/minio.remote';
 
 	let buckets = $derived(await getBuckets());
 	let selectedBucket = $derived(buckets?.[0] || '');
@@ -103,17 +103,30 @@
 						<button
 							class="btn btn-sm rounded-3"
 							onclick={async () => {
-								const data = await downloadBucket1({ bucket: selectedBucket.name, folder: 'Зима' });
+								await rrr({ name: 'Серый', value: 'Конь' });
+								// await downloadBucket3({ bucket: selectedBucket.name, prefix: 'Зима' });
 
-								console.log(data);
+								// const zip = new JSZip();
+								// const files = await downloadBucket1({
+								// 	bucket: selectedBucket.name,
+								// 	folder: 'Зима'
+								// });
 
-								// for (const f of data) {
-								// 	const a = document.createElement('a');
-								// 	a.href = f;
-								// 	a.download = f;
-								// 	a.click();
-								// 	await new Promise((r) => setTimeout(r, 80)); // чтобы не блокировались окна
-								// }
+								// const promises = files.map(async ({ url, name }) => {
+								// 	try {
+								// 		const res = await fetch(url);
+								// 		if (!res.ok) throw new Error(`${name}: ${res.status} ${res.statusText}`);
+								// 		const blob = await res.blob(); // Readable → Blob
+								// 		zip.file(name, blob);
+								// 	} catch (e) {
+								// 		console.error('Skip', name, e);
+								// 	}
+								// });
+
+								// await Promise.allSettled(promises); // не прерываем из-за одной ошибки
+
+								// const zipBlob = await zip.generateAsync({ type: 'blob' });
+								// fileSaver.saveAs(zipBlob, 'bucket-export.zip');
 							}}>Скачать бакет <b>{selectedBucket?.name}</b></button
 						>
 

@@ -7,6 +7,7 @@ import type { Client } from 'minio';
 import path, { dirname } from 'path';
 import * as v from 'valibot';
 import { CACHE_CONTROL, minioClient } from './minio';
+import { ZipArchive } from 'archiver';
 
 export const getBuckets = query(async () => {
 	try {
@@ -43,6 +44,32 @@ export const deleteBucket = query(v.string(), async (bucket) => {
 	}
 });
 
+export const downloadBucket3 = command(
+	v.object({ bucket: v.string(), prefix: v.string() }),
+	async (data) => {
+		const items = await new Promise((resolve, reject) => {
+			const stream = minioClient.listObjects(data.bucket, data.prefix, true);
+			const itemsArr: any[] = [];
+
+			stream.on('data', (obj) => itemsArr.push(obj));
+			stream.on('end', () => resolve(itemsArr));
+			stream.on('error', (err) => {
+				stream.destroy();
+				reject(err);
+			});
+		});
+
+		const archive = new ZipArchive({ zlib: { level: 6 } });
+
+		for (const obj of items) {
+			const s3Stream = await minioClient.getObject(data.bucket, obj.key);
+			archive.append(s3Stream, { name: obj.key.replace(`${data.prefix}/`, '') });
+		}
+
+		return items;
+	}
+);
+
 export const downloadBucket1 = command(
 	v.object({ bucket: v.string(), folder: v.string() }),
 	async (data) => {
@@ -57,7 +84,9 @@ export const downloadBucket1 = command(
 					const files = await Promise.all(
 						items.map(async (obj) => ({
 							name: obj.name,
-							url: await minioClient.presignedGetObject(data.bucket, obj.name, 5 * 60)
+							url: await minioClient.presignedGetObject(data.bucket, obj.name, 5 * 60, {
+								'response-content-disposition': `attachment; filename="${obj.name}"`
+							})
 						}))
 					);
 					resolve(files);
@@ -132,14 +161,14 @@ export const addFolder = command(
 		bucket: v.string(),
 		folder: v.string()
 	}),
-	async (data) => {
-		if (data.bucket.trim() === '' && data.folder.trim() === '') return;
+	async ({ bucket, folder }) => {
+		if (bucket.trim() === '' && folder.trim() === '') return;
 
 		// folder должен быть без начального слэша, например 'images/2024'
-		const objectName = data.folder.endsWith('/') ? data.folder : data.folder + '/';
+		const objectName = folder.endsWith('/') ? folder : folder + '/';
 
 		await minioClient.putObject(
-			data.bucket,
+			bucket,
 			objectName,
 			Buffer.alloc(0), // пустой буфер
 			0 // длина
@@ -152,15 +181,15 @@ export const deleteFolder = command(
 		bucket: v.string(),
 		folder: v.string()
 	}),
-	async (data) => {
-		const objects = minioClient.listObjects(data.bucket, data.folder, true);
+	async ({ bucket, folder }) => {
+		const objects = minioClient.listObjects(bucket, folder, true);
 		const removeObjects = [];
 
 		for await (const obj of objects) {
 			removeObjects.push({ name: obj.name });
 		}
 
-		if (removeObjects.length != 0) await minioClient.removeObjects(data.bucket, removeObjects);
+		if (removeObjects.length != 0) await minioClient.removeObjects(bucket, removeObjects);
 	}
 );
 
@@ -203,16 +232,16 @@ export const addPhotos = command(
 		folder: v.string(),
 		photos: v.array(v.blob())
 	}),
-	async (data) => {
-		if (!data.photos || !(data.photos[0] instanceof Blob)) return;
+	async ({ bucket, folder, photos }) => {
+		if (!photos || !(photos[0] instanceof Blob)) return;
 
-		for (const f of data.photos) {
+		for (const f of photos) {
 			const file = f as Blob & { name: string; type: string };
 			const ext = file.name.split('.').pop()?.toLowerCase() || 'bin';
 			const key = `${crypto.randomUUID()}.${ext}`;
 
 			let buffer = Buffer.from(await file.arrayBuffer());
-			await minioClient.putObject(data.bucket, `${data.folder}/${key}`, buffer, file.size, {
+			await minioClient.putObject(bucket, `${folder}/${key}`, buffer, file.size, {
 				'Content-Type': file.type,
 				'Cache-Control': CACHE_CONTROL
 			});
@@ -225,8 +254,8 @@ export const deletePhoto = command(
 		bucket: v.string(),
 		photo: v.string()
 	}),
-	async (data) => {
-		await minioClient.removeObject(data.bucket, data.photo);
+	async ({ bucket, photo }) => {
+		await minioClient.removeObject(bucket, photo);
 	}
 );
 
