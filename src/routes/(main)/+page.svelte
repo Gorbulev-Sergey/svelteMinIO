@@ -11,6 +11,7 @@
 		deleteFolder,
 		deletePhoto,
 		downloadBucket,
+		downloadBucket1,
 		getBuckets,
 		getFolders,
 		getPhotos,
@@ -29,10 +30,15 @@
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
-	let progress = $state(10);
+	let progress = $state(0);
 
 	let isModalShow = $state({
-		bucket: { add: false, delete: false },
+		bucket: {
+			add: false,
+			delete: false,
+			download: false,
+			path: 'C:/Users/gorbu/Desktop'
+		},
 		folder: { add: false, delete: false },
 		photo: { add: false, delete: false, fullScreen: false }
 	});
@@ -96,8 +102,19 @@
 					<div class="d-flex align-items-center gap-1">
 						<button
 							class="btn btn-sm rounded-3"
-							onclick={async () => await downloadBucket(selectedBucket.name)}
-							>Скачать бакет <b>{selectedBucket?.name}</b></button
+							onclick={async () => {
+								const data = await downloadBucket1({ bucket: selectedBucket.name, folder: 'Зима' });
+
+								console.log(data);
+
+								// for (const f of data) {
+								// 	const a = document.createElement('a');
+								// 	a.href = f;
+								// 	a.download = f;
+								// 	a.click();
+								// 	await new Promise((r) => setTimeout(r, 80)); // чтобы не блокировались окна
+								// }
+							}}>Скачать бакет <b>{selectedBucket?.name}</b></button
 						>
 
 						<button
@@ -124,7 +141,7 @@
 								Папка
 							</button>
 							<button class="menu-item rounded-3" onclick={() => inputFiles?.click()}
-								>{isModalShow.photo.add ? 'Загрузка...' : 'Фотографии'}</button
+								>Фотографии</button
 							>
 							<input
 								hidden
@@ -136,7 +153,6 @@
 								onchange={async (e: Event) => {
 									const t = e.target as HTMLInputElement;
 									if (!t.files || t.files.length === 0) return;
-
 									// снимаем снапшот и сразу сбрасываем input,
 									// чтобы повторный выбор тех же файлов сработал
 									const files = Array.from(t.files);
@@ -167,7 +183,12 @@
 											}
 										};
 										await Promise.all(Array.from({ length: CONCURRENCY }, worker));
-
+										toast({
+											title: 'Сообщение',
+											content: 'Фотографии успешно добавлены!',
+											bg: 'success',
+											opacity: '10'
+										});
 										if (errors.length) {
 											// показать пользователю, какие файлы не залились
 											console.warn(

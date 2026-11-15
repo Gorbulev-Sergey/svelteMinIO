@@ -4,7 +4,7 @@ import { createWriteStream, mkdir } from 'fs';
 import { once } from 'events';
 import { access, constants } from 'fs/promises';
 import type { Client } from 'minio';
-import { dirname } from 'path';
+import path, { dirname } from 'path';
 import * as v from 'valibot';
 import { CACHE_CONTROL, minioClient } from './minio';
 
@@ -43,13 +43,42 @@ export const deleteBucket = query(v.string(), async (bucket) => {
 	}
 });
 
+export const downloadBucket1 = command(
+	v.object({ bucket: v.string(), folder: v.string() }),
+	async (data) => {
+		try {
+			const stream = minioClient.listObjects(data.bucket, data.folder, true);
+			const items: any[] = [];
+
+			let result = new Promise((resolve, reject) => {
+				stream.on('error', reject);
+				stream.on('data', (obj) => items.push(obj));
+				stream.on('end', async () => {
+					const files = await Promise.all(
+						items.map(async (obj) => ({
+							name: obj.name,
+							url: await minioClient.presignedGetObject(data.bucket, obj.name, 5 * 60)
+						}))
+					);
+					resolve(files);
+				});
+			});
+
+			// Возвращаем только файлы
+			return ((await result) as [])?.filter((o) => o.name?.at(-1) != '/');
+		} catch (e) {
+			return { status: 'error' };
+		}
+	}
+);
+
 export const downloadBucket = command(v.string(), async (bucket) => {
 	let baseDir = `C:/Users/gorbu/Desktop/${bucket}`;
 
 	// Собираем все имена объектов из потока listObjects
 	const objects = await new Promise((resolve, reject) => {
-		const names = [];
 		const stream = minioClient.listObjects(bucket, '', true);
+		const names = [];
 
 		stream.on('data', (obj) => {
 			if (obj.name) names.push(obj.name);
