@@ -61,13 +61,6 @@
 			</div>
 			<div class="d-flex align-items-center justify-content-between w-100">
 				<button
-					class="btn btn-sm rounded-3"
-					onclick={() => {
-						isShow = false;
-						onCancel();
-					}}>{buttonCancelTitle}</button
-				>
-				<button
 					class="btn btn-sm btn-solid theme-inverse rounded-3"
 					onclick={() => {
 						onOk();
@@ -76,6 +69,13 @@
 							onCancel();
 						}
 					}}>{buttonOkTitle}</button
+				>
+				<button
+					class="btn btn-sm rounded-3"
+					onclick={() => {
+						isShow = false;
+						onCancel();
+					}}>{buttonCancelTitle}</button
 				>
 			</div>
 		</div>

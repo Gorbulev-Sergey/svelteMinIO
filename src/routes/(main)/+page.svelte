@@ -29,6 +29,7 @@
 
 	let files = $state<null | FileList>();
 	let inputFiles = $state<HTMLInputElement>();
+	let progress = $state(10);
 
 	let isModalShow = $state({
 		bucket: { add: false, delete: false },
@@ -57,7 +58,7 @@
 <Column>
 	<Block>
 		<Column gap="2">
-			<div class="d-flex align-items-center justify-content-between gap-2 w-100">
+			<div class="d-flex align-items-center justify-content-between gap-3 w-100">
 				<section class="d-flex align-items-center gap-0">
 					{#each selectedFolder?.split('/') as item, i}
 						{#if i == 0}
@@ -88,7 +89,7 @@
 						>
 					{/each}
 				</section>
-				<div class="d-flex align-items-center gap-3">
+				<section class="d-flex align-items-center gap-3">
 					<small class="badge bg-10 rounded-3">
 						в папке: <b class="text-dark">{(await photos)?.length} фото</b>
 					</small>
@@ -162,7 +163,7 @@
 													errors.push({ file, error: err });
 												}
 												done++;
-												// progress = Math.round((done / files.length) * 100);
+												progress = Math.round((done / files.length) * 100);
 											}
 										};
 										await Promise.all(Array.from({ length: CONCURRENCY }, worker));
@@ -180,13 +181,20 @@
 											bucket: selectedBucket.name,
 											folder: selectedFolder
 										}).refresh();
+										progress = 0;
 									}
 								}}
 							/>
 						</div>
 					</div>
-				</div>
+				</section>
 			</div>
+
+			{#if progress > 0}
+				<div class="progress shadow-none rounded-3 mx-1" style="height: .25em;">
+					<div class="progress-bar theme-primary" style="width: {progress}%"></div>
+				</div>
+			{/if}
 
 			<div class="d-flex gap-2 w-100">
 				<section class="d-flex flex-column gap-3">
