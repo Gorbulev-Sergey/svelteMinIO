@@ -118,7 +118,6 @@ export const downloadBucket = command(v.string(), async (bucket) => {
 	});
 
 	let files = (objects as [])?.filter((o) => o?.at(-1) != '/');
-	console.log(`Найдено файлов: ${files.length}`);
 
 	const downloadPromises = files.map(async (name, i) => {
 		try {
